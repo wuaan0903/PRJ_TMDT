@@ -1,0 +1,58 @@
+
+    <div class="loader" style="display: none;">
+        <i class="bx bx-loader-circle bx-spin bx-rotate-90"></i>
+    </div>
+    <div class="containerr" style="width: 100%;">
+        <div class="shopping-cart">
+            <h1 class="heading" style="
+    margin-bottom: 30px;
+    text-align: center;
+    letter-spacing: -1px;
+    font-size: 30px;
+">Chi tiết đơn hàng</h1>
+            <!-- <% if (order) { %>
+                <h2><%= order._id %></h2> -->
+                <table id="TableSP" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; vertical-align: middle;">Ảnh</th>
+                            <th style="text-align: center; vertical-align: middle;">Tên sản phẩm</th>
+                            <th style="text-align: center; vertical-align: middle;">Size</th>
+                            <th style="text-align: center; vertical-align: middle;">Đơn giá</th>
+                            <th style="text-align: center; vertical-align: middle;">Số lượng</th>
+                            <th style="text-align: center; vertical-align: middle;">Thành Tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% let totalOrderPrice = 0; %>
+                        <% if (order.products && order.products.length > 0) { %>
+                            <% order.products.forEach(productOrder => {
+                                const { productDetails } = productOrder;
+                                const totalPrice = productDetails.price * productOrder.quantity;
+                                totalOrderPrice += totalPrice;
+                            %>
+                                <tr>
+                                    <td style="text-align: center; vertical-align: middle;">
+                                        <img src="http://localhost:3002/api/products/thumbnail/<%= productDetails.thumbnail %>" height="100" alt="" style="padding:10px 0;">
+                                    </td>
+                                    <td style="text-align: center; vertical-align: middle;"><%= productDetails.name %></td>
+                                    <td style="text-align: center; vertical-align: middle;"><%= productOrder.size %></td>
+                                    <td style="text-align: center; vertical-align: middle;"><%= productDetails.price.toLocaleString('vi-VN') %> ₫</td>
+                                    <td style="text-align: center; vertical-align: middle;"><%= productOrder.quantity %></td>
+                                    <td style="text-align: center; vertical-align: middle;"><%= totalPrice.toLocaleString('vi-VN') %> ₫</td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="6" style="text-align:center">No products found for this order.</td></tr>
+                        <% } %>
+                        <tr class="table-bottom">
+                            <td colspan="5" style="text-align: center;"><b>Tổng Cộng:</b></td>
+                            <td style="text-align: center;"><%= totalOrderPrice.toLocaleString('vi-VN') %> ₫</td>
+                        </tr>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <p>Order not found.</p>
+            <% } %>
+        </div>
+    </div>

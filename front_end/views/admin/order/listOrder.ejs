@@ -1,0 +1,410 @@
+<%- layout('../layouts/index') %>
+
+<style>
+    :root {
+        --blue: #3C91E6;
+    }
+
+    tbody {
+        font-weight: 500;
+    }
+
+    .modall {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        visibility: hidden;
+        pointer-events: none;
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    .modall.active {
+
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+
+    .overlay {
+        transition: 0.4s;
+        position: fixed;
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(269deg, #000000a1, #ffffff00);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .modall.active .overlay {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .modal-box {
+        position: fixed;
+        left: 58%;
+        top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: none;
+    width: 70%;
+    max-height: 575px;
+    overflow: auto;
+    padding: 30px 20px;
+    border-radius: 24px;
+    background-color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.4s ease;
+    transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    .modall.active .modal-box {
+        opacity: 1;
+    pointer-events: auto;
+    top: 350px;
+    }
+
+
+    #content main .table-data .head h3.active a {
+        color: #000;
+    }
+
+    .container {
+        padding: 0;
+        margin-top: 0;
+        max-width: 100%;
+    }
+
+    .containerr .shopping-cart {
+        padding: 0;
+    }
+
+    .containerr .shopping-cart table tr td {
+
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -1px;
+    }
+
+    .containerr .shopping-cart table thead th {
+        font-size: 18px;
+        letter-spacing: -1px;
+        white-space: nowrap;
+    }
+
+    .table-body {
+        max-height: 313px;
+        overflow: auto;
+    }
+
+    /* width */
+    ::-webkit-scrollbar {
+        width: 5px;
+        height: 10px;
+        transform: translateX(-10px);
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: rgb(182, 182, 182);
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgb(112, 112, 112);
+    }
+     .loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+         margin-top: 20px;
+      }
+    .loader i {
+         font-size: 3em;
+    }
+
+     .status-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .status-dropdown .status-btn {
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 4px;
+        display: inline-block;
+        white-space: nowrap;
+        position: relative; /* Add position relative to the button */
+    }
+
+    .status-dropdown .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        left: 0;
+        top: 100%;
+        border-radius: 4px;
+        padding: 5px 0;
+        white-space: nowrap;
+    }
+
+    .status-dropdown .dropdown-content a {
+        color: black;
+        padding: 8px 12px;
+        text-decoration: none;
+        display: block;
+    }
+
+    .status-dropdown .dropdown-content a:hover {
+         background-color: #f1f1f1;
+    }
+
+    .status-dropdown.active .dropdown-content {
+        display: block;
+    }
+</style>
+<main>
+    <div class="view-panell">
+        <section class="modall view">
+            <span class="overlay"></span>
+            <div class="modal-box">
+
+            </div>
+
+        </section>
+        <div id="order-container">
+             <div class="loader" style="display: flex; justify-content: center; align-items: center;"><i class="bx bx-loader-circle bx-spin bx-rotate-90"></i></div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const orderContainer = document.getElementById('order-container');
+    async function fetchOrders() {
+        try {
+            const response = await fetch('/api/orders');
+            if (!response.ok) {
+                orderContainer.innerHTML = '<p>Failed to load orders.</p>';
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const orders = await response.json();
+                orderContainer.innerHTML = '';
+            // Group orders by date
+            const ordersByDate = orders.reduce((acc, order) => {
+                const date = new Date(order.date).toLocaleDateString();
+                if (!acc[date]) {
+                    acc[date] = [];
+                }
+                acc[date].push(order);
+                return acc;
+            }, {});
+
+            // Sort dates in descending order (latest first)
+            const sortedDates = Object.keys(ordersByDate).sort((a, b) => new Date(b) - new Date(a));
+             for (const date of sortedDates) {
+                 // Sort orders within each date group by time (latest first)
+                ordersByDate[date].sort((a, b) => new Date(b.date) - new Date(a.date));
+                const dateDiv = document.createElement('div');
+                dateDiv.classList.add('date');
+                dateDiv.innerHTML = `<p>${date}</p>`;
+                orderContainer.appendChild(dateDiv);
+
+                const tableDataDiv = document.createElement('div');
+                tableDataDiv.classList.add('table-data');
+                const orderDiv = document.createElement('div');
+                orderDiv.classList.add('order');
+                const table = document.createElement('table');
+                table.classList.add('myTable');
+
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Mã đơn hàng</th>
+                            <th>Thời gian</th>
+                            <th>Họ Tên</th>
+                            <th>Số Điện Thoại</th>
+                            <th>Địa Chỉ</th>
+                            <th>Tình trạng</th>
+                            <th>Chi Tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+                const tbody = table.querySelector('tbody');
+                for (const order of ordersByDate[date]) {
+                   const user = await fetchUser(order.userId);
+                   const row = document.createElement('tr');
+                      const statusDropdown = `
+                        <div class="status-dropdown">
+                            <span class="status-btn status ${getStatusClass(order.status)}">${getStatusText(order.status)}</span>
+                           <div class="dropdown-content">
+                                <a href="#" data-status="pending" data-order-id="${order._id}">Đang chờ xử lý</a>
+                                <a href="#" data-status="processing" data-order-id="${order._id}">Đang giao hàng</a>
+                                <a href="#" data-status="completed" data-order-id="${order._id}">Đã giao hàng</a>
+                                <a href="#" data-status="cancelled" data-order-id="${order._id}">Đã hủy</a>
+                            </div>
+                        </div>
+                    `;
+                    row.innerHTML = `
+                    <td>#${order._id.slice(-2)}</td>
+                         <td>${new Date(order.date).toLocaleTimeString()}</td>
+                        <td>${user.username || 'N/A'}</td>
+                        <td>${order.phoneNumber}</td>
+                         <td>${order.address}</td>
+                         <td>${statusDropdown}</td>
+                        <td><span class="status edit" onclick="viewSp('${order._id}')">Xem</span></td>
+                    `;
+                    tbody.appendChild(row);
+                }
+                orderDiv.appendChild(table)
+                tableDataDiv.appendChild(orderDiv)
+                orderContainer.appendChild(tableDataDiv);
+            }
+            attachStatusDropdownListeners();
+        } catch (error) {
+            console.error('Error fetching or processing orders:', error);
+            orderContainer.innerHTML = '<p>Error loading orders.</p>';
+        }
+    }
+    async function fetchUser(userId) {
+        try {
+            const response = await fetch(`/api/users/${userId}`);
+             if (!response.ok) {
+                 return {name: 'N/A'}
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const user = await response.json();
+            return user;
+        } catch (error) {
+             console.error('Error fetching user:', error);
+            return { name: 'N/A' }
+        }
+    }
+    function getStatusClass(status) {
+        switch (status) {
+            case 'pending':
+                return 'delete'; // You can change 'delete' to an appropriate class
+            case 'processing':
+                return 'process';
+            case 'completed':
+                return 'complete';
+            case 'cancelled':
+                return 'cancelled';
+            default:
+                return '';
+        }
+    }
+    function getStatusText(status) {
+       switch (status) {
+            case 'pending':
+                return 'Đang chờ xử lý';
+            case 'processing':
+                return 'Đang giao hàng';
+            case 'completed':
+                return 'Đã giao hàng';
+            case 'cancelled':
+                return 'Đã hủy';
+            default:
+                return status;
+        }
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+       try {
+            const response = await fetch(`/api/orders/${orderId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+              fetchOrders();
+             console.log(`Order ${orderId} status updated to ${newStatus}`);
+         } catch (error) {
+            console.error('Error updating order status:', error);
+        }
+    }
+
+    function attachStatusDropdownListeners() {
+        document.querySelectorAll('.status-dropdown').forEach(dropdown => {
+            const btn = dropdown.querySelector('.status-btn');
+            const content = dropdown.querySelector('.dropdown-content');
+
+            btn.addEventListener('click', (e) => {
+                   e.stopPropagation();
+                dropdown.classList.toggle('active');
+            });
+
+
+            content.addEventListener('click', async (event) => {
+               if(event.target.tagName === 'A')
+               {
+                   event.preventDefault();
+                  const newStatus = event.target.getAttribute('data-status');
+                   const orderId = event.target.getAttribute('data-order-id');
+                   await updateOrderStatus(orderId, newStatus);
+                   dropdown.classList.remove('active');
+
+               }
+            });
+        });
+    }
+    async function viewSp(orderId) {
+        const modal = document.querySelector('.modall.view');
+        const modalContent = document.querySelector('.modal-box');
+        modalContent.innerHTML = '<div class="loader" style="display: flex; justify-content: center; align-items: center;"><i class="bx bx-loader-circle bx-spin bx-rotate-90"></i></div>'
+
+        
+
+        try {
+            const response = await fetch(`/admin/order/order-product/${orderId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const html = await response.text();
+            modalContent.innerHTML = html;
+        } catch (error) {
+            console.error('Error fetching modal content:', error);
+            modalContent.innerHTML = '<p>Failed to load order details.</p>';
+        }
+        modal.classList.add('active');
+    }
+
+    const modals = document.querySelectorAll('.modall');
+    modals.forEach(modal => {
+        const overlay = modal.querySelector('.overlay');
+        overlay.addEventListener('click', () => {
+            modal.classList.remove('active');
+        })
+    });
+     document.addEventListener('click', (event) => {
+        if(!event.target.closest('.status-dropdown'))
+        {
+           document.querySelectorAll('.status-dropdown.active').forEach(dropdown => {
+                dropdown.classList.remove('active');
+           });
+        }
+
+     });
+
+    fetchOrders();
+</script>

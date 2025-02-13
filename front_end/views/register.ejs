@@ -1,0 +1,68 @@
+<%- layout('layouts/index') %>
+<style>
+
+        .form-control{
+            height: 45px;
+            width: 100%;
+            outline: none;
+            font-size: 16px;
+            border-radius: 5px;
+            padding-left: 15px;
+            border: none;
+            background: #ededed;
+            transition: all 0.3s ease;
+        }
+        .btn-submit{
+            border: none;
+            padding: 20px;
+            width: 100%;
+            background: #000;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+</style>
+
+
+
+<div class="container my-5 px-5" style="padding-top:85px; margin-bottom:40px;">
+    <div class="row justify-content-center pb-5 mt-4">
+        <div class="col-md-5">
+            <div class="heading-title d-flex justify-content-center">
+                <h2 class="text-center mb-4 fw-bold fs-4">
+                    <a href="/login" style="color: #cccccc; text-decoration:none;">ĐĂNG NHẬP</a>
+                </h2>
+                <h2 class="text-center mb-4 fw-bold fs-4" style="padding-left: 20px; margin-left: 20px;border-left: 2px solid #000;padding-right: 0;margin-right: 0;border-right: none; ">ĐĂNG KÝ</h2>
+                
+            </div>
+            
+            <form id="registerForm">
+                <div class="mb-3">
+                    <label for="registerName" class="form-label fw-medium">Họ tên</label>
+                    <input type="text" class="form-control" id="registerName" placeholder="Nhập họ và tên" required>
+                </div>
+                <div class="mb-4">
+                    <label for="registerEmail" class="form-label fw-medium">Email</label>
+                    <input type="email" class="form-control" id="registerEmail" placeholder="Nhập địa chỉ Email" required>
+                </div>
+                <div class="mb-4">
+                    <label for="registerPhoneNb" class="form-label fw-medium">Số điện thoại</label>
+                    <input type="text" class="form-control" id="registerPhoneNb" placeholder="Nhập số điện thoại" required>
+                </div>
+                <div class="mb-4">
+                    <label for="registerPassword" class="form-label fw-medium">Mật khẩu</label>
+                    <input type="password" class="form-control" id="registerPassword" placeholder="Nhập mật khẩu" required>
+                </div>
+                <div class="mb-4">
+                    <label for="registerConfirmPassword" class="form-label fw-medium">Mật khẩu</label>
+                    <input type="password" class="form-control" id="registerConfirmPassword" placeholder="Xác nhận mật khẩu" required>
+                </div>
+                <div id="RegisterError" class="text-danger mb-3" style="display: none;"></div>
+                <button type="submit" class="btn-submit">ĐĂNG KÝ</button>
+                
+            </form>
+        </div>
+    </div>
+</div>  

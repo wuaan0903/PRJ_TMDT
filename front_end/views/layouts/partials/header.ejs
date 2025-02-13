@@ -1,0 +1,462 @@
+<style>
+    .sub-collection {
+        margin-right: 30px;
+        transition: 0.3s;
+    }
+
+    .sub-collection a {
+        color: rgb(255, 255, 255);
+        padding: 38px 0;
+        font-weight: 600;
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+
+    .sub-collection .sub-list {
+        display: block;
+        background: #212121;
+        min-width: 200px;
+        max-width: 180%;
+        position: absolute;
+        z-index: 99;
+        top: 150%;
+        pointer-events: none;
+        visibility: hidden;
+        opacity: 0;
+        -webkit-box-shadow: 0px 6px 15px rgb(0 0 0 / 20%);
+        box-shadow: 0px 6px 15px rgb(0 0 0 / 20%);
+        -webkit-transition: all 0.3s ease;
+        -o-transition: all 0.3s ease;
+        transition: all 0.3s ease;
+        padding: 0;
+        text-transform: uppercase;
+    }
+
+    .sub-collection .sub-list li {
+        line-height: 40px;
+        border-bottom: 1px solid #3c3c3c;
+        margin-left: 10px;
+        margin-right: 0;
+        overflow: hidden;
+    }
+
+    .sub-collection .sub-list li i {
+        position: relative;
+        left: -30px;
+        color: rgb(255, 255, 255);
+        font-size: 21px;
+        transform: translateY(5px);
+        transition: 0.3s;
+    }
+
+    .sub-collection .sub-list li a {
+        transition: 0.3s;
+        color: rgb(255, 255, 255);
+        font-size: 12.5px;
+        font-weight: 600;
+        position: relative;
+        left: -26px;
+    }
+
+    .sub-collection:hover .sub-list {
+        pointer-events: auto;
+        visibility: visible;
+        top: 100%;
+        opacity: 1;
+    }
+
+    .sub-collection .sub-list li:hover i {
+        left: 0;
+    }
+
+    .sub-collection .sub-list li:hover a {
+        left: 0;
+        font-weight: 700;
+    }
+
+    .menu-right-mobile {
+        display: none;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .header-action {
+            display: none !important;
+        }
+
+        .navbar {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        .menu-right-mobile {
+            display: block;
+            font-size: 36px;
+        }
+    }
+
+
+    .login-form {
+        position: absolute;
+        width: 368px;
+        background: #fff;
+        border: 1px solid #ddd;
+        right: 100px;
+        top: 80px;
+        border-radius: 4px;
+        box-shadow: rgb(0 0 0 / 20%) 1px 1px 4px;
+        transition: .3s ease-out;
+        opacity: 0;
+        padding: 20px;
+        transition: 0.2s;
+        transform: scale(0);
+    }
+    .show {
+        transform: scale(1);
+        transition: 0.2s;
+        opacity: 1;
+    }
+    
+    
+
+</style>
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-menu mx-auto px-5 py-3 fixed-top">
+    <div class="container-fluid">
+        <!-- Logo -->
+        <div class="header-logo">
+            <a class="nav-link" href="/">
+                <img src="http://localhost:3002/api/products/thumbnail/logo.png" alt="" style="height: 50px;">
+            </a>
+        </div>
+
+        <!-- Menu -->
+        <div class="header-menu">
+            <div class="menu-right-mobile toggle">
+                <i class='bx bx-menu menu1'></i>
+                <i class='bx bx-x close'></i>
+            </div>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto" id="collection-menu">
+                   
+                </ul>
+            </div>
+        </div>
+
+        <!-- Header Action -->
+        <div class="header-action d-flex align-items-center">
+            <!-- Search Bar -->
+            <div class="input-group me-3">
+                <input type="text" class="form-control" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
+                <button class="btn btn-outline-light" type="button">
+                    <i class='bx bx-search-alt fs-4'></i>
+                </button>
+            </div>
+
+            <!-- User Icon -->
+            <!-- User Icon / Dropdown -->
+            <div class="login" id="user-controls">
+                <i class='bx bxs-user fs-4 px-2'></i>
+            </div>
+            <div id="login-form1">
+                <div class="login-form" id="login-form" style="width: 320px;">
+                    </div>
+            </div>
+            <div class="shop">
+                <div class="icon-shop">
+                    <i class='bx bxs-shopping-bag fs-4 px-2'></i>
+                    <span class="count">
+                        <span class="count-number">0</span>
+                    </span>
+                </div>
+            </div>
+            <div class="shop-form1">
+                <div class="shop-form">
+                    <p class="boxtitle">GIỎ HÀNG</p>
+                    <div class="cart">
+                        <div class="cart-view-scroll">
+                            <div id="cart-view">
+                                <div id="loading-message" style="text-align: center;">Loading cart...</div>
+                                <div id="no-cart-message" style="display:none;text-align: center;">Your cart is empty.</div>
+                            </div>
+                        </div>
+                        <div class="cart-total">
+                            <div class="total">
+                                <h2>TỔNG TIỀN:</h2>
+                                <h3 class="total-money">0 ₫</h3>
+                            </div>
+                            <div class="cart-button">
+                                <a href="/cart" class="linktocart button " id="cart-link">XEM GIỎ HÀNG</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="menu-mobile">
+    <ul id="mobile-menu">
+        <li><a href=" ">TRANG CHỦ</a></li>
+        
+         <li><a href=" ">Xem giỏ hàng</a></li>
+        <li><a href=" ">Đăng nhập</a></li>
+    </ul>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const collectionMenu = document.getElementById('collection-menu');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const cartView = document.getElementById('cart-view');
+        const totalMoneyElement = document.querySelector('.total-money');
+        const loadingMessage = document.getElementById('loading-message');
+        const noCartMessage = document.getElementById('no-cart-message');
+        const countNumber = document.querySelector('.count-number');
+        const cartLink = document.getElementById('cart-link');
+        const userControl = document.getElementById('user-controls'); // Changed to target the user control div
+        const userControlContent = document.getElementById('login-form');
+        let userId;
+        let cartId;
+
+         // Function to format the price
+         function formatPrice(price) {
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+         // Function to fetch cart data and update cart UI
+        const fetchAndUpdateCart = (userId) => {
+                if (!userId) {
+                    loadingMessage.style.display = 'none';
+                     noCartMessage.style.display = 'block';
+                    return;
+                }
+               cartLink.href = `/cart/${userId}`;
+
+                 fetch(`/api/cart/${userId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(cartData => {
+                        cartId = cartData._id;
+                        loadingMessage.style.display = 'none';
+                         if (!cartData || !cartData.items || cartData.items.length === 0) {
+                            noCartMessage.style.display = 'block';
+                            return;
+                        }
+                        countNumber.textContent = cartData.items.length;
+                        let cartHTML = '';
+                        let total = 0;
+
+                        cartData.items.forEach(item => {
+                            // Fetch product information
+                            fetch(`/api/product/${item.productId}`)
+                                .then(productResponse => {
+                                    if (!productResponse.ok) {
+                                        throw new Error(`HTTP error! Status: ${productResponse.status}`);
+                                    }
+                                    return productResponse.json();
+                                })
+                                .then(productData => {
+                                    total += productData.price * item.quantity;
+                                    const formattedPrice = formatPrice(productData.price);
+                                    cartHTML += `
+                                        <div class="item">  
+                                            <div class="img">
+                                                <img src="http://localhost:3002/api/products/thumbnail/${productData.thumbnail}" alt="${productData.name}">
+                                            </div>
+                                            <div style="width: 100%;">
+                                                <h2 style="padding-right: 30px;">${productData.name} / Size: ${item.size}</h2>
+                                                <button class="delete" data-item-id="${item.productId}"><i class='bx bx-x'></i></button>
+                                                <input class="qty-value " type="text" readonly="" name="mnc-quantity" value="${item.quantity}">
+                                                <h3> ${formattedPrice} ₫</h3>
+                                            </div>
+                                        </div>
+                                    `;
+                                    cartView.innerHTML = cartHTML;
+                                    totalMoneyElement.textContent = `${formatPrice(total)} ₫`
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching product data:', error);
+                                    cartView.innerHTML += `<p>Error loading product information.</p>`;
+                                });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching cart data:', error);
+                        loadingMessage.style.display = 'none';
+                        cartView.innerHTML = `<p>Giỏ hàng hiện đang trống ! </p>`;
+                    });
+
+            }
+
+        fetch('/auth/user')
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    // Redirect to login page if not logged in
+                    userControl.addEventListener('click', function() {
+                        window.location.href = '/login';
+                    });
+
+                     userControlContent.innerHTML = `
+                     <a id="login-btn" href="/login">
+                         <i class='bx bx-user fs-4 px-2'></i>
+                     </a>
+                 `;
+                 throw new Error('Not logged in');
+
+                }
+            })
+            .then(userData => {
+                 userId = userData.user.user._id;
+                userControlContent.innerHTML = `
+    <div>
+        <h3 style="font-size: 16px; text-align: center; padding-bottom: 10px; margin-bottom: 20px; border-bottom: 1px solid #909090;color: #000; font-weight: 600;">
+            THÔNG TIN TÀI KHOẢN
+        </h3>
+        <ul style="text-align: left; float: left; line-height: 40px; display: block; width: 100%; margin:0;">
+            <li class="user-name">
+                <i class="bx bxs-user" style="color: #004da1; transform: translateY(2px);"></i>
+                <span style="color: #004da1; font-size: 16px; font-weight: 800;">${userData.user.user.username}</span>
+                <i class="bx bx-star" style="color: #ff0000; transform: translateY(2px);"></i>
+            </li>
+            <li>
+                <i class="bx bxs-user-account" style="color: #000; transform: translateY(2px);"></i>
+                <a href="" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;">Tài khoản của tôi</a>
+                <i class="bx bx-chevron-right" style="color: #000; transform: translateY(10px); float: right; font-size: 24px;"></i>
+            </li>
+            <li>
+                <i class="bx bxs-cart" style="color: #000; transform: translateY(2px);"></i>
+                <a href="" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;"">Danh sách đơn hàng</a>
+                <i class="bx bx-chevron-right" style="color: #000; transform: translateY(10px); float: right; font-size: 24px;"></i>
+            </li>
+            <li>
+                <i class="bx bx-log-out" style="color: #000; transform: translateY(2px);"></i>
+                <a href="/auth/logout" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;">Đăng xuất</a>
+                <i class="bx bx-chevron-right" style="color: #000; transform: translateY(10px); float: right; font-size: 24px;"></i>
+            </li>
+        </ul>
+    </div>
+
+                `;
+                 // Initialize Bootstrap dropdown
+                 const dropdownElementList = document.querySelectorAll('.dropdown-toggle')
+                 dropdownElementList.forEach(dropdownToggleEl => {
+                    new bootstrap.Dropdown(dropdownToggleEl)
+                })
+                fetchAndUpdateCart(userId);
+            })
+            .catch(error => {
+                console.log("User is not logged in (HEADER) ", error);
+            });
+
+
+         //fetch and render collections and categories
+       fetch('/api/collections')
+            .then(response => response.json())
+            .then(collections => {
+               let menuHTML = '';
+               let mobileMenuHTML = '';
+               collections.forEach(collection => {
+                   menuHTML += `
+                        <li class="sub-collection">
+                            <a href="#">
+                                ${collection.name}
+                                <i class='bx bx-chevron-down'></i>
+                            </a>
+                            <ul class="sub-list">
+                             
+                            </ul>
+                        </li>
+                   `;
+                   mobileMenuHTML += `
+                    <li>
+                        <div class="list">
+                            <a href="#">
+                                ${collection.name}
+                                <i class='bx bx-chevron-down'></i>
+                            </a>
+                        </div>
+                        <ul class="sub-list">
+                         
+                        </ul>
+                    </li>
+                   `
+               });
+               collectionMenu.innerHTML = menuHTML;
+               mobileMenu.innerHTML += mobileMenuHTML;
+
+               //Fetch and render categories for each collection
+               collections.forEach(collection => {
+                    fetch(`/api/categories?collectionId=${collection._id}`)
+                        .then(response => response.json())
+                        .then(categories => {
+                            const subList = document.querySelector(`#collection-menu li:nth-child(${collections.indexOf(collection) + 1}) .sub-list`);
+                            const mobileSubList = document.querySelector(`#mobile-menu li:nth-child(${collections.indexOf(collection) + 2}) .sub-list`);
+                            let categoryHTML = '';
+                            let mobileCategoryHTML = '';
+                                categories.forEach(category => {
+                                    categoryHTML += `
+                                        <li>
+                                             <i class='bx bx-chevrons-right'></i>
+                                            <a href="/filter?categoryId=${category._id}">
+                                                ${category.name}
+                                            </a>
+                                        </li>
+                                    `;
+                                    mobileCategoryHTML += `
+                                        <li>
+                                            <a href="/filter?categoryId=${category._id}">
+                                                 ${category.name}
+                                            </a>
+                                        </li>
+                                    `;
+                                });
+                                if (subList) {
+                                        subList.innerHTML = categoryHTML;
+                                    }
+                                 if(mobileSubList){
+                                    mobileSubList.innerHTML = mobileCategoryHTML;
+                                 }
+                            })
+                            .catch(error => console.error('Error fetching categories:', error));
+               });
+
+            })
+            .catch(error => console.error('Error fetching collections:', error));
+
+
+
+          //Handle item deletion
+            document.addEventListener('click', async function (event) {
+                if (event.target.classList.contains('bx-x')) {
+                    const deleteButton = event.target.closest('.delete');
+                    if (deleteButton) {
+                        const itemIdToDelete = deleteButton.getAttribute('data-item-id');
+                            if (!userId || !cartId) return;
+                        try {
+                            const response = await fetch(`/api/cart/${cartId}/${itemIdToDelete}`, {
+                                method: 'DELETE',
+                            });
+                             if (response.ok) {
+                                deleteButton.closest('.item').remove();
+                                 fetchAndUpdateCart(userId);
+
+                            } else {
+                                console.error("Failed to delete item from cart.");
+                            }
+                        } catch (error) {
+                            console.error('Error during deletion:', error);
+                        }
+                    }
+                }
+            });
+
+    });
+
+</script>

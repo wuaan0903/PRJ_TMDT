@@ -1,0 +1,51 @@
+<%- layout('layouts/index') %>
+<style>
+    .form-control{
+        height: 45px;
+        width: 100%;
+        outline: none;
+        font-size: 16px;
+        border-radius: 5px;
+        padding-left: 15px;
+        border: none;
+        background: #ededed;
+        transition: all 0.3s ease;
+    }
+    .btn-submit{
+        border: none;
+        padding: 20px;
+        width: 100%;
+        background: #000;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+</style>
+<div class="container my-5 px-5" style="padding-top:85px; margin-bottom:40px;">
+    <div class="row justify-content-center pb-5 mt-4">
+        <div class="col-md-5">
+            <div class="heading-title d-flex justify-content-center">
+                <h2 class="text-center mb-4 fw-bold fs-4">ĐĂNG NHẬP</h2>
+                <h2 class="text-center mb-4 fw-bold fs-4">
+                    <a href="/register" style="padding-left: 20px; margin-left: 20px;border-left: 2px solid #000;padding-right: 0;margin-right: 0;border-right: none; color: #cccccc; text-decoration:none;">ĐĂNG KÝ</a>
+                </h2>
+            </div>
+            
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="loginEmail" class="form-label fw-medium">Email</label>
+                    <input type="email" class="form-control" id="loginEmail" placeholder="Email" required>
+                </div>
+                <div class="mb-4">
+                    <label for="loginPassword" class="form-label fw-medium">Mật khẩu</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="Mật khẩu" required>
+                </div>
+                <div id="loginError" class="text-danger mb-3" style="display: none;"></div>
+                <button type="submit" class="btn-submit">ĐĂNG NHẬP</button>
+                
+            </form>
+        </div>
+    </div>
+</div>  

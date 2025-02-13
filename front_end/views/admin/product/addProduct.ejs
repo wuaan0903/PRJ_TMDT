@@ -1,0 +1,326 @@
+<%- layout('../layouts/index') %>
+
+    <main>
+
+        <div class="border rounded-4 bg-white">
+            <div class="p-3 border-bottom">
+                <h2 class="fs-4 m-0">
+                    <%= typeof product !=='undefined' ? 'Sửa sản phẩm' : 'Sản phẩm mới' %>
+                </h2>
+            </div>
+            <div class="p-3">
+                <form accept-charset="UTF-8" id="form-add-product" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" value="v0QILKcDHctZK0wGCXSTH2JzwgYyhdtEJ02exwIs">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="name" class="form-label">Tên sản phẩm</label>
+                            <input type="text" class="form-control" name="name" placeholder="Tên sản phẩm"
+                                value="<%= typeof product !== 'undefined' ? product.name : '' %>">
+                        </div>
+                        <div class="col">
+                            <label for="price" class="form-label">Giá bán</label>
+                            <input type="text" class="form-control price" name="price" placeholder="Giá bán"
+                                value="<%= typeof product !== 'undefined' ? product.price : '' %>" aria-label="Giá bán">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="desc" class="form-label">Mô tả sản phẩm</label>
+                            <textarea class="form-control" name="desc" rows="5"
+                                placeholder=""><%= typeof product !== 'undefined' ? product.
+                                description : '' %></textarea>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="Collection" class="form-label">Bộ sưu tập</label>
+                                <select id="collection" class="form-select" name="collection"
+                                    aria-label="Default select example">
+                                    <option value="none">Chọn bộ sưu tập</option>
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label for="Category" class="form-label">Danh mục</label>
+                                <select id="category" class="form-select" name="category"
+                                    aria-label="Default select example">
+                                    <option value="none">Chọn danh mục</option>
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="Upload-Thumbnail" class="form-label">Upload Thumbnail</label>
+                            <div class="input-group mb-3">
+                                <input type="file" name="thumbnail" id="thumbnail" class="form-control"
+                                    onchange="previewThumbnail()">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div id="ThumbnailPreview" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                <% if (typeof product !=='undefined' && product.thumbnail) { %>
+                                    <img src="http://localhost:3002/api/products/thumbnail/<%= product.thumbnail %>" alt="Thumbnail"
+                                        style="max-width: 100px; max-height: 100px;">
+                                    <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="Upload-Image" class="form-label">Upload ảnh sản phẩm</label>
+                            <div class="input-group mb-3">
+                                <input type="file" name="images[]" id="images" class="form-control" multiple
+                                    onchange="previewImages()">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div id="imagePreview" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                <!-- Image previews will be added here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">
+                            <%= typeof product !=='undefined' ? 'Cập nhật sản phẩm' : 'Lưu sản phẩm' %>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const categorySelect = document.getElementById('category');
+            const collectionSelect = document.getElementById('collection');
+            const selectedCategoryId = '<%= typeof product !== "undefined" ? product.categories._id : "" %>';
+            const selectedCollectionId = '<%= typeof product !== "undefined" && product.categories ? product.categories.collection_id : "" %>';
+            const form = document.getElementById('form-add-product');
+            const imagePreview = document.getElementById('imagePreview');
+            const isEditing = '<%= typeof product !== "undefined" %>' === 'true';
+            const productId = '<%= typeof product !== "undefined" ? product._id : "" %>';
+            const thumbnail = document.getElementById('thumbnail');
+            const images = document.getElementById('images');
+
+            // Fetch and populate collections on page load
+            fetch('/api/collections')
+                .then(response => response.json())
+                .then(collections => {
+                    collections.forEach(collection => {
+                        const option = document.createElement('option');
+                        option.value = collection._id;
+                        option.text = collection.name;
+                        if (collection._id === selectedCollectionId) {
+                            option.selected = true; // Set default selected collection
+                        }
+                        collectionSelect.appendChild(option);
+                    });
+
+                    // Immediately fetch categories for the selected collection
+                    if (selectedCollectionId) {
+                        fetchCategories(selectedCollectionId);
+                    }
+                })
+                .catch(error => console.error('Error fetching collections:', error));
+
+            // Event listener to fetch categories when the collection changes
+            collectionSelect.addEventListener('change', function () {
+                const collectionId = this.value;
+                fetchCategories(collectionId);
+            });
+
+            function fetchCategories(collectionId) {
+                // Clear previous categories
+                categorySelect.innerHTML = '<option value="none">Chọn danh mục</option>';
+
+                // Fetch categories for the selected collection
+                fetch(`/api/categories?collectionId=${collectionId}`) // Ensure your API supports filtering by collection
+                    .then(response => response.json())
+                    .then(categories => {
+                        categories.forEach(category => {
+                            const option = document.createElement('option');
+                            option.value = category._id;
+                            option.text = category.name;
+                            if (category._id === selectedCategoryId) {
+                                option.selected = true; // Set default selected category if applicable
+                            }
+                            categorySelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching categories:', error));
+            }
+
+            // Fetch and populate product images if editing
+            if (isEditing) {
+                fetch(`/api/product/image/${productId}`)
+                    .then(response => response.json())
+                    .then(images => {
+                        images.forEach(image => {
+                            const imgContainer = document.createElement('div');
+                            imgContainer.style.position = 'relative';
+                            imgContainer.style.display = 'inline-block';
+
+                            const imgElement = document.createElement('img');
+                            imgElement.src = `http://localhost:3002/api/imageProduct/serve/${image.image_url}`;
+                            imgElement.style.maxWidth = '100px';
+                            imgElement.style.maxHeight = '100px';
+
+                            const deleteButton = document.createElement('button');
+                            deleteButton.textContent = 'x';
+                            deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
+                            deleteButton.style.position = 'absolute';
+                            deleteButton.style.top = '0';
+                            deleteButton.style.right = '0';
+                            deleteButton.style.lineHeight = '0.8'
+                            deleteButton.onclick = function () {
+                                deleteImage(image._id, imgContainer);
+                            };
+
+                            imgContainer.appendChild(imgElement);
+                            imgContainer.appendChild(deleteButton)
+                            imagePreview.appendChild(imgContainer);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching product images:', error));
+            }
+
+            // Function to handle image deletion
+            async function deleteImage(imageId, imageContainer) {
+                if (confirm('Bạn có chắc muốn xóa ảnh này không?')) {
+                    try {
+                        const response = await fetch(`/api/product/image/${imageId}`, {
+                            method: 'DELETE',
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to delete image.');
+                        }
+                        imageContainer.remove();
+                        console.log('Image deleted successfully')
+                    } catch (error) {
+                        console.error('Error deleting image:', error);
+                        alert('Error deleting image: ' + error.message);
+                    }
+                }
+            }
+
+            // Form submission handler
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const isEditing = '<%= typeof product !== "undefined" %>' === 'true';
+                const productId = '<%= typeof product !== "undefined" ? product._id : "" %>';
+                const hasNewThumbnail = formData.get('thumbnail').size > 0;
+                const hasNewImages = formData.getAll('images[]').some(file => file.size > 0);
+
+                try {
+                    // First, handle the product data
+                    const productData = {
+                        name: formData.get('name'),
+                        price: formData.get('price'),
+                        description: formData.get('desc'),
+                        categories: formData.get('category'),
+                    };
+
+                    // Product API call
+                    const productResponse = await fetch(isEditing ? `/api/product/${productId}` : '/api/product', {
+                        method: isEditing ? 'PUT' : 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(productData)
+                    });
+
+                    if (!productResponse.ok) {
+                        throw new Error('Failed to save product data');
+                    }
+
+                    const savedProduct = await productResponse.json();
+
+                    //handle thumbnail
+                    if (hasNewThumbnail) {
+                        const thumbnailFormData = new FormData()
+                        thumbnailFormData.append('thumbnail', formData.get('thumbnail'));
+                        const test = thumbnailFormData.get('thumbnail');
+                            
+                        const thumbnailResponse = await fetch(`http://localhost:3002/api/products/${savedProduct._id}`, {
+                            method: 'PUT',
+                            body: thumbnailFormData
+                        });
+                        if (!thumbnailResponse.ok) {
+                            throw new Error('Failed to upload thumbnail');
+                        }
+                    }
+                    //handle images
+                    if (hasNewImages) {
+                        const imageFormData = new FormData();
+                        const imageFiles = formData.getAll('images[]');
+                        imageFiles.forEach(file => {
+                            imageFormData.append('images', file);
+                        });
+                        imageFormData.append('product_id', savedProduct._id);
+                        const imageResponse = await fetch(`http://localhost:3002/api/imageProduct/`, {
+                            method: 'POST',
+                            body: imageFormData
+                        });
+
+                        if (!imageResponse.ok) {
+                            throw new Error('Failed to upload images');
+                        }
+                    }
+                    // Redirect after successful submission
+                    window.location.href = '/admin/products';
+
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error saving product: ' + error.message);
+                }
+            });
+        });
+
+
+        function previewThumbnail() {
+            const preview = document.getElementById('ThumbnailPreview');
+            const thumbnail = document.getElementById('thumbnail');
+            preview.innerHTML = "";
+            if (thumbnail.files && thumbnail.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const image = document.createElement('img');
+                    image.src = e.target.result;
+                    image.style.maxWidth = '100px';
+                    image.style.maxHeight = '100px';
+                    preview.appendChild(image);
+                }
+                reader.readAsDataURL(thumbnail.files[0]);
+            }
+        }
+
+        function previewImages() {
+            const preview = document.getElementById('imagePreview');
+            const files = document.getElementById('images').files;
+            // Check if any files are selected
+            if (!files || files.length === 0) return
+            preview.innerHTML = "";
+
+            for (const file of files) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const image = document.createElement('img');
+                    image.src = e.target.result;
+                    image.style.maxWidth = '100px';
+                    image.style.maxHeight = '100px';
+                    preview.appendChild(image);
+                }
+                reader.readAsDataURL(file);
+            }
+
+        }
+    </script>

@@ -1,0 +1,121 @@
+<%- layout('layouts/index') %>
+
+<main id="view-panel">
+    <!-- BOX INFO -->
+    <ul class="box-info p-0">
+        <li>
+            <i class='bx bxs-calendar-check'></i>
+            <span class="text">
+                <h3><%= totalOrders %></h3>
+                <p>Đơn hàng mới</p>
+            </span>
+        </li>
+        <li>
+            <i class='bx bxs-package'></i>
+            <span class="text">
+                <h3><%= totalProducts %></h3>
+                <p>Sản phẩm</p>
+            </span>
+        </li>
+        <li>
+            <i class='bx bxs-dollar-circle'></i>
+            <span class="text">
+                <h3><%= totalRevenue.toLocaleString('vi-VN') %> ₫</h3>
+                <p>Doanh thu</p>
+            </span>
+        </li>
+    </ul>
+
+    <!-- TABLE DATA -->
+    <div class="table-data">
+        <!-- ORDER TABLE -->
+        <div class="order">
+            <div class="head">
+                <h3>Đơn hàng hôm nay</h3>
+                <div>
+                    <i class='bx bx-search'></i>
+                    <i class='bx bx-filter'></i>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã đơn hàng</th>
+                        <th>Tên khách hàng</th>
+                        <th>Ngày đặt hàng</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orders.forEach(order => { %>
+                        <tr>
+                            <td>
+                                <p><%= order._id %></p>
+                            </td>
+                            <td>
+                                <p><%= order.username %></p>
+                            </td>
+                            <td>
+                                <p><%= order.date %></p>
+                            </td>
+                            <td>
+                                <span class="status <%= order.status %>"><%= order.status %></span>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TODO LIST -->
+        <div class="todo">
+            <div class="head">
+                <h3>Danh mục</h3>
+                <div>
+                    <i class='bx bx-plus'></i>
+                    <i class='bx bx-filter'></i>
+                </div>
+            </div>
+            <ul class="todo-list p-0">
+                <li class="completed">
+                  <% collections.forEach(collection => { %>
+                    <div class="li-content">
+                        <p style="z-index: 1; margin:0;"><%= collection.name %></p>
+                        <i style="z-index: 1;" class='bx bx-dots-vertical-rounded'></i>
+                        <div class="linee"></div>
+                    </div>
+                  <% }) %>
+                </li>
+            </ul>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Function to check user role from the backend
+    async function checkUserRole() {
+        try {
+            const response = await fetch('/auth/user'); // Make the request to the api
+            if (!response.ok) {
+              window.location.href = '/';
+                return false;
+            }
+            const data = await response.json(); // get the data back from api
+            if (data.success && data.user && data.user.user.role === 'admin') {
+                return true
+            }
+            window.location.href = '/'; // if not admin, redirect
+             return false;
+        } catch (error) {
+            console.error('Error checking user role:', error);
+             window.location.href = '/'; // if error, redirect
+             return false;
+        }
+    }
+
+
+    // Check user role on page load
+    document.addEventListener('DOMContentLoaded', async function() {
+        await checkUserRole();
+    });
+</script>

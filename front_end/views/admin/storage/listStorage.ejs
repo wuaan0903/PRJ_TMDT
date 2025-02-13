@@ -1,0 +1,101 @@
+<%- layout('../layouts/index') %>
+
+<main>
+    <div class="border rounded-4 bg-white">
+        <div class="p-3 border-bottom">
+            <h2 class="fs-4 m-0">Kho hàng sản phẩm</h2>
+        </div>
+        <div class="table-data">
+            <div class="order">
+                <table class="myTable">
+                    <thead>
+                        <tr>
+                            <th>Hình ảnh sản phẩm</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <!-- Product rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const productTableBody = document.getElementById('productTableBody');
+
+        // Function to fetch products and render the table
+        async function fetchProducts() {
+            try {
+                const response = await fetch('/api/products');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const products = await response.json();
+                renderProductTable(products);
+            } catch (error) {
+                console.error('Failed to fetch products:', error);
+                productTableBody.innerHTML = '<tr><td colspan="4">Failed to load products.</td></tr>';
+            }
+        }
+
+
+         async function fetchProductQuantity(productId) {
+            try {
+                const response = await fetch(`/api/product-quantity/${productId}`);
+                  if (response.ok) {
+                    const quantityData = await response.json();
+                    return quantityData.reduce((acc, cur) => acc + cur.quantity, 0);
+                }
+                 return null;
+            } catch (error) {
+                console.error(`Failed to fetch quantity for product ${productId}:`, error);
+                return null;
+            }
+        }
+
+        async function renderProductTable(products) {
+            productTableBody.innerHTML = ''; // Clear existing rows
+
+            for (const product of products) {
+                try {
+                   const quantity = await fetchProductQuantity(product._id)
+                   const quantityDisplay = quantity != null ? quantity : 'N/A'
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                         <td><img class="imgProduct" style="width: 100px;height: 100px;" src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}"></td>
+                        <td>${product.name}</td>
+                         <td>
+                            <span class="quantity-display" id="quantity-${product._id}">${quantityDisplay}</span>
+                        </td>
+                       <td><a href="/admin/storage/edit/${product._id}" class="btn btn-primary edit-quantity-from-detail">Edit Quantity</a></td>
+                    `;
+                  productTableBody.appendChild(row);
+
+
+                } catch (error) {
+                    console.error(`Failed to fetch quantity for product ${product._id}:`, error);
+                      const row = document.createElement('tr');
+                      row.innerHTML = `
+                         <td><img class="imgProduct" style="width: 100px;height: 100px;" src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}"></td>
+                        <td>${product.name}</td>
+                         <td>
+                            <span class="quantity-display" id="quantity-${product._id}">N/A</span>
+                        </td>
+                        <td><a href="/admin/storage/edit/${product._id}" class="btn btn-primary edit-quantity-from-detail">Edit Quantity</a></td>
+                    `;
+                    productTableBody.appendChild(row);
+                }
+
+            }
+        }
+
+        // Initial fetch of products
+        fetchProducts();
+    });
+</script>

@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Launch Node.js",
+        "type": "node",
+        "request": "launch",
+        "program": "${workspaceFolder}/server.js",
+        "console": "integratedTerminal",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "env": {
+          "NODE_ENV": "development"
+        },
+        "outFiles": [
+          "${workspaceFolder}/dist/**/*.js"
+        ]
+      },
+      {
+        "name": "Launch Firefox",
+        "type": "firefox",
+        "request": "launch",
+        "url": "http://localhost:3000"
+      }
+    ]
+  }

@@ -1,0 +1,126 @@
+<%- layout('../layouts/index') %>
+
+<main>
+    <div class="border rounded-4 bg-white">
+        <div class="p-3 border-bottom">
+            <h2 class="fs-4 m-0">Cập nhật kho hàng</h2>
+        </div>
+
+        <div class="p-3">
+            <form accept-charset="UTF-8" id="form-add-product" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="_token" value="2eqSpwVyxE4tFb0uDtR0CSvNnFCxfxRSvHpw1BP7">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="exampleFormControlInput1" class="form-label">Tên sản phẩm</label>
+                        <input type="hidden" name="productId" value="<%= productQuantity[0].product_id %>">
+                        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Tên sản phẩm" name="name" value="" readonly>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="size" class="form-label">Danh sách Size và Số lượng</label>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Size</th>
+                                <th>Số lượng</th>
+                                <th>Mô tả</th>
+                                <th>Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <% const sizeLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL']; %>
+                                <% sizeLabels.forEach((size, index) => { %>
+                                <tr>
+                                    <td><%= index + 1 %></td>
+                                    <td>
+                                        <input type="hidden" name="sizes[]" value="<%= size %>">
+                                        <%= size %>
+                                    </td>
+                                    <td>
+                                        <% 
+                                            let quantity = 0;
+                                            const quantities = productQuantity ? productQuantity : [];
+                                            const foundQuantity = quantities.find(q => q.size === size);
+                                            if(foundQuantity) {
+                                                quantity = foundQuantity.quantity;
+                                            }
+                                        %>
+                                        <input type="number" class="form-control price" name="quantity[]" placeholder="0" value="<%= quantity %>" aria-label="Số lượng" min="0">
+                                    </td>
+                                    <td>
+                                        <span id="descQuantity-<%= index + 1 %>">Trong kho còn lại <b><%= quantity %></b> sản phẩm</span>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-success btn-update-row" data-size="<%= size %>" data-row-index="<%= index + 1 %>">Cập nhật</button>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+
+                         <!-- Trường ẩn để lưu trữ dữ liệu sizeQuantities -->
+                        <input type="hidden" id="size-quantities" name="size_quantities">
+
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+          const productId = document.querySelector('input[name="productId"]').value;
+          const productNameInput = document.querySelector('input[name="name"]');
+           try {
+                const response = await fetch(`/api/product/${productId}`);
+                 if(response.ok){
+                     const data = await response.json();
+                     productNameInput.value = data.name;
+                 } else {
+                   console.error('Failed to fetch product name:', response.status, response.statusText);
+                  productNameInput.value = "Failed to load product name";
+                }
+                
+            } catch(error) {
+              console.error('Error fetch product name:', error);
+              productNameInput.value = "Failed to load product name";
+            }
+        const updateButtons = document.querySelectorAll('.btn-update-row');
+        updateButtons.forEach(button => {
+            button.addEventListener('click', async function() {
+              const size = this.getAttribute('data-size');
+              const rowIndex = this.getAttribute('data-row-index');
+              const quantityInput = document.querySelector(`tbody tr:nth-child(${rowIndex}) input[name="quantity[]"]`);
+              const quantity = quantityInput.value;
+
+            try{
+                const response = await fetch(`/api/product-quantity/${productId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            size: size,
+                            quantity: quantity
+                         }),
+                     });
+                      const data = await response.json();
+                      if (response.ok) {
+                        document.querySelector(`#descQuantity-${rowIndex} b`).textContent = quantity;
+                      } else{
+                         console.error('Error updating quantity:', data.message || 'Failed to update product quantity');
+                        alert('Failed to update quantity')
+                      }
+                } catch(error){
+                 console.error('Error updating quantity:', error);
+                   alert('An error occurred while updating product quantity.')
+                }
+            });
+        });
+    });
+</script>

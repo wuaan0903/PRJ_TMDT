@@ -1,0 +1,183 @@
+.container-test{
+    max-width: 450px;
+    width: 100%;
+}
+
+.container-test .heading{
+  padding-top: 20px
+}
+.heading-page{
+    display: flex;
+    justify-content: center;
+    color: #000;
+    text-transform: uppercase;
+}
+.heading-page a{
+    color: #cccccc;
+    padding-right: 20px;
+    margin-right: 20px;
+    border-right: 2px solid #000;
+}
+.content{
+    display: flex;
+    justify-content: center;
+    padding: 0 10px 20px 10px;
+}
+.content form .user-details{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 20px 0 12px 0;
+    flex-direction: column;
+  }
+
+  .input-box .img{
+    display: none;
+  }
+  .input-box .img.active{
+    display: block;
+  }
+  form .user-details .input-box{
+    margin-bottom: 15px;
+    width: 100%;
+  }
+  form .input-box span.details{
+    display: block;
+    font-weight: 500;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  form .input-box .title-details .details{
+    color:#cccccc;
+  }
+  form .input-box span.details.active{
+    font-weight: 800;
+    color: #000;
+  }
+  #form-register{
+    width: 100%;
+  }
+  .footer-button{
+    display: flex;
+    justify-content: end;
+  }
+  #collection,#category,#collection1,#category1{
+    padding: 10px;
+    width: 100%;
+    font-size: 16px;
+  }
+  .collection-category,.price-product{
+    display: flex;
+    justify-content: space-between;
+  }
+  .collection-category .input-box.active{
+    width: 45%;
+  }
+  .price-product .input-box.active{
+    width: 45%;
+  }
+  .user-details .input-box input{
+    height: 45px;
+    width: 100%;
+    outline: none;
+    font-size: 16px;
+    border-radius: 5px;
+    padding-left: 15px;
+    border: none;
+    background:#ffffff;
+    border: 1px solid #8b8b8b;
+    transition: all 0.3s ease;
+  }
+  .user-details .input-box #fileToUpload1{
+    padding-left: 0;
+    border: none;
+    transition: all 0.3s ease;
+    display: none;
+  }
+  .user-details .input-box #fileToUpload2{
+    padding-left: 0;
+    border: none;
+    transition: all 0.3s ease;
+    display: none;
+  }
+
+  .user-details .input-box .img label{
+    background: #000;
+    color: #fff;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .user-details .input-box .img label i{
+    font-size: 20px;
+    transform: translateY(4px);
+  }
+  .user-details .input-box .img span{
+    white-space: nowrap;
+    display: inline-grid;
+    max-width: 230px;
+    overflow: hidden;
+    letter-spacing: -1px;
+    font-weight: 500;
+  }
+
+   form .gender-details .gender-title{
+    font-size: 16px;
+    font-weight: 500;
+   }
+   form .category{
+     display: flex;
+     width: 80%;
+     margin: 14px 0 ;
+     justify-content: space-between;
+   }
+   form .category label{
+     display: flex;
+     align-items: center;
+     cursor: pointer;
+   }
+
+   form input[type="radio"]{
+     display: none;
+   }
+   form .footer-button button{
+    border: none;
+    padding: 20px;
+    width: 40%;
+    background: #000;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+   }
+
+
+
+
+   @media(max-width: 584px){
+
+  form .user-details .input-box{
+      margin-bottom: 15px;
+      width: 100%;
+    }
+    form .category{
+      width: 100%;
+    }
+    .content form .user-details{
+      max-height: 300px;
+      overflow-y: scroll;
+    }
+    .user-details::-webkit-scrollbar{
+      width: 5px;
+    }
+    }
+    @media(max-width: 459px){
+    .container .content .category{
+      flex-direction: column;
+    }
+  }
+  
