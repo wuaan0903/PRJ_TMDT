@@ -37,16 +37,20 @@ app.get('/', (req, res) => {
   res.render('home'); // Renders the home.ejs file
 });
 
+app.get('/login', (req, res) => {
+  res.render('login');
+})
+app.get('/register', (req, res) =>{
+  res.render('register');
+});
 
 
-
-
-// app.get('/admin', (req, res) => {
-//   res.render('admin/home'); // Renders the home.ejs file
-// });
-// app.get('/admin/home', (req, res) => {
-//   res.render('admin/home'); // Renders the home.ejs file
-// });
+app.get('/admin', (req, res) => {
+  res.render('admin/home'); // Renders the home.ejs file
+});
+app.get('/admin/home', (req, res) => {
+  res.render('admin/home'); // Renders the home.ejs file
+});
 app.get('/admin/orders', (req, res) => {
   res.render('admin/order/listOrder'); // 
 });

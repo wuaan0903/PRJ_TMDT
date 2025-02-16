@@ -53,5 +53,10 @@ export const deleteProduct = async (req, res) => {
 
 // Serve product's thumbnail image
 export const serveThumbnail =  (req, res) => {
-
+    const thumbnailPath = path.resolve("public/uploads/product/" + req.params.filename);
+    res.sendFile(thumbnailPath, (err) => {
+        if (err) {
+          res.status(404).json({ message: `Thumbnail not found + ${err}` });
+        }
+      });
 };

@@ -6,21 +6,21 @@
         <li>
             <i class='bx bxs-calendar-check'></i>
             <span class="text">
-                <h3><%= totalOrders %></h3>
+                <h3>100</h3>
                 <p>Đơn hàng mới</p>
             </span>
         </li>
         <li>
             <i class='bx bxs-package'></i>
             <span class="text">
-                <h3><%= totalProducts %></h3>
+                <h3>100</h3>
                 <p>Sản phẩm</p>
             </span>
         </li>
         <li>
             <i class='bx bxs-dollar-circle'></i>
             <span class="text">
-                <h3><%= totalRevenue.toLocaleString('vi-VN') %> ₫</h3>
+                <h3>1000000 ₫</h3>
                 <p>Doanh thu</p>
             </span>
         </li>
@@ -46,24 +46,7 @@
                         <th>Trạng thái</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <% orders.forEach(order => { %>
-                        <tr>
-                            <td>
-                                <p><%= order._id %></p>
-                            </td>
-                            <td>
-                                <p><%= order.username %></p>
-                            </td>
-                            <td>
-                                <p><%= order.date %></p>
-                            </td>
-                            <td>
-                                <span class="status <%= order.status %>"><%= order.status %></span>
-                            </td>
-                        </tr>
-                    <% }); %>
-                </tbody>
+
             </table>
         </div>
 
@@ -77,15 +60,7 @@
                 </div>
             </div>
             <ul class="todo-list p-0">
-                <li class="completed">
-                  <% collections.forEach(collection => { %>
-                    <div class="li-content">
-                        <p style="z-index: 1; margin:0;"><%= collection.name %></p>
-                        <i style="z-index: 1;" class='bx bx-dots-vertical-rounded'></i>
-                        <div class="linee"></div>
-                    </div>
-                  <% }) %>
-                </li>
+                
             </ul>
         </div>
     </div>

@@ -1,0 +1,6 @@
+product_service/node_modules/
+product_service/test_api_routes.bat
+user_service/node_modules/
+order_service/node_modules/
+payment_service/node_modules/
+front_end/node_modules/

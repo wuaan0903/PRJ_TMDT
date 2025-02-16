@@ -49,3 +49,70 @@
         </div>
     </div>
 </div>  
+<script>
+
+    // Check if user is already logged in if yes redirect to home page
+
+    async function checkUserLoginStatus() {
+            try {
+                const response = await fetch('/auth/user');
+                const data = await response.json();
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error checking user login status:', error);
+            }
+        }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const errorDiv = document.getElementById('loginError');
+
+        
+
+        try {
+            const response = await fetch('/api/login', { // Added cache control
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                 },
+                  
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Handle successful login (e.g., redirect to home page)
+                Swal.fire({
+                    icon: 'success',
+                    title: "Đăng nhập thành công !",
+                    text: "Đang chuyển hướng, vui lòng chờ...",
+                    timer: 1200,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                }).then(() => {
+                    window.location.href = '/';
+                });
+                
+            } else {
+                // Handle login error (e.g., display. Please try again later.';
+                errorDiv.textContent = data.message || 'Login failed. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+         catch (error) {
+                console.error('Error during login:', error);
+                 errorDiv.textContent =  'An error occurred. Please try again.'; // Show error
+                errorDiv.style.display = 'block';
+        }
+    });
+
+    // Check user role on page load
+    document.addEventListener('DOMContentLoaded', async function() {
+        await checkUserLoginStatus();
+    });
+</script>
