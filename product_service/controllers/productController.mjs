@@ -184,3 +184,20 @@ export const serveThumbnail =  (req, res) => {
         }
       });
 };
+
+
+// 🛍️ API lấy danh sách sản phẩm theo danh mục
+export const getProductsByCategory = async (req, res) => {
+    try {
+        const { category } = req.params;
+        const products = await Product.find({ category });
+
+        if (!products.length) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
+};
