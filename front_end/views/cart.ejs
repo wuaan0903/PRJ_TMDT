@@ -63,41 +63,34 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label letter-spacing fw-medium">Họ và tên</label>
-                                <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3"
-                                    style="font-size: 14px;" placeholder="Nhập họ tên của bạn" required>
+                                <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Nhập họ tên của bạn" required="">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label letter-spacing fw-medium">Số điện thoại</label>
-                                <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3"
-                                    style="font-size: 14px;" placeholder="Nhập số điện thoại của bạn" id="phoneNumber"
-                                    required>
+                                <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Nhập số điện thoại của bạn" id="phoneNumber" required="">
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label letter-spacing fw-medium">Email</label>
-                            <input type="email" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3"
-                                style="font-size: 14px;" placeholder="Theo dõi đơn hàng sẽ được gửi qua Email và ZNS"
-                                required>
+                            <input type="email" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Theo dõi đơn hàng sẽ được gửi qua Email và ZNS" required="">
                         </div>
                         <div class="mb-3">
                             <label class="form-label letter-spacing fw-medium">Địa chỉ</label>
-                            <input type="text" class="form-control mb-2 rounded-pill fw-medium letter-spacing py-2 px-3"
-                                style="font-size: 14px;" placeholder="Địa chỉ (ví dụ: 103 Vạn Phúc)"
-                                id="address" required>
+                            <input type="text" class="form-control mb-2 rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Địa chỉ (ví dụ: 103 Vạn Phúc)" id="address" required="">
                             <div class="row">
                                 <div class="col-md-4">
                                     <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="citySelect">
-                                        <option value="" selected disabled>Chọn Tỉnh/Thành phố</option>
-                                        </select>
+                                        <option value="" selected="" disabled="">Chọn Tỉnh/Thành phố</option>
+                                        <option value="Hồ Chí Minh">Hồ Chí Minh</option><option value="Hà Nội">Hà Nội</option></select>
                                 </div>
                                 <div class="col-md-4">
                                     <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="districtSelect">
-                                          <option value="" selected disabled>Chọn Quận/Huyện</option>
+                                          <option value="" selected="" disabled="">Chọn Quận/Huyện</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="wardSelect">
-                                        <option value="" selected disabled>Chọn Phường/Xã</option>
+                                        <option value="" selected="" disabled="">Chọn Phường/Xã</option>
                                     </select>
                                 </div>
                             </div>
@@ -105,20 +98,16 @@
 
                         <h4 class="mb-3 pt-3 fw-bold letter-spacing fs-3">Hình thức thanh toán</h4>
                         <div class="payment-shipping">
-                            <form>
+                            
                                 <!-- Thanh toán khi nhận hàng -->
                                 <div class="mb-2">
-                                    <label for="payment-COD"
-                                        class="payment-method-item d-flex align-items-center border rounded p-2 active">
+                                    <label for="payment-COD" class="payment-method-item d-flex align-items-center border rounded p-2 active">
                                         <span class="custom-radio me-2">
-                                            <input type="radio" id="payment-COD" name="payment-method" value="COD"
-                                                autocomplete="off">
+                                            <input type="radio" id="payment-COD" name="payment-method" value="COD" autocomplete="off">
                                             <span class="checkmark"></span>
                                         </span>
                                         <span class="payment-method-icon-wrapper me-2">
-                                            <img src="https://mcdn.coolmate.me/image/October2024/mceclip2_42.png"
-                                                alt="Thanh toán khi nhận hàng" class="img-fluid"
-                                                style="max-width: 40px;">
+                                            <img src="https://mcdn.coolmate.me/image/October2024/mceclip2_42.png" alt="Thanh toán khi nhận hàng" class="img-fluid" style="max-width: 40px;">
                                         </span>
                                         <strong>Thanh toán khi nhận hàng</strong>
                                     </label>
@@ -126,16 +115,13 @@
 
                                 <!-- Ví MoMo -->
                                 <div class="mb-2">
-                                    <label for="payment-momo"
-                                        class="payment-method-item d-flex align-items-center border rounded p-2">
+                                    <label for="payment-momo" class="payment-method-item d-flex align-items-center border rounded p-2">
                                         <span class="custom-radio me-2">
-                                            <input type="radio" id="payment-momo" name="payment-method" value="momo"
-                                                autocomplete="off">
+                                            <input type="radio" id="payment-momo" name="payment-method" value="momo" autocomplete="off">
                                             <span class="checkmark"></span>
                                         </span>
                                         <span class="payment-method-icon-wrapper me-2">
-                                            <img src="https://mcdn.coolmate.me/image/October2024/mceclip1_171.png"
-                                                alt="Ví MoMo" class="img-fluid" style="max-width: 40px;">
+                                            <img src="https://mcdn.coolmate.me/image/October2024/mceclip1_171.png" alt="Ví MoMo" class="img-fluid" style="max-width: 40px;">
                                         </span>
                                         <strong>Ví MoMo</strong>
                                     </label>
@@ -143,38 +129,30 @@
 
                                 <!-- Thanh toán qua ZaloPay -->
                                 <div class="mb-2">
-                                    <label for="payment-zalopay"
-                                        class="payment-method-item d-flex flex-column flex-md-row align-items-start align-items-md-center border rounded p-2">
+                                    <label for="payment-zalopay" class="payment-method-item d-flex flex-column flex-md-row align-items-start align-items-md-center border rounded p-2">
                                         <span class="custom-radio me-2">
-                                            <input type="radio" id="payment-zalopay" name="payment-method"
-                                                value="zalopay" autocomplete="off">
+                                            <input type="radio" id="payment-zalopay" name="payment-method" value="zalopay" autocomplete="off">
                                             <span class="checkmark"></span>
                                         </span>
                                         <span class="payment-method-icon-wrapper me-2">
-                                            <img src="https://mcdn.coolmate.me/image/October2024/mceclip3_6.png"
-                                                alt="Thanh toán qua ZaloPay" class="img-fluid" style="max-width: 40px;">
+                                            <img src="https://mcdn.coolmate.me/image/October2024/mceclip3_6.png" alt="Thanh toán qua ZaloPay" class="img-fluid" style="max-width: 40px;">
                                         </span>
                                         <div>
                                             <strong>Thanh toán qua ZaloPay</strong><br>
-                                            <small class="fw-medium">Hỗ trợ mọi hình thức thanh toán <img
-                                                    src="https://mcdn.coolmate.me/image/October2024/mceclip0_27.png"
-                                                    alt="ZaloPay" style="height: 16px;"></small>
+                                            <small class="fw-medium">Hỗ trợ mọi hình thức thanh toán <img src="https://mcdn.coolmate.me/image/October2024/mceclip0_27.png" alt="ZaloPay" style="height: 16px;"></small>
                                         </div>
                                     </label>
                                 </div>
 
                                 <!-- Ví điện tử VNPAY -->
                                 <div class="mb-2">
-                                    <label for="payment-vnpay"
-                                        class="payment-method-item d-flex flex-column flex-md-row align-items-start align-items-md-center border rounded p-2">
+                                    <label for="payment-vnpay" class="payment-method-item d-flex flex-column flex-md-row align-items-start align-items-md-center border rounded p-2">
                                         <span class="custom-radio me-2">
-                                            <input type="radio" id="payment-vnpay" name="payment-method" value="vnpay"
-                                                autocomplete="off">
+                                            <input type="radio" id="payment-vnpay" name="payment-method" value="vnpay" autocomplete="off">
                                             <span class="checkmark"></span>
                                         </span>
                                         <span class="payment-method-icon-wrapper me-2">
-                                            <img src="https://mcdn.coolmate.me/image/October2024/mceclip0_81.png"
-                                                alt="Ví điện tử VNPAY" class="img-fluid" style="max-width: 40px;">
+                                            <img src="https://mcdn.coolmate.me/image/October2024/mceclip0_81.png" alt="Ví điện tử VNPAY" class="img-fluid" style="max-width: 40px;">
                                         </span>
                                         <div>
                                             <strong>Ví điện tử VNPAY</strong><br>
@@ -182,20 +160,44 @@
                                         </div>
                                     </label>
                                 </div>
-                            </form>
-                        </div>
+                            
+                        </div></form>
 
-                    </form>
+                    
                 </div>
 
                 <!-- Giỏ hàng -->
                 <div class="col-lg-5">
                     <h4 class="mb-3 fw-bold letter-spacing fs-3">Giỏ hàng</h4>
-                    <div class="border p-3 mb-3" style="max-height: 420px; overflow-y: scroll;"
-                        id="cart-items-container">
-
-                        <!-- Cart items will be rendered here -->
-                    </div>
+                    <div class="border p-3 mb-3" style="max-height: 420px; overflow-y: scroll;" id="cart-items-container"><div class="d-flex justify-content-between mb-3">
+                    <img src="http://localhost:3002/api/products/thumbnail/img_1739764847669.webp" alt="Sản phẩm" class="me-3" style="height: 120px; object-fit: cover;">
+                        <div class="d-flex flex-column align-items-start justify-content-between w-100">
+                            <h6 class="mb-1 fw-medium letter-spacing">Áo Nỉ chui đầu Essentials</h6>
+                                <div class="d-flex w-100 justify-content-between">
+                                    <select id="size-67b2b476638c8666ec776a36" class="form-select rounded-pill w-25 fw-medium size-select" name="size" aria-label="Default select example" data-size="L" data-item-id="67b2b476638c8666ec776a36">
+                                        <option value="S">S</option>
+                                        <option value="M">M</option>
+                                        <option value="L" selected="">L</option>
+                                        <option value="XL">XL</option>
+                                        <option value="2XL">2XL</option>
+                                        <option value="3XL">3XL</option>
+                                    </select>
+                                    <div class="quantity-area d-flex align-items-center ms-5">
+                                        <button type="button" class="qty-btn fw-bold" data-item-id="67b2b476638c8666ec776a36" onclick="decreaseQuantity(this)">-</button>
+                                        <input type="text" id="quantity-67b2b476638c8666ec776a36" name="quantity" value="1" min="1" class="form-control text-center quantity-input fw-bold" style="width: 40px;" data-item-id="67b2b476638c8666ec776a36">
+                                        <button type="button" class="qty-btn fw-bold" data-item-id="67b2b476638c8666ec776a36" onclick="increaseQuantity(this)">+</button>
+                                    </div>
+                                    <div>
+                                        <p class=" fw-bold ">199.000đ</p>
+                                    </div>
+                                </div>
+                                    
+                                
+                                <button class="btn btn-light text-dark fw-medium delete-button" data-item-id="67b2b476638c8666ec776a36">
+                                    <i class="bx bx-trash"></i>
+                                    Xóa</button>
+                            </div>
+                 </div></div>
 
                     <div class="pricing-info">
                         <!-- Divider -->
@@ -204,7 +206,7 @@
                         <div class="d-flex justify-content-between align-items-center my-3">
                             <p class="mb-0 letter-spacing fw-medium">Tạm tính</p>
                             <p class="mb-0 text-end">
-                                <span class="fw-medium" id="subtotal">0đ</span>
+                                <span class="fw-medium" id="subtotal">199.000đ</span>
 
                             </p>
                         </div>
@@ -232,13 +234,13 @@
                         <div class="d-flex justify-content-between align-items-center pricing-info__total mt-3">
                             <p class="pricing-info__total_title mb-0 text-black fw-bold letter-spacing">Tổng</p>
                             <p class="mb-0 text-end">
-                                <span class="total text-black fw-bold" id="total">0đ</span>
+                                <span class="total text-black fw-bold" id="total">199.000đ</span>
 
                             </p>
                         </div>
                     </div>
                     <div class="button text-end mt-5">
-                        <button class="btn btn__txt bg-menu" id="order-button" >
+                        <button class="btn btn__txt bg-menu" id="order-button">
                             <div class="">ĐẶT HÀNG</div>
                         </button>
                     </div>
