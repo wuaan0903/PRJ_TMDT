@@ -37,6 +37,16 @@ app.get('/', (req, res) => {
   res.render('home'); // Renders the home.ejs file
 });
 
+app.get('/product', (req, res) => {
+  
+  res.render('productDetails'); // Renders the home.ejs file
+});
+
+app.get('/cart', (req, res) => {
+  
+  res.render('cart'); // Renders the home.ejs file
+});
+
 app.get('/login', (req, res) => {
   res.render('login');
 })
@@ -80,6 +90,10 @@ app.get('/admin/collections', (req, res) => {
 // app.get('/cart', (req, res) => {
 //   res.render('cart'); // Renders the cart.ejs file
 // });
+
+app.get('/admin', adminController.renderHomePage);
+
+app.get('/admin/collections/edit/:id', productController.renderEditCollectionPage);
 
 
 // app.use(userRoutes);
