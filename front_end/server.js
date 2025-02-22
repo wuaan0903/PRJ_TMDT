@@ -37,10 +37,7 @@ app.get('/', (req, res) => {
   res.render('home'); // Renders the home.ejs file
 });
 
-app.get('/product', (req, res) => {
-  
-  res.render('productDetails'); // Renders the home.ejs file
-});
+
 
 app.get('/cart', (req, res) => {
   
@@ -83,13 +80,9 @@ app.get('/admin/collections', (req, res) => {
   res.render('admin/collection/listCollection'); // 
 });
 
-// app.get('/admin/collections/edit', (req, res) => {
-//   res.render('admin/collection/editCollection'); // 
-// });
 
-// app.get('/cart', (req, res) => {
-//   res.render('cart'); // Renders the cart.ejs file
-// });
+app.get('/product/:id', productController.renderProductDetails);
+
 
 app.get('/admin', adminController.renderHomePage);
 

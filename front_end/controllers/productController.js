@@ -57,75 +57,75 @@ const renderEditCollectionPage = async (req, res) => {
 }
 
 const renderProductDetails = async (req, res) => {
-    const productId = req.params.id;
-    try {
-        const productResponse = await axios.get(`http://localhost:3000/api/product/${productId}`);
-        if (productResponse.status !== 200) {
-            return res.status(productResponse.status).send(`Failed to fetch product with ID ${productId}`);
+  const productId = req.params.id;
+  try {
+      const productResponse = await axios.get(`http://localhost:3000/api/product/${productId}`);
+      if (productResponse.status !== 200) {
+          return res.status(productResponse.status).send(`Failed to fetch product with ID ${productId}`);
+      }
+      const product = productResponse.data;
+
+      // const imagesResponse = await axios.get(`http://localhost:3000/api/product/image/${productId}`);
+      // if (imagesResponse.status !== 200) {
+      //     return res.status(imagesResponse.status).send(`Failed to fetch product images with ID ${productId}`);
+      // }
+
+      // const images = imagesResponse.data;
+
+
+      // Fetch all products
+      const allProductsResponse = await axios.get(`http://localhost:3000/api/products`);
+      if (allProductsResponse.status !== 200) {
+           console.log("failed to fetch all products");
+           relatedProducts = [];
+      }
+      let allProducts = allProductsResponse.data;
+
+        // Fetch the category of the current product
+        const categoryResponse = await axios.get(`http://localhost:3000/api/category/${product.categories._id}`);
+        if(categoryResponse.status !== 200){
+            throw new Error(`HTTP error! status: ${categoryResponse.status}`);
         }
-        const product = productResponse.data;
-
-        const imagesResponse = await axios.get(`http://localhost:3000/api/product/image/${productId}`);
-        if (imagesResponse.status !== 200) {
-            return res.status(imagesResponse.status).send(`Failed to fetch product images with ID ${productId}`);
-        }
-
-        const images = imagesResponse.data;
+       const categoryData = categoryResponse.data;
+       const collectionId = categoryData.collection_id._id;
 
 
-        // Fetch all products
-        const allProductsResponse = await axios.get(`http://localhost:3000/api/products`);
-        if (allProductsResponse.status !== 200) {
-             console.log("failed to fetch all products");
-             relatedProducts = [];
-        }
-        let allProducts = allProductsResponse.data;
-
-          // Fetch the category of the current product
-          const categoryResponse = await axios.get(`http://localhost:3000/api/category/${product.categories._id}`);
-          if(categoryResponse.status !== 200){
-              throw new Error(`HTTP error! status: ${categoryResponse.status}`);
-          }
-         const categoryData = categoryResponse.data;
-         const collectionId = categoryData.collection_id._id;
-
-
-        // Filter related products by collection
-        let relatedProducts = allProducts.filter(relatedProduct => {
-             if(relatedProduct._id !== productId){
-                  if(relatedProduct.categories){
-                    return relatedProduct.categories._id.toString() === product.categories._id.toString();
-                  }
-                  return false
-             }
-             return false;
-         });
-
-
-
-        //Filter by collection id
-
-        relatedProducts =  await Promise.all(relatedProducts.map(async (product) =>{
-               const categoryResponse = await axios.get(`http://localhost:3000/api/category/${product.categories._id}`);
-               if(categoryResponse.status !== 200){
-                     throw new Error(`HTTP error! status: ${categoryResponse.status}`);
-               }
-               const categoryData =  categoryResponse.data;
-                if(categoryData.collection_id._id.toString() === collectionId.toString()){
-                    return product;
+      // Filter related products by collection
+      let relatedProducts = allProducts.filter(relatedProduct => {
+           if(relatedProduct._id !== productId){
+                if(relatedProduct.categories){
+                  return relatedProduct.categories._id.toString() === product.categories._id.toString();
                 }
-                 return null;
-           }));
+                return false
+           }
+           return false;
+       });
 
 
-           relatedProducts = relatedProducts.filter(product => product !== null);
+
+      //Filter by collection id
+
+      relatedProducts =  await Promise.all(relatedProducts.map(async (product) =>{
+             const categoryResponse = await axios.get(`http://localhost:3000/api/category/${product.categories._id}`);
+             if(categoryResponse.status !== 200){
+                   throw new Error(`HTTP error! status: ${categoryResponse.status}`);
+             }
+             const categoryData =  categoryResponse.data;
+              if(categoryData.collection_id._id.toString() === collectionId.toString()){
+                  return product;
+              }
+               return null;
+         }));
 
 
-        res.render('productDetails', { product, images, relatedProducts });
-    } catch (error) {
-        console.error('Error fetching product details:', error);
-        res.status(500).send('Failed to fetch product details.');
-    }
+         relatedProducts = relatedProducts.filter(product => product !== null);
+
+
+      res.render('productDetails', { product, relatedProducts });
+  } catch (error) {
+      console.error('Error fetching product details:', error);
+      res.status(500).send('Failed to fetch product details.');
+  }
 };
 
 
