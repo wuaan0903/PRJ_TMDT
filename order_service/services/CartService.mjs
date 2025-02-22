@@ -34,7 +34,7 @@ export const addToCart = async (cartId, productId, quantity, size) => {
     return cart;
 };
 export const getCartByUser = async (userId) => {
-
+    return await Cart.findOne({ userId }).populate('items');
 };
 
 export const removeFromCart = async (cartId, itemId) => {

@@ -107,8 +107,7 @@
 
                     <div class="mb-3">
                         <button class="btn bg-black text-light fw-bold fs-6 letter-spacing px-5 py-3 w-100 mb-3"
-                            onclick="addToCart()">THÊM
-                            VÀO GIỎ HÀNG</button>
+                            onclick="addToCart()">THÊM VÀO GIỎ HÀNG</button>
                             <button class="btn border-dark text-black fw-bold fs-6 letter-spacing px-5 py-3 w-100" onclick="viewCart()">
                                 XEM GIỎ HÀNG
                             </button>
@@ -256,5 +255,156 @@
 
     </div>
 </section>
+
+<script>
+
+   function changeImage(thumbnail) {
+       const mainImage = document.getElementById('mainImage');
+       mainImage.src = thumbnail.src;
+   }
+
+   function decreaseQuantity() {
+       let quantityInput = document.getElementById("quantity");
+       let currentValue = parseInt(quantityInput.value) || 1;
+       if (currentValue > 1) {
+           quantityInput.value = currentValue - 1;
+       }
+   }
+
+   function increaseQuantity() {
+       let quantityInput = document.getElementById("quantity");
+       let currentValue = parseInt(quantityInput.value) || 1;
+       quantityInput.value = currentValue + 1;
+   }
+
+
+   // JavaScript code here
+   const sizeButtons = document.querySelectorAll('.size-btn');
+
+   sizeButtons.forEach(button => {
+       button.addEventListener('click', () => {
+           sizeButtons.forEach(btn => {
+               btn.style.background = '#d9d9d9';
+               btn.style.color = '#000';
+           });
+           button.style.background = '#212121';
+           button.style.color = '#fff';
+           document.getElementById('selectedSize').value = button.getAttribute('data-size');
+       });
+   });
+
+   async function addToCart() {
+       const productId = document.getElementById('productId').value;
+       const quantity = parseInt(document.getElementById('quantity').value);
+       const size = document.getElementById('selectedSize').value;
+        if(!size){
+             Swal.fire({
+                   icon: 'error',
+                   title: "Please select a size!",
+                    timer: 1500,
+                   timerProgressBar: true,
+                   showConfirmButton: false,
+               });
+             return;
+         }
+       try {
+         //1. get user info
+           const userInfo = await fetch('/auth/user', {
+               method: 'GET',
+               headers: {
+                   'Content-Type': 'application/json',
+               }
+           });
+           if (!userInfo.ok) {
+               alert("Please login to add items to your cart");
+               window.location.href = '/login';
+               return;
+           }
+           const user = await userInfo.json();
+           if (!user.success) {
+               alert("Please login to add items to your cart");
+               window.location.href = '/login';
+               return;
+           }
+           const userId = user.user.user._id;
+    
+            //3. get cart info
+            const cartResponse = await fetch(`/api/cart/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+
+            });
+              let cartData = null;
+           if(cartResponse.ok){
+                cartData = await cartResponse.json();
+                if(!cartData){
+                     //create the cart
+                     const createCart = await fetch(`/api/cart`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({userId: userId})                    });
+                   if(!createCart.ok){
+                         throw new Error(`HTTP error! status: ${createCart.status}`);
+                   }
+                   cartData = await createCart.json();
+               }
+          }else{
+            //create the cart
+            const createCart = await fetch(`/api/cart`, {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                 },
+                 body: JSON.stringify({userId: userId})
+               });
+               if(!createCart.ok){
+                   throw new Error(`HTTP error! status: ${createCart.status}`);
+               }
+               cartData = await createCart.json();
+          }
+
+
+            // add item to cart
+           const addItemResponse = await fetch(`/api/cart/item`, {
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({
+                    cartId: cartData._id,
+                    productId: productId,
+                    quantity: quantity,
+                    size: size
+               })
+            });
+            if(!addItemResponse.ok){
+                   throw new Error(`HTTP error! status: ${addItemResponse.status}`);
+              }
+           //    const addItemData = await addItemResponse.json();
+            if(addItemResponse.status === 200){
+
+                 Swal.fire({
+                   icon: 'success',
+                   title: "Thêm vào giỏ hàng thành công !",
+                   text: "Bạn đã thêm 1 sản phẩm vào giỏ hàng !",
+                   timer: 1500,
+                   timerProgressBar: true,
+                   showConfirmButton: false,
+               }).then(() => {
+                   window.location.reload();
+               });
+               }else{
+                   alert("Can't add to cart, please try again later");
+               }
+       } catch (error) {
+           console.error('Error adding to cart', error);
+           alert("Can't add to cart, please try again later");
+       }
+   }
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
