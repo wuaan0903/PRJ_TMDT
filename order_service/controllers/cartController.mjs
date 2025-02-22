@@ -23,7 +23,14 @@ export const addItemToCart = async (req, res) => {
 };
 
 export const getUserCart = async (req, res) => {
+    const { userId } = req.params;
 
+    try {
+      const cart = await getCartByUser(userId);
+      res.json(cart);
+    } catch (err) {
+      res.status(500).send('Server error');
+    }
 };
 
 export const removeItemFromCart = async (req, res) => {
