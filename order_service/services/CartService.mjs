@@ -38,15 +38,54 @@ export const getCartByUser = async (userId) => {
 };
 
 export const removeFromCart = async (cartId, itemId) => {
-  
+  const cart = await Cart.findById(cartId);
+
+  if (!cart) {
+    throw new Error('Cart not found');
+  }
+
+  cart.items = cart.items.filter(item => item._id.toString() !== itemId);
+
+  await cart.save();
+  return cart;
 };
 
 
 export const changeQuantityandSize = async (cartId, itemId, quantity, size) => {
-  
+  const cart = await Cart.findById(cartId);
+
+  if (!cart) {
+    throw new Error('Cart not found');
+  }
+
+  const item = cart.items.find(item => item._id.toString() === itemId);
+
+  if (!item) {
+    throw new Error('Item not found');
+  }
+
+  if(quantity === 0){
+    cart.items = cart.items.filter(item => item._id.toString() !== itemId);
+  } else if (quantity) {
+    item.quantity = quantity;
+  }
+
+  if(size){
+    item.size = size;
+  }
+
+
+  await cart.save();
+  return cart;
 };
 
 // delete cart
 export const deleteCart = async (cartId) => {
-  
+  const cart = await Cart.findById(cartId);
+
+  if (!cart) {
+    throw new Error('Cart not found');
+  }
+
+  await Cart.deleteOne({_id: cartId});
 };
