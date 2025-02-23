@@ -293,6 +293,36 @@
        });
    });
 
+   async function viewCart() {
+    try {
+        const userInfo = await fetch('/auth/user', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        if (!userInfo.ok) {
+            alert("Please login to view your cart");
+            window.location.href = '/login';
+            return;
+        }
+        const user = await userInfo.json();
+        if (!user.success) {
+            alert("Please login to view your cart");
+            window.location.href = '/login';
+            return;
+        }
+        const userId = user.user.user._id;
+        window.location.href = `/cart/${userId}`;
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        alert("Could not redirect to cart, please try again later.");
+    }
+}
+
+
+
+
    async function addToCart() {
        const productId = document.getElementById('productId').value;
        const quantity = parseInt(document.getElementById('quantity').value);

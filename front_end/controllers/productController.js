@@ -149,5 +149,7 @@ module.exports = {
   renderEditCollectionPage,
   renderAddPage,
   renderEditPage,
-  renderProductSortByCategory
+  renderProductSortByCategory,
+  renderProductDetails
+
 };

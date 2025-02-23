@@ -34,12 +34,11 @@ app.get("/", (req, res) => {
   res.render("home"); // Renders the home.ejs file
 });
 
+app.get("/search", (req, res) => {
+  res.render("search"); // Renders the cart.ejs file
+} );
 
 
-app.get('/cart', (req, res) => {
-  
-  res.render('cart'); // Renders the home.ejs file
-});
 app.get("/admin/orders", (req, res) => {
   res.render("admin/order/listOrder"); //
 
@@ -92,6 +91,7 @@ app.get("/admin/collections", (req, res) => {
 
 
 app.get('/product/:id', productController.renderProductDetails);
+app.get('/cart/:id', cartController.renderCartPage);
 
 
 app.get('/admin', adminController.renderHomePage);
