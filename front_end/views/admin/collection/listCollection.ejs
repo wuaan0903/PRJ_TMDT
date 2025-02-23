@@ -22,7 +22,7 @@
                         </tr>
                     </thead>
                     <tbody class="tbody active" id="collectionTableBody">
-                        <!-- Collections will be loaded here -->
+                        <!-- Dữ liệu bộ sưu tập sẽ được tải ở đây -->
                     </tbody>
                 </table>
             </div>
@@ -40,19 +40,19 @@
         try {
             const response = await fetch('/api/collections');
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
             }
             const collections = await response.json();
             updateTable(collections);
         } catch (error) {
-            console.error('Failed to fetch collections:', error);
-            alert('Failed to load collections.');
+            console.error('Không thể tải danh sách bộ sưu tập:', error);
+            alert('Không thể tải danh sách bộ sưu tập.');
         }
     }
 
     function updateTable(collections) {
         const tableBody = document.getElementById('collectionTableBody');
-        tableBody.innerHTML = ''; // Clear existing rows
+        tableBody.innerHTML = ''; // Xóa các hàng hiện có
         collections.forEach((collection, index) => {
             const row = document.createElement('tr');
             row.setAttribute('data-collection-id', collection._id);
@@ -78,24 +78,25 @@
     }
 
     function confirmDelete(collectionId) {
-        if (confirm("Are you sure you want to delete this collection?")) {
+        if (confirm("Bạn có chắc chắn muốn xóa bộ sưu tập này không?")) {
             fetch(`/api/collection/${collectionId}`, {
                 method: 'DELETE',
             })
             .then(response => {
                 if (response.ok) {
-                    // Remove the row from the table
+                    // Xóa hàng khỏi bảng
                     const rowToDelete = document.querySelector(`[data-collection-id="${collectionId}"]`);
                     if (rowToDelete) {
                         rowToDelete.remove();
                     }
+                    alert('Xóa bộ sưu tập thành công.');
                 } else {
-                    alert('Failed to delete the collection.');
+                    alert('Xóa bộ sưu tập thất bại.');
                 }
             })
             .catch(error => {
-                console.error('Error during deletion:', error);
-                alert('An error occurred during the deletion.');
+                console.error('Lỗi khi xóa:', error);
+                alert('Đã xảy ra lỗi khi xóa.');
             });
         }
     }
@@ -104,7 +105,7 @@
         const collectionName = document.getElementById('collectionName').value.trim();
 
         if (!collectionName) {
-            alert('Please enter a collection name.');
+            alert('Vui lòng nhập tên bộ sưu tập.');
             return;
         }
         try {
@@ -118,12 +119,13 @@
             if (response.ok) {
                 fetchCollections();
                 document.getElementById('collectionName').value = '';
+                alert('Thêm bộ sưu tập thành công.');
             } else {
-                alert('Failed to add the collection.');
+                alert('Thêm bộ sưu tập thất bại.');
             }
         } catch (error) {
-            console.error('Error during addition:', error);
-            alert('An error occurred during the add.');
+            console.error('Lỗi khi thêm bộ sưu tập:', error);
+            alert('Đã xảy ra lỗi khi thêm bộ sưu tập.');
         }
     }
 </script>
