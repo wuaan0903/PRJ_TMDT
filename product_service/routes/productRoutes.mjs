@@ -5,13 +5,15 @@ import {
     getProductById, 
     updateProduct, 
     deleteProduct,
-    serveThumbnail
+    serveThumbnail,
+    searchProducts,
 } from '../controllers/productController.mjs';
 
 const router = express.Router();
 
 router.post('/',  createProduct);
 router.get('/',  getAllProducts);
+router.get('/search',  searchProducts);
 router.get('/:id',  getProductById);
 router.put('/:id',  updateProduct);
 router.delete('/:id',  deleteProduct);

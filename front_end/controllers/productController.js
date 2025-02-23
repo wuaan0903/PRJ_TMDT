@@ -1,46 +1,42 @@
-// Assuming you have a controller file (e.g., productController.js)
-const axios = require('axios');
+const axios = require("axios");
 
+const renderAddPage = async (req, res) => {
+  const productId = req.params.id;
+  try {
+    const response = await axios.get(
+      `http://localhost:3000/api/product/${productId}`
+    );
+    if (response.status !== 200) {
+      return res
+        .status(response.status)
+        .send(`Failed to fetch product with ID ${productId}`);
+    }
+    const product = response.data;
+    res.render("admin/product/addProduct", { product }); // Pass product data to the view
+  } catch (error) {
+    console.error("Error fetching product for edit:", error);
+    res.status(500).send("Failed to fetch product for edit.");
+  }
+};
 const renderEditPage = async (req, res) => {
   const productId = req.params.id;
   try {
-    const response = await axios.get(`http://localhost:3000/api/product/${productId}`);
-     if (response.status !== 200) {
-          return res.status(response.status).send(`Failed to fetch product with ID ${productId}`);
-       }
+    const response = await axios.get(
+      `http://localhost:3000/api/product/${productId}`
+    );
+    if (response.status !== 200) {
+      return res
+        .status(response.status)
+        .send(`Failed to fetch product with ID ${productId}`);
+    }
     const product = response.data;
-    res.render('admin/product/addProduct', { product }); // Pass product data to the view
+    console.log("Product Data:", product);
+    res.render("admin/product/editProduct", { product }); // Pass product data to the view
   } catch (error) {
-    console.error('Error fetching product for edit:', error);
-     res.status(500).send('Failed to fetch product for edit.');
+    console.error("Error fetching product for edit:", error);
+    res.status(500).send("Failed to fetch product for edit.");
   }
 };
-
-const renderEditQuantityPage = async (req, res) => {
-  const productId = req.params.id;
-  try {
-    const response = await axios.get(`http://localhost:3000/api/product-quantity/${productId}`);
-     if (response.status !== 200) {
-          return res.status(response.status).send(`Failed to fetch product with ID ${productId}`);
-       }
-    let productQuantity;
-    if(response.data !== null && response.data.length > 0) {
-      productQuantity = response.data;
-    } else {
-      productQuantity = [{
-        product_id: productId,
-        size: "",
-        quantity: ""
-      }];
-    }
-    
-    res.render('admin/storage/editStorage', { productQuantity }); 
-  } catch (error) {
-    console.error('Error fetching product for edit:', error);
-     res.status(500).send('Failed to fetch product for edit.');
-  }
-}
-
 const renderEditCollectionPage = async (req, res) => {
   const collectionId = req.params.id;
   try {
@@ -149,12 +145,9 @@ const renderProductSortByCategory = async (req, res) => {
      res.status(500).send('Failed to fetch category.');
   }
 };
-
-
 module.exports = {
-    renderEditPage,
-    renderEditQuantityPage,
-    renderEditCollectionPage,
-    renderProductDetails,
-    renderProductSortByCategory
-}
+  renderEditCollectionPage,
+  renderAddPage,
+  renderEditPage,
+  renderProductSortByCategory
+};

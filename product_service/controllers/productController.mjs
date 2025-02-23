@@ -184,3 +184,33 @@ export const serveThumbnail =  (req, res) => {
         }
       });
 };
+
+// Hàm loại bỏ dấu tiếng Việt
+const removeDiacritics = (str) => {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+};
+
+
+export const searchProducts = async (req, res) => {
+    try {
+        const query = req.query.q;
+        if (!query) return res.status(400).json({ message: "Thiếu từ khóa tìm kiếm" });
+
+        // Loại bỏ dấu và chuyển thành chữ thường
+        const normalizedQuery = removeDiacritics(query);
+        const regex = new RegExp(normalizedQuery, "i"); // Tìm kiếm không phân biệt hoa/thường
+
+        // Lấy tất cả sản phẩm
+        let products = await Product.find();
+
+        // Lọc dữ liệu theo tên sản phẩm không dấu
+        products = products.filter((product) => {
+            const normalizedName = removeDiacritics(product.name); // Loại bỏ dấu và chuyển thành chữ thường
+            return regex.test(normalizedName); // Kiểm tra khớp với từ khóa tìm kiếm
+        });
+
+        res.status(200).json(products);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
