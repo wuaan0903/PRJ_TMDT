@@ -150,7 +150,6 @@ const renderProductSortByCategory = async (req, res) => {
   }
 };
 
-
 module.exports = {
     renderEditPage,
     renderEditQuantityPage,
