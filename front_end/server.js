@@ -88,6 +88,7 @@ app.get('/admin', adminController.renderHomePage);
 
 app.get('/admin/collections/edit/:id', productController.renderEditCollectionPage);
 
+app.get('/admin/storage/edit/:id', productController.renderEditQuantityPage);
 
 // app.use(userRoutes);
 // Start server

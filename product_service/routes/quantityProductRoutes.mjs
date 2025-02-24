@@ -5,7 +5,8 @@ import {
     getQuantityByProductId,
     deleteQuantityProduct,
     editQuantityByProductId,
-    getQuantityByProductIdAndSize
+    getQuantityByProductIdAndSize,
+    addNewSize  
 } from '../controllers/quantityProductController.mjs';
 
 
@@ -14,6 +15,5 @@ router.post('/:productId', createQuantityProduct);
 router.put('/edit/:productId', editQuantityByProductId);
 router.get('/:productId', getQuantityByProductIdAndSize);
 router.delete('/:id', deleteQuantityProduct);
-
-
+router.post('/size/:productId', addNewSize);
 export default router;
