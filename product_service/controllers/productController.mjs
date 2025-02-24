@@ -185,6 +185,15 @@ export const serveThumbnail =  (req, res) => {
       });
 };
 
+// Serve product's thumbnail image
+export const serveBanner =  (req, res) => {
+    const thumbnailPath = path.resolve("public/uploads/banner/" + req.params.filename);
+    res.sendFile(thumbnailPath, (err) => {
+        if (err) {
+          res.status(404).json({ message: `Banner not found + ${err}` });
+        }
+      });
+};
 
 // 🛍️ API lấy danh sách sản phẩm theo danh mục
 export const getProductsByCategory = async (req, res) => {
