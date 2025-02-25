@@ -185,32 +185,31 @@ export const serveThumbnail =  (req, res) => {
       });
 };
 
+
 // Hàm loại bỏ dấu tiếng Việt
 const removeDiacritics = (str) => {
-    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 };
-
 
 export const searchProducts = async (req, res) => {
     try {
         const query = req.query.q;
         if (!query) return res.status(400).json({ message: "Thiếu từ khóa tìm kiếm" });
 
-        // Loại bỏ dấu và chuyển thành chữ thường
-        const normalizedQuery = removeDiacritics(query);
-        const regex = new RegExp(normalizedQuery, "i"); // Tìm kiếm không phân biệt hoa/thường
+        // Chuẩn hóa từ khóa tìm kiếm
+        const normalizedQuery = removeDiacritics(query).toLowerCase();
 
-        // Lấy tất cả sản phẩm
-        let products = await Product.find();
+        // Tìm kiếm trực tiếp trong MongoDB thay vì lấy tất cả rồi lọc lại
+        const products = await Product.find();
 
         // Lọc dữ liệu theo tên sản phẩm không dấu
-        products = products.filter((product) => {
-            const normalizedName = removeDiacritics(product.name); // Loại bỏ dấu và chuyển thành chữ thường
-            return regex.test(normalizedName); // Kiểm tra khớp với từ khóa tìm kiếm
+        const filteredProducts = products.filter((product) => {
+            const normalizedName = removeDiacritics(product.name).toLowerCase();
+            return normalizedName.includes(normalizedQuery);
         });
 
-        res.status(200).json(products);
+        res.status(200).json(filteredProducts);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(500).json({ message: "Lỗi máy chủ", error: err.message });
     }
-};
+}

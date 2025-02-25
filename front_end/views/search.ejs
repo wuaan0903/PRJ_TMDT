@@ -1,61 +1,53 @@
 <%- layout('layouts/index') %>
 
 <style>
+    .product-image-container {
+        width: 100%;
+        height: 450px; /* Đảm bảo ảnh có chiều cao lớn */
+        background-color: #f8f8f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        overflow: hidden; /* Tránh tràn ảnh */
+    }
+
     .product-image {
-        max-height: 700px;
-        object-fit: cover;
+        width: 100%;  /* Kéo full chiều rộng */
+        height: 100%; /* Kéo full chiều cao */
+        object-fit: cover; /* Cắt ảnh để fill toàn bộ khung */
     }
 
-    .thumbnail-img {
-        height: 80px;
-        cursor: pointer;
+    .card-title {
+        white-space: normal; /* Cho phép tên sản phẩm xuống dòng */
+        word-wrap: break-word;
+        text-align: center;
+        font-size: 1rem; /* Đảm bảo không quá to */
     }
 
-    .thumbnail-img:hover {
-        border: 2px solid #000;
+    .product-price {
+        text-align: center;
+        color: red;
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-top: 5px;
     }
 
     @media (max-width: 576px) {
-        .product-image {
-            max-height: 400px;
+        .product-image-container {
+            height: 350px; /* Điều chỉnh ảnh nhỏ hơn trên mobile */
         }
-        .thumbnail-img {
-            height: 60px;
-        }
-    }
-
-    .cool-cash {
-        background: red;
-        color: white;
-        font-size: 12px;
-        padding: 3px 6px;
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        font-weight: bold;
-    }
-
-    .color-options span {
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        border-radius: 50%;
-        margin-right: 5px;
-        border: 1px solid #ccc;
     }
 </style>
 
+<!-- Ô tìm kiếm đầu trang -->
 <section style="padding-top: 80px;">
     <div class="container">
-        <!-- Tiêu đề và thanh tìm kiếm -->
         <div class="d-flex align-items-center gap-3 mt-4">
             <h5 class="fw-bold mb-0">Sản phẩm</h5>
             <div class="d-flex gap-2">
-                <input id="searchInput" type="text" class="form-control form-control-sm rounded-pill" placeholder="Nhập từ khóa..." style="max-width: 200px;">
-                <select id="categorySelect" class="form-select form-select-sm rounded-pill" style="max-width: 200px;">
-                    <option value="">Danh mục</option>
-                </select>
-                <button id="searchBtn" class="btn btn-dark btn-sm rounded-pill px-3">
+                <input id="searchInputTop" type="text" class="form-control form-control-sm rounded-pill" placeholder="Nhập từ khóa..." style="max-width: 250px;">
+                <button id="searchBtnTop" class="btn btn-dark btn-sm rounded-pill px-3">
                     <i class='bx bx-search-alt fs-4'></i>
                 </button>
             </div>
@@ -64,59 +56,76 @@
     <hr class="my-4">
 </section>
 
+<!-- Phần kết quả tìm kiếm -->
 <section style="padding-bottom: 30px;">
     <div class="container">
-        <!-- Tiêu đề Kết quả -->
         <h5 class="mt-4 fw-bold text-center pb-2 border-bottom">Kết quả</h5>
-
-        <!-- Danh sách sản phẩm -->
-        <div id="resultContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3"></div>
+        <div id="resultContainer" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3"></div> <!-- 5 sản phẩm trên 1 hàng ngang -->
     </div>
 </section>
 
 <script>
-    document.getElementById('searchBtn').addEventListener('click', searchProducts);
-    document.getElementById('searchInput').addEventListener('keypress', function(event) {
+    document.getElementById('searchBtnTop').addEventListener('click', searchProducts);
+    document.getElementById('searchInputTop').addEventListener('keypress', function(event) {
         if (event.key === 'Enter') searchProducts();
     });
 
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
     async function searchProducts() {
-        const query = document.getElementById('searchInput').value.trim();
+        const query = document.getElementById('searchInputTop').value.trim();
+
         if (!query) {
             alert('Vui lòng nhập từ khóa tìm kiếm!');
             return;
         }
 
-        try {
-            const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
-            const products = await response.json();
+        window.history.pushState({}, '', `/search?q=${encodeURIComponent(query)}`);
 
-            const resultContainer = document.getElementById('resultContainer');
+        const resultContainer = document.getElementById('resultContainer');
+        resultContainer.innerHTML = `<p class="text-center text-muted">Đang tìm kiếm...</p>`;
+
+        try {
+            const response = await fetch(`http://localhost:3002/api/products/search?q=${encodeURIComponent(query)}`);
+            const products = await response.json();
             resultContainer.innerHTML = '';
 
-            if (products.length === 0) {
+            if (!products.length) {
                 resultContainer.innerHTML = `<p class="text-center text-muted">Không tìm thấy sản phẩm nào!</p>`;
                 return;
             }
 
             products.forEach(product => {
-                const productCard = `
+                resultContainer.insertAdjacentHTML('beforeend', `
                     <div class="col">
-                        <div class="card product-card position-relative">
-                            <img src="${product.image || 'https://via.placeholder.com/300'}" class="card-img-top product-image" alt="${product.name}">
-                            <div class="card-body text-center">
-                                <h6 class="card-title fw-bold">${product.name}</h6>
-                                <div class="color-options mt-2">
-                                    ${product.colors.map(color => `<span style="background-color: ${color};"></span>`).join('')}
-                                </div>
+                        <div class="card h-100">
+                            <div class="product-image-container">
+                                <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}" class="product-image" alt="${product.name}">
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${product.name}</h5>
+                                <p class="product-price">${product.price.toLocaleString()} đ</p>
+                                <a href="/products/${product._id}" class="btn btn-primary mt-auto">Xem chi tiết</a>
                             </div>
                         </div>
                     </div>
-                `;
-                resultContainer.innerHTML += productCard;
+                `);
             });
         } catch (error) {
             console.error('Lỗi khi tìm kiếm sản phẩm:', error);
+            resultContainer.innerHTML = `<p class="text-center text-danger">Có lỗi xảy ra, vui lòng thử lại!</p>`;
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const query = getQueryParam('q');
+
+        if (query) {
+            document.getElementById('searchInputTop').value = query;
+            searchProducts();
+        }
+    });
 </script>

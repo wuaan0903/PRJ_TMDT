@@ -97,6 +97,7 @@ app.get("/admin/products/edit/:id", productController.renderEditPage);
 
 app.get('/admin/collections/edit/:id', productController.renderEditCollectionPage);
 
+
 app.get("/admin/storage", (req, res) => {
   res.render("admin/storage/listStorage"); //
 });
