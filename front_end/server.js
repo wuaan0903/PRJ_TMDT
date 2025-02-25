@@ -89,10 +89,13 @@ app.get("/admin/collections", (req, res) => {
   res.render("admin/collection/listCollection"); //
 });
 
+app.get("/admin/account", (req, res) => {
+  res.render("admin/account/listAccount"); //
+});
 
 app.get('/product/:id', productController.renderProductDetails);
 app.get('/cart/:id', cartController.renderCartPage);
-
+app.get('/admin/storage/edit/:id', productController.renderEditQuantityPage);
 
 app.get('/admin', adminController.renderHomePage);
 

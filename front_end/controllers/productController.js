@@ -125,6 +125,32 @@ const renderProductDetails = async (req, res) => {
 };
 
 
+const renderEditQuantityPage = async (req, res) => {
+  const productId = req.params.id;
+  try {
+    const response = await axios.get(`http://localhost:3000/api/product-quantity/${productId}`);
+     if (response.status !== 200) {
+          return res.status(response.status).send(`Failed to fetch product with ID ${productId}`);
+       }
+    let productQuantity;
+    if(response.data !== null && response.data.length > 0) {
+      productQuantity = response.data;
+    } else {
+      productQuantity = [{
+        product_id: productId,
+        size: "",
+        quantity: ""
+      }];
+    }
+    
+    res.render('admin/storage/editStorage', { productQuantity }); 
+  } catch (error) {
+    console.error('Error fetching product for edit:', error);
+     res.status(500).send('Failed to fetch product for edit.');
+  }
+}
+
+
 //Render product sort by category page
 const renderProductSortByCategory = async (req, res) => {
   const categoryId = req.query.categoryId;
@@ -150,6 +176,7 @@ module.exports = {
   renderAddPage,
   renderEditPage,
   renderProductSortByCategory,
-  renderProductDetails
+  renderProductDetails,
+  renderEditQuantityPage
 
 };
