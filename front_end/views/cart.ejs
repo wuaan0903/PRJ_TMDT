@@ -251,3 +251,371 @@
 
 
     </section>
+
+
+    <script>
+        // Assume you have a way to get the userId (e.g., from user context, cookie, or local storage)
+        const cart = <%- JSON.stringify(cart) %>;
+        const userId = cart.userId;
+        const PRODUCT_API_URL = '/api/product'; // Replace with your product API URL
+        const cities = {
+          "Hồ Chí Minh": {
+              "Quận 1": ["Phường Bến Nghé", "Phường Bến Thành", "Phường Cô Giang","Phường Cầu Ông Lãnh","Phường Đa Kao","Phường Nguyễn Cư Trinh","Phường Nguyễn Thái Bình","Phường Phạm Ngũ Lão","Phường Tân Định","Phường Cầu Kho"],
+              "Quận 7": ["Phường Tân Thuận Đông", "Phường Tân Thuận Tây", "Phường Tân Kiểng", "Phường Tân Hưng", "Phường Bình Thuận", "Phường Phú Mỹ","Phường Tân Phong","Phường Tân Phú","Phường Phú Thuận", "Phường  Tân Quy"],
+              "Quận 3": ["Phường 1","Phường 2","Phường 3","Phường 4","Phường 5","Phường 6","Phường 7","Phường 8","Phường 9","Phường 10","Phường 11","Phường 12","Phường 13","Phường 14"],
+              "Quận Bình Thạnh": ["Phường 1","Phường 2","Phường 3","Phường 5","Phường 6","Phường 7","Phường 11","Phường 12","Phường 13","Phường 14","Phường 15","Phường 17","Phường 19","Phường 21","Phường 22","Phường 24","Phường 25","Phường 26","Phường 27","Phường 28"],
+          },
+          "Hà Nội": {
+              "Quận Ba Đình": ["Phường Cống Vị", "Phường Điện Biên", "Phường Đội Cấn", "Phường Giảng Võ", "Phường Kim Mã", "Phường Liễu Giai","Phường Ngọc Hà","Phường Ngọc Khánh","Phường Nguyễn Trung Trực","Phường Phúc Xá","Phường Quán Thánh","Phường Thành Công","Phường Trúc Bạch","Phường Vĩnh Phúc"],
+              "Quận Cầu Giấy": ["Phường Dịch Vọng", "Phường Dịch Vọng Hậu", "Phường Mai Dịch", "Phường Nghĩa Đô","Phường Nghĩa Tân","Phường Quan Hoa","Phường Trung Hòa","Phường Yên Hòa"],
+              "Quận Hoàn Kiếm": ["Phường Chương Dương", "Phường Cửa Đông", "Phường Cửa Nam", "Phường Đồng Xuân", "Phường Hàng Bạc", "Phường Hàng Bài", "Phường Hàng Bồ", "Phường Hàng Bông", "Phường Hàng Buồm", "Phường Hàng Đào", "Phường Hàng Gai", "Phường Hàng Mã","Phường Hàng Trống","Phường Lý Thái Tổ","Phường Phan Chu Trinh","Phường Phúc Tân","Phường Trần Hưng Đạo","Phường Tràng Tiền"]
+          }
+      };
+
+        async function fetchProduct(productId) {
+            try {
+                const response = await fetch(`${PRODUCT_API_URL}/${productId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch product price for ${productId}: ${response.statusText}`);
+                }
+                const productData = await response.json();
+                
+                return productData; // Assuming your product API returns price like this
+    
+            } catch (error) {
+                console.error(`Error fetching product price for ${productId}:`, error);
+                return null; // Or handle error as needed
+            }
+        }
+
+        function calculateTotals(items){
+                let subtotal = 0;
+                items.forEach(item => {
+                    subtotal += item.price * item.quantity;
+                    const test = item;
+                    const test2 = subtotal.toLocaleString('vi-VN') + 'đ';
+                })
+                
+                document.getElementById('subtotal').textContent =  subtotal.toLocaleString('vi-VN') + 'đ';
+                document.getElementById('total').textContent = subtotal.toLocaleString('vi-VN') + 'đ';
+            }
+
+        async function renderCartItems(items) {
+            const cartContainer = document.getElementById('cart-items-container');
+            if (!cartContainer) {
+                console.error("Cart container element not found!");
+                return;
+            }
+            cartContainer.innerHTML = '';
+    
+            if (!items || items.length === 0) {
+                cartContainer.innerHTML = '<p>Your cart is empty.</p>';
+                return;
+            }
+    
+            for (const item of items) {
+                const product = await fetchProduct(item.productId);
+                if (product === null) {
+                    continue; // Skip if price not found
+                }
+                //   item.price = product.price.toLocaleString('vi-VN') + 'đ';
+                item.price = product.price;
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('d-flex', 'justify-content-between', 'mb-3');
+                itemElement.innerHTML = `
+                    <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}" alt="Sản phẩm" class="me-3" style="height: 120px; object-fit: cover;">
+                        <div class="d-flex flex-column align-items-start justify-content-between w-100">
+                            <h6 class="mb-1 fw-medium letter-spacing">${product.name}</h6>
+                                <div class="d-flex w-100 justify-content-between">
+                                    <select id="size-${item._id}" class="form-select rounded-pill w-25 fw-medium size-select" name="size" aria-label="Default select example" data-size="${item.size}" data-item-id="${item._id}">
+                                        <option value="S" ${item.size === 'S' ? 'selected' : ''}>S</option>
+                                        <option value="M" ${item.size === 'M' ? 'selected' : ''}>M</option>
+                                        <option value="L" ${item.size === 'L' ? 'selected' : ''}>L</option>
+                                        <option value="XL" ${item.size === 'XL' ? 'selected' : ''}>XL</option>
+                                        <option value="2XL" ${item.size === '2XL' ? 'selected' : ''}>2XL</option>
+                                        <option value="3XL" ${item.size === '3XL' ? 'selected' : ''}>3XL</option>
+                                    </select>
+                                    <div class="quantity-area d-flex align-items-center ms-5">
+                                        <button type="button" class="qty-btn fw-bold" data-item-id="${item._id}" onclick="decreaseQuantity(this)">-</button>
+                                        <input type="text" id="quantity-${item._id}" name="quantity" value="${item.quantity}" min="1" class="form-control text-center quantity-input fw-bold" style="width: 40px;" data-item-id="${item._id}">
+                                        <button type="button" class="qty-btn fw-bold" data-item-id="${item._id}"  onclick="increaseQuantity(this)">+</button>
+                                    </div>
+                                    <div>
+                                        <p class=" fw-bold ">${product.price.toLocaleString('vi-VN') + 'đ'}</p>
+                                    </div>
+                                </div>
+                                    
+                                
+                                <button class="btn btn-light text-dark fw-medium delete-button" data-item-id="${item._id}">
+                                    <i class='bx bx-trash'></i>
+                                    Xóa</button>
+                            </div>
+                `;
+                cartContainer.appendChild(itemElement);
+                
+            }
+                calculateTotals(items);
+                // Add event listeners for delete buttons
+                const deleteButtons = document.querySelectorAll('.delete-button');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const itemId = this.getAttribute('data-item-id');
+                        deleteCartItem(itemId, cart._id);
+                    });
+                });
+                    
+                
+                    // Add event listeners to quantity inputs
+                    const quantityInputs = document.querySelectorAll('.quantity-input');
+                    quantityInputs.forEach(input => {
+                        input.addEventListener('change', function () {
+                            const itemId = this.getAttribute('data-item-id');
+                            const quantity = parseInt(this.value) || 1;
+                            updateCartItemQuantity(itemId, quantity, cart._id);
+                        });
+                    });
+                    
+                    const sizeSelects = document.querySelectorAll('.size-select');
+                    sizeSelects.forEach(select => {
+                        select.addEventListener('change', function () {
+                            const itemId = this.closest('.d-flex.justify-content-between.mb-3').querySelector('.delete-button').getAttribute('data-item-id');
+                            const size = this.value;
+                            
+                            updateCartItemSize(itemId, size, cart._id);
+                        });
+                    });
+        }
+
+        async function updateCartItemSize(itemId, size, cartId) {
+            try {
+                        const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({size: size}),
+                        });
+        
+                        if (!response.ok) {
+                            throw new Error(`Failed to update cart item: ${response.statusText}`);
+                        }
+        
+                        const updatedCart = await response.json();
+                            console.log("updated cart after change size : ", updatedCart)
+                            //fetchCart(); we dont need to fetch again since cart is already passed in
+                            renderCartItems(updatedCart.items)
+        
+                    } catch (error) {
+                            console.error('Error updating cart item size:', error);
+                            alert('Failed to update cart item size. Please try again.');
+                    }
+        }
+
+        async function updateCartItemQuantity(itemId, quantity, cartId) {
+            try {
+                        const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ quantity: quantity }),
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`Failed to update cart item: ${response.statusText}`);
+                        }
+        
+                        const updatedCart = await response.json();
+                        console.log("updated cart after change quantity: ", updatedCart)
+                            //fetchCart(); we dont need to fetch again since cart is already passed in
+                            renderCartItems(updatedCart.items)
+        
+                    } catch (error) {
+                            console.error('Error updating cart item quantity:', error);
+                            alert('Failed to update cart item quantity. Please try again.');
+                    }
+        }
+
+        async function deleteCartItem(itemId, cartId) {
+            try {
+                const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
+                    method: 'DELETE'
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`Failed to delete cart item: ${response.statusText}`);
+                }
+        
+                const updatedCart = await response.json();
+                console.log("updated cart after delete: ", updatedCart)
+                // fetchCart(); we dont need to fetch again since cart is already passed in
+                renderCartItems(updatedCart.items)
+            } catch (error) {
+                console.error('Error deleting cart item:', error);
+                alert('Failed to delete cart item. Please try again.');
+            }
+            }
+        // Function to handle order form submission
+        async function handleOrderSubmit(event) {
+            event.preventDefault();
+            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            const address = getAddress();
+            const phoneNumber = document.getElementById('phoneNumber').value;
+        
+            try {
+                const orderData = {
+                    userId,
+                    address,
+                    phoneNumber,
+                    items: cart.items,
+                };
+                    let paymentResponse;
+                if(paymentMethod === 'COD'){
+                        const response = await fetch('/api/order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({...orderData, paymentMethod: paymentMethod})
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Failed to create order: ${response.statusText}`);
+                    }
+                        paymentResponse = await response.json();
+                        if(paymentResponse.paymentUrl){
+                        // Delete cart after order is placed
+                        // const deleteCartResponse = await fetch(`/api/cart/${cart._id}`, {
+                        //     method: 'DELETE'
+                        // });
+                            window.location.href = paymentResponse.paymentUrl;
+                    }
+                        console.log("order info from backend: ", paymentResponse);
+                        alert('Order placed successfully!');
+                }else {
+                    // const response = await fetch(`${PAYMENT_API_URL}/${paymentMethod}`,{
+                        const response = await fetch('/api/order', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({...orderData, paymentMethod: paymentMethod})
+                    })
+                    if (!response.ok) {
+                        throw new Error(`Failed to process payment: ${response.statusText}`);
+                    }
+                        paymentResponse = await response.json();
+                        console.log("payment info from backend: ", paymentResponse);
+                    if(paymentResponse.paymentUrl){
+                            // Delete cart after order is placed
+                        //     const deleteCartResponse = await fetch(`/api/cart/${cart._id}`, {
+                        //     method: 'DELETE'
+                        // });
+                            window.location.href = paymentResponse.paymentUrl;
+                    } else{
+                        alert('Payment processed successfully');
+                        // Handle case where no redirect is needed, or handle failed status
+                            console.log("payment info from backend: ", paymentResponse);
+                    }
+                }
+                
+                
+                
+            } catch(error) {
+                console.error('Error submitting order:', error);
+                alert('Không đủ số lượng sản phẩm trong kho. Vui lòng thử lại sau.');
+            }
+        }
+        
+
+        function decreaseQuantity(button) {
+            const itemId = button.getAttribute('data-item-id');
+            let quantityInput = document.getElementById(`quantity-${itemId}`);
+            let currentValue = parseInt(quantityInput.value) || 1;
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+            }
+            quantityInput.dispatchEvent(new Event('change'));
+        }
+        
+        function increaseQuantity(button) {
+            const itemId = button.getAttribute('data-item-id');
+            let quantityInput = document.getElementById(`quantity-${itemId}`);
+            let currentValue = parseInt(quantityInput.value) || 1;
+            quantityInput.value = currentValue + 1;
+            quantityInput.dispatchEvent(new Event('change'));
+        }
+        
+        
+    function populateCities() {
+    const citySelect = document.getElementById('citySelect');
+    for (const city in cities) {
+        const option = document.createElement('option');
+        option.value = city;
+        option.textContent = city;
+        citySelect.appendChild(option);
+    }
+    }
+
+function populateDistricts(selectedCity) {
+  const districtSelect = document.getElementById('districtSelect');
+    districtSelect.innerHTML = '<option value="" selected disabled>Chọn Quận/Huyện</option>';
+  if(selectedCity){
+        const districts = cities[selectedCity];
+          for (const district in districts) {
+              const option = document.createElement('option');
+              option.value = district;
+              option.textContent = district;
+              districtSelect.appendChild(option);
+          }
+  }
+}
+
+  function populateWards(selectedCity, selectedDistrict) {
+    const wardSelect = document.getElementById('wardSelect');
+     wardSelect.innerHTML = '<option value="" selected disabled>Chọn Phường/Xã</option>';
+     if (selectedCity && selectedDistrict) {
+          const wards = cities[selectedCity][selectedDistrict];
+              wards.forEach(ward => {
+                  const option = document.createElement('option');
+                  option.value = ward;
+                  option.textContent = ward;
+                  wardSelect.appendChild(option);
+          });
+      }
+}
+
+function getAddress(){
+    const city = document.getElementById('citySelect').value;
+    const district = document.getElementById('districtSelect').value;
+    const ward = document.getElementById('wardSelect').value;
+    const street = document.getElementById('address').value;
+     if(city && district && ward && street){
+          return `${street}, ${ward}, ${district}, ${city}`
+     }
+      return ''
+}
+    const citySelect = document.getElementById('citySelect');
+      citySelect.addEventListener('change', function() {
+          const selectedCity = this.value;
+          populateDistricts(selectedCity);
+          populateWards();
+      });
+      
+      const districtSelect = document.getElementById('districtSelect');
+          districtSelect.addEventListener('change', function () {
+              const selectedCity = document.getElementById('citySelect').value;
+              const selectedDistrict = this.value;
+              populateWards(selectedCity, selectedDistrict);
+          });
+
+
+      document.addEventListener('DOMContentLoaded', () => {
+          populateCities();
+          renderCartItems(cart.items);
+
+              const orderButton = document.getElementById('order-button');
+              if (orderButton) {
+                  orderButton.addEventListener('click', handleOrderSubmit);
+              }
+          });
+  </script>
