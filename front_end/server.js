@@ -102,6 +102,11 @@ app.get('/admin', adminController.renderHomePage);
 app.get('/admin/collections/edit/:id', productController.renderEditCollectionPage);
 
 
+app.get('/payment/success', paymentController.renderPaymentSuccess);
+
+app.get('/payment/error', paymentController.renderPaymentFailed);
+
+
 // app.use(userRoutes);
 // Start server
 app.listen(PORT, () => {
