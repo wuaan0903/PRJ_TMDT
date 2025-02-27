@@ -174,4 +174,29 @@ router.get('/api/collection/:id', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/collection/${req.params.id}`);
 });
 
+// Proxy for fetching all reviews
+router.get('/api/reviews', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct`);
+});
+
+// Proxy for fetching reviews by product_id
+router.get('/api/reviewProduct/:product_id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct/${req.params.product_id}`);
+});
+
+// Proxy for creating a new review
+router.post('/api/review', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct`, 'post');
+});
+
+// Proxy for updating a review by id
+router.put('/api/review/:id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct/${req.params.id}`, 'put');
+});
+
+// Proxy for deleting a review by id
+router.delete('/api/review/:id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct/${req.params.id}`, 'delete');
+});
+
 module.exports = router;
