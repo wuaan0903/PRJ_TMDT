@@ -90,39 +90,43 @@
 
 <!-- Modal Chi Tiết Tài Khoản -->
 <div class="modal fade" id="detailAccountModal" tabindex="-1" aria-labelledby="detailAccountModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="detailAccountModalLabel">Chi tiết tài khoản</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="detailAccountForm">
-          <div class="mb-3">
-            <label for="detailAccountName" class="form-label">Tên tài khoản</label>
-            <input type="text" class="form-control" id="detailAccountName" name="detailAccountName" required>
-          </div>
-          <div class="mb-3">
-            <label for="detailAccountEmail" class="form-label">Email</label>
-            <input type="email" class="form-control" id="detailAccountEmail" name="detailAccountEmail" required>
-          </div>
-          <div class="mb-3">
-            <label for="detailAccountPhoneNumber" class="form-label">Số điện thoại</label>
-            <input type="text" class="form-control" id="detailAccountPhoneNumber" name="detailAccountPhoneNumber" required>
-          </div>
-          <div class="mb-3">
-            <label for="detailAccountRole" class="form-label">Vai trò</label>
-            <select class="form-control" id="detailAccountRole" name="detailAccountRole" required>
-              <option value="user">Người dùng</option>
-              <option value="staff">Nhân viên</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary">Cập nhật</button>
-        </form>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailAccountModalLabel">Chi tiết tài khoản</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="detailAccountForm">
+            <div class="mb-3">
+              <label for="detailAccountName" class="form-label">Tên tài khoản</label>
+              <input type="text" class="form-control" id="detailAccountName" name="detailAccountName" required>
+            </div>
+            <div class="mb-3">
+              <label for="detailAccountEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="detailAccountEmail" name="detailAccountEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="detailAccountPhoneNumber" class="form-label">Số điện thoại</label>
+              <input type="text" class="form-control" id="detailAccountPhoneNumber" name="detailAccountPhoneNumber" required>
+            </div>
+            <div class="mb-3">
+              <label for="detailAccountRole" class="form-label">Vai trò</label>
+              <select class="form-control" id="detailAccountRole" name="detailAccountRole" required>
+                <option value="user">Người dùng</option>
+                <option value="staff">Nhân viên</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="detailAccountPassword" class="form-label">Cập Nhật Mật khẩu</label>
+              <input type="password" class="form-control" id="detailAccountPassword" name="detailAccountPassword" placeholder="Nhập mật khẩu mới nếu muốn thay đổi">
+            </div>
+            <button type="submit" class="btn btn-primary">Cập nhật</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 <!-- Bootstrap Bundle (bao gồm Popper.js) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -268,8 +272,15 @@
             document.getElementById('detailAccountEmail').value = account.email;
             document.getElementById('detailAccountPhoneNumber').value = account.phone_number;
             document.getElementById('detailAccountRole').value = account.role;
+    
+            const passwordField = document.getElementById('detailAccountPassword');
+            
+                passwordField.value = ''; // Đặt lại trường mật khẩu cho tài khoản người dùng
+            
+            passwordField.parentElement.style.display = 'block'; // Hiển thị trường mật khẩu
+    
             document.getElementById('detailAccountForm').setAttribute('data-account-id', account._id);
-
+    
             const detailAccountModal = new bootstrap.Modal(document.getElementById('detailAccountModal'));
             detailAccountModal.show();
         } catch (error) {
@@ -277,7 +288,6 @@
             alert('Không thể tải thông tin tài khoản.');
         }
     }
-
     async function updateAccount(event) {
         event.preventDefault();
         const accountId = document.getElementById('detailAccountForm').getAttribute('data-account-id');
@@ -285,18 +295,25 @@
         const accountEmail = document.getElementById('detailAccountEmail').value.trim();
         const accountPhoneNumber = document.getElementById('detailAccountPhoneNumber').value.trim();
         const accountRole = document.getElementById('detailAccountRole').value;
-
+        const accountPassword = document.getElementById('detailAccountPassword').value.trim();
+    
         if (!accountName || !accountEmail || !accountPhoneNumber) {
             alert('Vui lòng nhập đầy đủ thông tin tài khoản.');
             return;
         }
+    
+        const updateData = { username: accountName, email: accountEmail, phone_number: accountPhoneNumber, role: accountRole };
+        if (accountPassword) {
+            updateData.password = accountPassword; // Chỉ thêm trường mật khẩu nếu có giá trị
+        }
+    
         try {
             const response = await fetch(`/api/account/${accountId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username: accountName, email: accountEmail, phone_number: accountPhoneNumber, role: accountRole }),
+                body: JSON.stringify(updateData),
             });
             if (response.ok) {
                 fetchUsers();

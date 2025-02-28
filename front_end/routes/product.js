@@ -199,4 +199,36 @@ router.delete('/api/review/:id', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct/${req.params.id}`, 'delete');
 });
 
+
+
+// Proxy for fetching all vouchers
+router.get('/api/vouchers', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/vouchers`);
+});
+
+// Proxy for fetching a single voucher by id
+router.get('/api/voucher/:id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/vouchers/${req.params.id}`);
+});
+
+// Proxy for creating a new voucher
+router.post('/api/voucher', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/vouchers`, 'post');
+});
+
+// Proxy for updating a voucher by id
+router.patch('/api/voucher/:id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/vouchers/${req.params.id}`, 'patch');
+});
+
+// Proxy for deleting a voucher by id
+router.delete('/api/voucher/:id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/vouchers/${req.params.id}`, 'delete');
+});
+
+// Proxy for check a voucher by code
+router.get('/api/voucher/check/:code', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/vouchers/check/${req.params.code}`);
+});
+
 module.exports = router;

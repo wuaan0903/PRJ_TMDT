@@ -54,7 +54,11 @@
         }
     </style>
     <section style="padding-top: 82px;">
-        <div class="container my-5">
+        <div class="container my-5" style="
+        margin: 0;
+        max-width: 100%;
+        padding: 0 60px;
+    ">
             <div class="row">
                 <!-- Thông tin đặt hàng -->
                 <div class="col-lg-7">
@@ -198,32 +202,66 @@
                                     Xóa</button>
                             </div>
                  </div></div>
+                 
+                 <div class="d-flex">
+                    <input type="text" id="voucherCodeInput" class="form-control" placeholder="Nhập mã giảm giá" style="
+                    border-radius: 30px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    padding: 10px;
+                    margin-right: 10px;
+                    ">
+                    <button class="btn btn-dark" onclick="applyVoucher()" style="
+                    font-size: 14px;
+                    font-weight: 600;
+                    width: 250px;
+                    border-radius: 30px;
+                    ">Áp dụng Voucher</button>
+                </div>
 
                     <div class="pricing-info">
                         <!-- Divider -->
                         <div class="divider border-top my-2"></div>
                         <!-- Tạm tính -->
                         <div class="d-flex justify-content-between align-items-center my-3">
-                            <p class="mb-0 letter-spacing fw-medium">Tạm tính</p>
+                            <p class="mb-0 letter-spacing " style="
+                            font-size: 14px;
+                            font-weight: 600;
+                        ">Tạm tính</p>
                             <p class="mb-0 text-end">
-                                <span class="fw-medium" id="subtotal">199.000đ</span>
+                                <span style="
+                                font-size: 14px;
+                                font-weight: 600;
+                            " id="subtotal">199.000đ</span>
 
                             </p>
                         </div>
 
                         <!-- Giảm giá -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <p class="mb-0 letter-spacing fw-medium">Giảm giá</p>
+                            <p class="mb-0 letter-spacing" style="
+                            font-size: 14px;
+                            font-weight: 600;
+                            ">Giảm giá</p>
                             <p class="mb-0 text-end">
-                                <span class="price_text fw-medium">0đ</span>
+                                <span id="discountAmount" style="
+                                font-size: 14px;
+                                font-weight: 600;
+                                ">0đ</span>
                             </p>
                         </div>
 
                         <!-- Phí giao hàng -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <p class="mb-0 letter-spacing fw-medium">Phí giao hàng</p>
+                            <p class="mb-0 letter-spacing" style="
+                            font-size: 14px;
+                            font-weight: 600;
+                        ">Phí giao hàng</p>
                             <p class="mb-0 text-end">
-                                <span class="fw-medium">Miễn phí</span>
+                                <span style="
+                                font-size: 14px;
+                                font-weight: 600;
+                            ">Miễn phí</span>
                             </p>
                         </div>
 
@@ -325,9 +363,15 @@
                 itemElement.innerHTML = `
                     <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}" alt="Sản phẩm" class="me-3" style="height: 120px; object-fit: cover;">
                         <div class="d-flex flex-column align-items-start justify-content-between w-100">
-                            <h6 class="mb-1 fw-medium letter-spacing">${product.name}</h6>
+                            <h6 class="mb-1 letter-spacing" style="
+    font-size: 14px;
+    font-weight: 600;
+">${product.name}</h6>
                                 <div class="d-flex w-100 justify-content-between">
-                                    <select id="size-${item._id}" class="form-select rounded-pill w-25 fw-medium size-select" name="size" aria-label="Default select example" data-size="${item.size}" data-item-id="${item._id}">
+                                    <select id="size-${item._id}" class="form-select rounded-pill w-25 size-select" name="size" aria-label="Default select example" data-size="${item.size}" data-item-id="${item._id}" style="
+    font-size: 13px;
+    font-weight: 600;
+">
                                         <option value="S" ${item.size === 'S' ? 'selected' : ''}>S</option>
                                         <option value="M" ${item.size === 'M' ? 'selected' : ''}>M</option>
                                         <option value="L" ${item.size === 'L' ? 'selected' : ''}>L</option>
@@ -341,12 +385,18 @@
                                         <button type="button" class="qty-btn fw-bold" data-item-id="${item._id}"  onclick="increaseQuantity(this)">+</button>
                                     </div>
                                     <div>
-                                        <p class=" fw-bold ">${product.price.toLocaleString('vi-VN') + 'đ'}</p>
+                                        <p class=" fw-bold " style="
+    margin: 10px 0;
+">${product.price.toLocaleString('vi-VN') + 'đ'}</p>
                                     </div>
                                 </div>
                                     
                                 
-                                <button class="btn btn-light text-dark fw-medium delete-button" data-item-id="${item._id}">
+                                <button class="btn btn-light text-dark delete-button" data-item-id="${item._id}" style="
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+">
                                     <i class='bx bx-trash'></i>
                                     Xóa</button>
                             </div>
@@ -618,4 +668,58 @@ function getAddress(){
                   orderButton.addEventListener('click', handleOrderSubmit);
               }
           });
+
+
+
+          async function applyVoucher() {
+            const voucherCode = document.getElementById('voucherCodeInput').value;
+            if (!voucherCode) {
+                alert('Vui lòng nhập mã giảm giá.');
+                return;
+            }
+        
+            try {
+                const response = await fetch(`/api/voucher/check/${voucherCode}`);
+                if (!response.ok) {
+                    throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
+                }
+                const voucher = await response.json();
+        
+                // Kiểm tra nếu voucher hợp lệ
+                if (voucher && voucher.isActive) {
+                    const discountAmount = calculateDiscount(voucher);
+                    updateTotal(discountAmount);
+                    alert('Áp dụng mã giảm giá thành công.');
+                } else {
+                    alert('Mã giảm giá không hợp lệ hoặc đã hết hạn.');
+                }
+            } catch (error) {
+                console.error('Lỗi khi áp dụng mã giảm giá:', error);
+                alert('Đã xảy ra lỗi khi áp dụng mã giảm giá.');
+            }
+        }
+        
+        function calculateDiscount(voucher) {
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/\D/g, ''));
+            let discountAmount = 0;
+        
+            if (voucher.type === 'percentage') {
+                discountAmount = (subtotal * voucher.discount) / 100;
+                if (voucher.maxDiscount && discountAmount > voucher.maxDiscount) {
+                    discountAmount = voucher.maxDiscount;
+                }
+            } else if (voucher.type === 'fixed') {
+                discountAmount = voucher.discount;
+            }
+        
+            return discountAmount;
+        }
+        
+        function updateTotal(discountAmount) {
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/\D/g, ''));
+            const total = subtotal - discountAmount;
+        
+            document.getElementById('discountAmount').textContent = discountAmount.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('total').textContent = total.toLocaleString('vi-VN') + 'đ';
+        }
   </script>

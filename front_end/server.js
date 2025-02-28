@@ -94,6 +94,10 @@ app.get("/admin/account", (req, res) => {
   res.render("admin/account/listAccount"); //
 });
 
+app.get("/admin/discount", (req, res) => {
+  res.render("admin/discount/listVoucher"); //
+});
+
 app.get('/product/:id', productController.renderProductDetails);
 app.get('/cart/:id', cartController.renderCartPage);
 app.get('/admin/storage/edit/:id', productController.renderEditQuantityPage);

@@ -1,0 +1,366 @@
+<%- layout('../layouts/index') %>
+<main id="view-panel">
+    <div class="bg-white border rounded-4">
+        <div>
+            <div class="p-3 border-bottom d-flex justify-content-between">
+                <h3 class="m-0 d-flex align-items-center fs-4">Quản lý Voucher</h3>
+                <button id="showAddVoucherModalBtn" class="btn btn-success m-2" style="white-space: nowrap;">Thêm mới</button>
+            </div>
+        </div>
+        <div class="table-data">
+            <div class="order">
+                <h4>Danh sách Voucher</h4>
+                <table class="myTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Mã Voucher</th>
+                            <th>Giảm giá</th>
+                            <th>Loại</th>
+                            <th>Ngày hết hạn</th>
+                            <th>Giá trị đơn hàng tối thiểu</th>
+                            <th>Giảm giá tối đa</th>
+                            <th>Giới hạn sử dụng</th>
+                            <th>Số lần đã sử dụng</th>
+                            <th>Trạng thái</th>
+                            <th>Chi tiết</th>
+                            <th>Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbody active" id="voucherTableBody">
+                        <!-- Dữ liệu voucher sẽ được tải ở đây -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal Thêm Voucher -->
+<div class="modal fade" id="addVoucherModal" tabindex="-1" aria-labelledby="addVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addVoucherModalLabel">Thêm Voucher</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addVoucherForm">
+                    <div class="mb-3">
+                        <label for="voucherCode" class="form-label">Mã Voucher</label>
+                        <input type="text" class="form-control" id="voucherCode" name="voucherCode" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="voucherDiscount" class="form-label">Giảm giá</label>
+                        <input type="number" class="form-control" id="voucherDiscount" name="voucherDiscount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="voucherType" class="form-label">Loại</label>
+                        <select class="form-control" id="voucherType" name="voucherType" required>
+                            <option value="percentage">Phần trăm</option>
+                            <option value="fixed">Cố định</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="voucherExpirationDate" class="form-label">Ngày hết hạn</label>
+                        <input type="date" class="form-control" id="voucherExpirationDate" name="voucherExpirationDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="voucherMinOrderValue" class="form-label">Giá trị đơn hàng tối thiểu</label>
+                        <input type="number" class="form-control" id="voucherMinOrderValue" name="voucherMinOrderValue">
+                    </div>
+                    <div class="mb-3">
+                        <label for="voucherMaxDiscount" class="form-label">Giảm giá tối đa</label>
+                        <input type="number" class="form-control" id="voucherMaxDiscount" name="voucherMaxDiscount">
+                    </div>
+                    <div class="mb-3">
+                        <label for="voucherUsageLimit" class="form-label">Giới hạn sử dụng</label>
+                        <input type="number" class="form-control" id="voucherUsageLimit" name="voucherUsageLimit">
+                    </div>
+                    <div class="mb-3">
+                        <label for="voucherIsActive" class="form-label">Trạng thái</label>
+                        <select class="form-control" id="voucherIsActive" name="voucherIsActive" required>
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Không hoạt động</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Thêm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chi Tiết Voucher -->
+<div class="modal fade" id="detailVoucherModal" tabindex="-1" aria-labelledby="detailVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailVoucherModalLabel">Chi tiết Voucher</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="detailVoucherForm">
+                    <input type="hidden" id="detailVoucherId">
+                    <div class="mb-3">
+                        <label for="detailVoucherCode" class="form-label">Mã Voucher</label>
+                        <input type="text" class="form-control" id="detailVoucherCode" name="detailVoucherCode" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="detailVoucherDiscount" class="form-label">Giảm giá</label>
+                        <input type="number" class="form-control" id="detailVoucherDiscount" name="detailVoucherDiscount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="detailVoucherType" class="form-label">Loại</label>
+                        <select class="form-control" id="detailVoucherType" name="detailVoucherType" required>
+                            <option value="percentage">Phần trăm</option>
+                            <option value="fixed">Cố định</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="detailVoucherExpirationDate" class="form-label">Ngày hết hạn</label>
+                        <input type="date" class="form-control" id="detailVoucherExpirationDate" name="detailVoucherExpirationDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="detailVoucherMinOrderValue" class="form-label">Giá trị đơn hàng tối thiểu</label>
+                        <input type="number" class="form-control" id="detailVoucherMinOrderValue" name="detailVoucherMinOrderValue">
+                    </div>
+                    <div class="mb-3">
+                        <label for="detailVoucherMaxDiscount" class="form-label">Giảm giá tối đa</label>
+                        <input type="number" class="form-control" id="detailVoucherMaxDiscount" name="detailVoucherMaxDiscount">
+                    </div>
+                    <div class="mb-3">
+                        <label for="detailVoucherUsageLimit" class="form-label">Giới hạn sử dụng</label>
+                        <input type="number" class="form-control" id="detailVoucherUsageLimit" name="detailVoucherUsageLimit">
+                    </div>
+                    <div class="mb-3">
+                        <label for="detailVoucherIsActive" class="form-label">Trạng thái</label>
+                        <select class="form-control" id="detailVoucherIsActive" name="detailVoucherIsActive" required>
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Không hoạt động</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Bundle (bao gồm Popper.js) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchVouchers();
+
+        document.getElementById('showAddVoucherModalBtn').addEventListener('click', () => {
+            $('#addVoucherModal').modal('show');
+        });
+
+        document.getElementById('addVoucherForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            await addVoucher();
+        });
+
+        document.getElementById('detailVoucherForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            await updateVoucher();
+        });
+    });
+
+    async function fetchVouchers() {
+        try {
+            const response = await fetch('/api/vouchers');
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
+            }
+            const vouchers = await response.json();
+            updateVoucherTable(vouchers);
+        } catch (error) {
+            console.error('Không thể tải danh sách voucher:', error);
+            alert('Không thể tải danh sách voucher.');
+        }
+    }
+
+    function updateVoucherTable(vouchers) {
+        const tableBody = document.getElementById('voucherTableBody');
+        tableBody.innerHTML = '';
+        vouchers.forEach((voucher, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${voucher.code}</td>
+                <td>${voucher.discount}</td>
+                <td>${voucher.type}</td>
+                <td>${new Date(voucher.expirationDate).toLocaleDateString()}</td>
+<td>${voucher.minOrderValue.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</td>
+<td>${voucher.maxDiscount.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</td>
+
+                <td>${voucher.usageLimit}</td>
+                <td>${voucher.usedCount}</td>
+                <td>${voucher.isActive ? 'Hoạt động' : 'Không hoạt động'}</td>
+                <td>
+                    <button class="btn btn-primary" onclick="showDetailModal('${voucher._id}')">Chi tiết</button>
+                    
+                </td>
+                <td>
+                    
+                    <button class="btn btn-danger" onclick="deleteVoucher('${voucher._id}')">Xóa</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    async function addVoucher() {
+        const form = document.getElementById('addVoucherForm');
+        const formData = new FormData(form);
+        const voucherData = {};
+    
+        formData.forEach((value, key) => {
+            voucherData[key] = value;
+        });
+    
+        // Chuyển đổi các giá trị boolean và số
+        voucherData.isActive = voucherData.voucherIsActive === 'true';
+        voucherData.discount = parseFloat(voucherData.voucherDiscount);
+        voucherData.minOrderValue = parseFloat(voucherData.voucherMinOrderValue);
+        voucherData.maxDiscount = parseFloat(voucherData.voucherMaxDiscount);
+        voucherData.usageLimit = parseInt(voucherData.voucherUsageLimit);
+        voucherData.usedCount = 0; // Đặt giá trị mặc định cho usedCount
+    
+        // Đổi tên các trường để khớp với định dạng yêu cầu
+        voucherData.code = voucherData.voucherCode;
+        voucherData.expirationDate = voucherData.voucherExpirationDate;
+        voucherData.type = voucherData.voucherType;
+    
+        // Xóa các trường không cần thiết
+        delete voucherData.voucherCode;
+        delete voucherData.voucherDiscount;
+        delete voucherData.voucherMinOrderValue;
+        delete voucherData.voucherMaxDiscount;
+        delete voucherData.voucherUsageLimit;
+        delete voucherData.voucherIsActive;
+        delete voucherData.voucherType;
+        delete voucherData.voucherExpirationDate;
+    
+        try {
+            const response = await fetch('/api/voucher', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(voucherData)
+            });
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
+            }
+            fetchVouchers();
+            $('#addVoucherModal').modal('hide');
+            form.reset();
+            alert('Thêm voucher thành công.');
+        } catch (error) {
+            console.error('Lỗi khi thêm voucher:', error);
+            alert('Đã xảy ra lỗi khi thêm voucher.');
+        }
+    }
+
+    async function showDetailModal(voucherId) {
+        try {
+            const response = await fetch(`/api/voucher/${voucherId}`);
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
+            }
+            const voucher = await response.json();
+            document.getElementById('detailVoucherId').value = voucher._id;
+            document.getElementById('detailVoucherCode').value = voucher.code;
+            document.getElementById('detailVoucherDiscount').value = voucher.discount;
+            document.getElementById('detailVoucherType').value = voucher.type;
+            document.getElementById('detailVoucherExpirationDate').value = voucher.expirationDate.split('T')[0];
+            document.getElementById('detailVoucherMinOrderValue').value = voucher.minOrderValue;
+            document.getElementById('detailVoucherMaxDiscount').value = voucher.maxDiscount;
+            document.getElementById('detailVoucherUsageLimit').value = voucher.usageLimit;
+            document.getElementById('detailVoucherIsActive').value = voucher.isActive;
+
+            $('#detailVoucherModal').modal('show');
+        } catch (error) {
+            console.error('Không thể tải thông tin voucher:', error);
+            alert('Không thể tải thông tin voucher.');
+        }
+    }
+
+
+    async function updateVoucher() {
+        const form = document.getElementById('detailVoucherForm');
+        const formData = new FormData(form);
+        const voucherData = {};
+    
+        formData.forEach((value, key) => {
+            voucherData[key] = value;
+        });
+    
+        // Chuyển đổi các giá trị boolean và số
+        voucherData.isActive = voucherData.detailVoucherIsActive === 'true';
+        voucherData.discount = parseFloat(voucherData.detailVoucherDiscount);
+        voucherData.minOrderValue = parseFloat(voucherData.detailVoucherMinOrderValue);
+        voucherData.maxDiscount = parseFloat(voucherData.detailVoucherMaxDiscount);
+        voucherData.usageLimit = parseInt(voucherData.detailVoucherUsageLimit);
+    
+        // Đổi tên các trường để khớp với định dạng yêu cầu
+        voucherData.code = voucherData.detailVoucherCode;
+        voucherData.expirationDate = voucherData.detailVoucherExpirationDate;
+        voucherData.type = voucherData.detailVoucherType;
+    
+        // Xóa các trường không cần thiết
+        delete voucherData.detailVoucherCode;
+        delete voucherData.detailVoucherDiscount;
+        delete voucherData.detailVoucherMinOrderValue;
+        delete voucherData.detailVoucherMaxDiscount;
+        delete voucherData.detailVoucherUsageLimit;
+        delete voucherData.detailVoucherIsActive;
+        delete voucherData.detailVoucherType;
+        delete voucherData.detailVoucherExpirationDate;
+    
+        const voucherId = document.getElementById('detailVoucherId').value;
+        console.log(voucherId);
+    
+        try {
+            const response = await fetch(`/api/voucher/${voucherId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(voucherData)
+            });
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
+            }
+            fetchVouchers();
+            $('#detailVoucherModal').modal('hide');
+            alert('Cập nhật voucher thành công.');
+        } catch (error) {
+            console.error('Lỗi khi cập nhật voucher:', error);
+            alert('Đã xảy ra lỗi khi cập nhật voucher.');
+        }
+    }
+
+    async function deleteVoucher(voucherId) {
+        if (!confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/voucher/${voucherId}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
+            }
+            fetchVouchers();
+            alert('Xóa voucher thành công.');
+        } catch (error) {
+            console.error('Lỗi khi xóa voucher:', error);
+            alert('Đã xảy ra lỗi khi xóa voucher.');
+        }
+    }
+</script>

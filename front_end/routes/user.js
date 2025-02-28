@@ -237,13 +237,20 @@ router.post('/api/account', async (req, res) => {
 // Proxy to update a user or staff account
 router.patch('/api/account/:userId', async (req, res) => {
   try {
-    const { username, email, phone_number, role } = req.body;
+    const { username, email, phone_number, role, password } = req.body; // Thêm trường password
+    const updateData = { username, email, phone_number, role };
+
+    // Chỉ thêm trường password nếu có giá trị
+    if (password) {
+      updateData.password = password;
+    }
+
     const backendResponse = await fetch(`${BACKEND_API_URL}/api/users/${req.params.userId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ username, email, phone_number, role })
+      body: JSON.stringify(updateData)
     });
 
     if (!backendResponse.ok) {
