@@ -7,6 +7,7 @@ import collectionRoutes from './routes/collectionRoutes.mjs';
 import imageProductRoutes from './routes/imageProductRoutes.mjs';
 import quantityProductRoutes from './routes/quantityProductRoutes.mjs';
 import bannerRoutes from './routes/bannerRoutes.mjs';
+import voucherRoutes from './routes/voucherRoutes.mjs'; 
 import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -25,6 +26,7 @@ app.use('/api/collection', collectionRoutes);
 app.use('/api/imageProduct', imageProductRoutes);
 app.use('/api/quantityProduct', quantityProductRoutes);
 app.use('/api/banners', bannerRoutes);
+app.use('/api/vouchers', voucherRoutes);
 
 // MongoDB Connection
 connectDB();

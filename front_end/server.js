@@ -47,6 +47,12 @@ app.get('/cart', (req, res) => {
   res.render('cart'); // Renders the home.ejs file
 });
 
+app.get('/account', (req, res) => {
+  
+  res.render('infor_account'); // Renders the home.ejs file
+});
+
+
 app.get('/login', (req, res) => {
   res.render('login');
 })
@@ -74,7 +80,10 @@ app.get('/admin/products/add', (req, res) => {
 app.get('/admin/storage', (req, res) => {
   res.render('admin/storage/listStorage'); // 
 });
-
+app.get('/admin/vouchers', (req, res) => {
+  
+  res.render('admin/vouchers/voucher'); // 
+});
 // app.get('/admin/storage/edit', (req, res) => {
 //   res.render('admin/storage/editStorage'); // 
 // });

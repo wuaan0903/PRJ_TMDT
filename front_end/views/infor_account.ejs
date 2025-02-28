@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Tài Khoản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f0f0;
+        }
+        .account-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar {
+            background: rgb(250, 249, 249);
+            color: rgb(4, 4, 4);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        .sidebar a {
+            color: rgb(9, 9, 9);
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-bottom: 1px solid #555;
+        }
+        .sidebar a:hover {
+            background: #25f20a;
+        }
+        .progress-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="progress-container">
+            <h3>Hi, Lê Hữu Hùng</h3>
+            <p>Chi tiêu thêm <strong>500.000đ</strong> để lên hạng <strong>BẠC</strong></p>
+            <div class="progress" style="height: 8px;">
+                <div class="progress-bar" style="width: 50%;"></div>
+            </div>
+            <p class="text-muted">Hạng thành viên được xét vào 01/01/2025, xét tiếp theo vào 01/01/2026</p>
+            <p class="text-end"><strong>50.000 CoolCash</strong></p>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="sidebar">
+                    <h5 class="text-center">Thông tin tài khoản</h5>
+                    <a href="#">Lịch sử đơn hàng</a>
+                    <a href="#">Lịch sử CoolCash</a>
+                    <a href="#">Ví Voucher</a>
+                    <a href="#">Sổ địa chỉ</a>
+                    <a href="#">Đánh giá và phản hồi</a>
+                    <a href="#">Chính sách & Câu hỏi</a>
+                    <a href="#" class="text-danger">Đăng xuất</a>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="account-container">
+                    <h5>Thông tin tài khoản</h5>
+                    <p><strong>Họ và tên:</strong> Lê Hữu Hùng </p>
+                    <p><strong>Số điện thoại:</strong> 0333790996</p>
+                    <p><strong>Giới tính:</strong> Chưa cập nhật</p>
+                    <p><strong>Ngày sinh:</strong> Hãy cập nhật để nhận quà!</p>
+                    <button class="btn btn-primary">Cập nhật</button>
+                    <hr>
+                    <h5>Thông tin đăng nhập</h5>
+                    <p><strong>Email:</strong> trickerquandz@gmail.com</p>
+                    <p><strong>Mật khẩu:</strong> ********</p>
+                    <button class="btn btn-primary">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
