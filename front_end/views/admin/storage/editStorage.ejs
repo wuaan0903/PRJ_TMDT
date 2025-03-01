@@ -1,5 +1,9 @@
 <%- layout('../layouts/index') %>
 
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    </head>
+
     <main>
         <div class="border rounded-4 bg-white">
             <div class="p-3 border-bottom">
@@ -41,7 +45,7 @@
                                             <th style="width: 100px;">Size</th>
                                             <th style="width: 150px;">Số lượng</th>
                                             <th>Mô tả</th>
-                                            <th style="width: 120px;">Hành động</th>
+                                            <th style="width: 120px;" class="text-center">Hành động</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -96,10 +100,21 @@
                                                         </b> sản phẩm</span>
                                                 </td>
                                                 <td>
-                                                    <button type="button" class="btn btn-success btn-update-row"
-                                                        data-size="<%= item.size %>"
-                                                        data-row-index="<%= index + 1 %>">Cập
-                                                        nhật</button>
+                                                    <div class="d-flex gap-2 justify-content-center action-buttons">
+                                                        <button type="button" class="btn btn-success btn-sm btn-update-row"
+                                                            data-size="<%= item.size %>"
+                                                            data-row-index="<%= index + 1 %>"
+                                                            title="Cập nhật">
+                                                            <i class="fas fa-sync-alt me-1"></i>
+                                                            Cập nhật
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger btn-sm btn-icon btn-delete-row"
+                                                            data-size="<%= item.size %>"
+                                                            data-row-index="<%= index + 1 %>"
+                                                            title="Xóa">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <% }); %>
@@ -167,6 +182,63 @@
                     } catch (error) {
                         console.error('Error updating quantity:', error);
                         alert('An error occurred while updating product quantity.')
+                    }
+                });
+            });
+            const deleteButtons = document.querySelectorAll('.btn-delete-row');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', async function () {
+                    if (!confirm('Bạn có chắc chắn muốn xóa size này không?')) {
+                        return;
+                    }
+
+                    const size = this.getAttribute('data-size');
+                    const rowIndex = this.getAttribute('data-row-index');
+                    const row = this.closest('tr');
+
+                    try {
+                        const response = await fetch(`/api/product-quantity/${productId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                size: size
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            // Xóa hàng khỏi bảng
+                            row.remove();
+                            
+                            // Kiểm tra nếu không còn size nào
+                            const remainingRows = document.querySelectorAll('tbody tr');
+                            if (remainingRows.length === 0) {
+                                const tbody = document.querySelector('tbody');
+                                tbody.innerHTML = `
+                                    <tr>
+                                        <td colspan="5" class="text-center">Không có dữ liệu size cho sản phẩm này</td>
+                                    </tr>
+                                `;
+                            } else {
+                                // Cập nhật lại STT cho các hàng còn lại
+                                remainingRows.forEach((row, index) => {
+                                    const sttCell = row.querySelector('td:first-child');
+                                    if (sttCell) {
+                                        sttCell.textContent = index + 1;
+                                    }
+                                });
+                            }
+                            
+                            alert(result.message || 'Xóa size thành công!');
+                        } else {
+                            alert(result.message || 'Không thể xóa size! Vui lòng thử lại.');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi khi xóa size! Vui lòng thử lại sau.');
                     }
                 });
             });
@@ -253,6 +325,122 @@
             .d-flex.gap-2 button {
                 width: 100%;
                 margin-bottom: 0.5rem;
+            }
+        }
+
+        .btn-danger {
+            padding: 0.375rem 0.75rem;
+        }
+
+        .btn-delete-row {
+            width: 40px;
+            padding: 0.375rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-update-row, .btn-delete-row {
+            min-width: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .btn-delete-row {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .d-flex.gap-1 {
+            gap: 0.25rem !important;
+        }
+
+        @media (max-width: 768px) {
+            .btn-update-row, .btn-delete-row {
+                width: auto;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        .action-buttons {
+            white-space: nowrap;
+        }
+
+        .btn-update-row {
+            padding: 0.25rem 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            min-width: 100px;
+            font-size: 0.875rem;
+        }
+
+        .btn-update-row:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon i {
+            font-size: 14px;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .btn-success.btn-icon, .btn-success.btn-update-row {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-danger.btn-icon {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-success.btn-icon:hover, .btn-success.btn-update-row:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        .btn-danger.btn-icon:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                gap: 0.5rem !important;
+            }
+            
+            .btn-icon {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .btn-icon i {
+                font-size: 12px;
+            }
+
+            .btn-update-row {
+                min-width: auto;
+                padding: 0.25rem 0.5rem;
             }
         }
     </style>
