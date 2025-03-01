@@ -1,252 +1,258 @@
 <%- layout('../layouts/index') %>
 
-<main>
-    <div class="border rounded-4 bg-white">
-        <div class="p-3 border-bottom">
-            <h2 class="fs-4 m-0">Cập nhật kho hàng</h2>
-        </div>
-        <div class="p-3">
-            <form accept-charset="UTF-8" id="form-add-product" method="post" enctype="multipart/form-data">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="exampleFormControlInput1" class="form-label">Tên sản phẩm</label>
-                        <input type="hidden" name="productId" value="<%= productQuantity[0].product_id %>">
-                        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Tên sản phẩm" name="name" value="" readonly>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Thêm size mới</label>
-                        <div class="d-flex gap-2">
-                            <input type="hidden" name="product_id" id="productId" value="<%= productQuantity[0].product_id %>">
-                            <input type="text" class="form-control" id="newSize" placeholder="Nhập size mới" name="size">
-                            <input type="number" class="form-control" id="newQuantity" placeholder="Nhập số lượng" name="quantity" min="0">
-                            <button id="addSizeBtn" type="button" class="btn btn-success" style="white-space: nowrap;">Thêm mới</button>
+    <main>
+        <div class="border rounded-4 bg-white">
+            <div class="p-3 border-bottom">
+                <h2 class="fs-4 m-0">Cập nhật kho hàng</h2>
+            </div>
+            <div class="p-3">
+                <form accept-charset="UTF-8" id="form-add-product" method="post" enctype="multipart/form-data">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="exampleFormControlInput1" class="form-label">Tên sản phẩm</label>
+                            <input type="hidden" name="productId" value="<%= productQuantity[0]?.product_id || '' %>">
+                            <input type="text" class="form-control" id="exampleFormControlInput1"
+                                placeholder="Tên sản phẩm" name="name" value="" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Thêm size mới</label>
+                            <div class="d-flex gap-2">
+                                <input type="hidden" name="product_id" id="productId"
+                                    value="<%= productQuantity[0]?.product_id || '' %>">
+                                <input type="text" class="form-control" id="newSize" placeholder="Nhập size mới"
+                                    name="size">
+                                <input type="number" class="form-control" id="newQuantity" placeholder="Nhập số lượng"
+                                    name="quantity" min="0">
+                                <button id="addSizeBtn" type="button" class="btn btn-success"
+                                    style="white-space: nowrap;">Thêm mới</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Phần bảng danh sách -->
-                <div class="row">
-                    <div class="col-12">
-                        <label for="size" class="form-label">Danh sách Size và Số lượng</label>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 60px;">STT</th>
-                                        <th style="width: 100px;">Size</th>
-                                        <th style="width: 150px;">Số lượng</th>
-                                        <th>Mô tả</th>
-                                        <th style="width: 120px;">Hành động</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% const sizeLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL']; %>
-                                    <% sizeLabels.forEach((size, index) => { %>
-                                    <tr>
-                                        <td><%= index + 1 %></td>
-                                        <td>
-                                            <input type="hidden" name="sizes[]" value="<%= size %>">
-                                            <%= size %>
-                                        </td>
-                                        <td>
-                                            <% 
-                                                let quantity = 0;
-                                                const quantities = productQuantity ? productQuantity : [];
-                                                const foundQuantity = quantities.find(q => q.size === size);
-                                                if(foundQuantity) {
-                                                    quantity = foundQuantity.quantity;
-                                                }
+                    <!-- Phần bảng danh sách -->
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="size" class="form-label">Danh sách Size và Số lượng</label>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 60px;">STT</th>
+                                            <th style="width: 100px;">Size</th>
+                                            <th style="width: 150px;">Số lượng</th>
+                                            <th>Mô tả</th>
+                                            <th style="width: 120px;">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (productQuantity && productQuantity.length> 0) {
+                                            // Define size order function
+                                            function getSizeOrder(size) {
+                                            // Common clothing sizes in order
+                                            const sizeOrder = {
+                                            'XS': 0,
+                                            'S': 1,
+                                            'M': 2,
+                                            'L': 3,
+                                            'XL': 4,
+                                            '2XL': 5,
+                                            'XXL': 5, // Alternative format
+                                            '3XL': 6,
+                                            'XXXL': 6, // Alternative format
+                                            '4XL': 7,
+                                            'XXXXL': 7, // Alternative format
+                                            '5XL': 8,
+                                            'XXXXXL': 8 // Alternative format
+                                            };
+
+                                            // Return the order if it exists, otherwise a high number
+                                            return sizeOrder[size.toUpperCase()] !== undefined ?
+                                            sizeOrder[size.toUpperCase()] : 999;
+                                            }
+
+                                            // Sort the productQuantity array by size order
+                                            const sortedProductQuantity = [...productQuantity].sort((a, b) => {
+                                            return getSizeOrder(a.size) - getSizeOrder(b.size);
+                                            });
+
+                                            sortedProductQuantity.forEach((item, index) => {
                                             %>
-                                            <input type="number" class="form-control price" name="quantity[]" placeholder="0" value="<%= quantity %>" aria-label="Số lượng" min="0">
-                                        </td>
-                                        <td>
-                                            <span id="descQuantity-<%= index + 1 %>">Trong kho còn lại <b><%= quantity %></b> sản phẩm</span>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-success btn-update-row" data-size="<%= size %>" data-row-index="<%= index + 1 %>">Cập nhật</button>
-                                        </td>
-                                    </tr>
-                                    <% }); %>
-                                </tbody>
-                            </table>
+                                            <tr>
+                                                <td>
+                                                    <%= index + 1 %>
+                                                </td>
+                                                <td>
+                                                    <input type="hidden" name="sizes[]" value="<%= item.size %>">
+                                                    <%= item.size %>
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control price" name="quantity[]"
+                                                        placeholder="0" value="<%= item.quantity %>"
+                                                        aria-label="Số lượng" min="0">
+                                                </td>
+                                                <td>
+                                                    <span id="descQuantity-<%= index + 1 %>">Trong kho còn lại <b>
+                                                            <%= item.quantity %>
+                                                        </b> sản phẩm</span>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-success btn-update-row"
+                                                        data-size="<%= item.size %>"
+                                                        data-row-index="<%= index + 1 %>">Cập
+                                                        nhật</button>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="5" class="text-center">Không có dữ liệu size cho
+                                                            sản phẩm này</td>
+                                                    </tr>
+                                                    <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<script>
-    document.addEventListener('DOMContentLoaded', async function() {
-          const productId = document.querySelector('input[name="productId"]').value;
-          const productNameInput = document.querySelector('input[name="name"]');
-           try {
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const productId = document.querySelector('input[name="productId"]').value;
+            const productNameInput = document.querySelector('input[name="name"]');
+            try {
                 const response = await fetch(`/api/product/${productId}`);
-                 if(response.ok){
-                     const data = await response.json();
-                     productNameInput.value = data.name;
-                 } else {
-                   console.error('Failed to fetch product name:', response.status, response.statusText);
-                  productNameInput.value = "Failed to load product name";
+                if (response.ok) {
+                    const data = await response.json();
+                    productNameInput.value = data.name;
+                } else {
+                    console.error('Failed to fetch product name:', response.status, response.statusText);
+                    productNameInput.value = "Failed to load product name";
                 }
-                
-            } catch(error) {
-              console.error('Error fetch product name:', error);
-              productNameInput.value = "Failed to load product name";
-            }
-        const updateButtons = document.querySelectorAll('.btn-update-row');
-        updateButtons.forEach(button => {
-            button.addEventListener('click', async function() {
-              const size = this.getAttribute('data-size');
-              const rowIndex = this.getAttribute('data-row-index');
-              const quantityInput = document.querySelector(`tbody tr:nth-child(${rowIndex}) input[name="quantity[]"]`);
-              const quantity = quantityInput.value;
 
-            try{
-                const response = await fetch(`/api/product-quantity/${productId}`, {
-                        method: 'PUT',
+            } catch (error) {
+                console.error('Error fetch product name:', error);
+                productNameInput.value = "Failed to load product name";
+            }
+            const updateButtons = document.querySelectorAll('.btn-update-row');
+            updateButtons.forEach(button => {
+                button.addEventListener('click', async function () {
+                    const size = this.getAttribute('data-size');
+                    const rowIndex = this.getAttribute('data-row-index');
+                    const quantityInput = document.querySelector(`tbody tr:nth-child(${rowIndex}) input[name="quantity[]"]`);
+                    const quantity = quantityInput.value;
+
+                    try {
+                        const response = await fetch(`/api/product-quantity/${productId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                size: size,
+                                quantity: quantity
+                            }),
+                        });
+                        const data = await response.json();
+                        if (response.ok) {
+                            document.querySelector(`#descQuantity-${rowIndex} b`).textContent = quantity;
+                            alert('Cập nhật số lượng thành công!');
+                        } else {
+                            console.error('Error updating quantity:', data.message || 'Failed to update product quantity');
+                            alert('Failed to update quantity')
+                        }
+                    } catch (error) {
+                        console.error('Error updating quantity:', error);
+                        alert('An error occurred while updating product quantity.')
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const addSizeBtn = document.getElementById('addSizeBtn');
+
+            addSizeBtn.addEventListener('click', async function () {
+                const productId = document.getElementById('productId').value;
+                const newSize = document.getElementById('newSize').value;
+                const newQuantity = document.getElementById('newQuantity').value;
+
+                // Validate dữ liệu
+                if (!productId || !newSize || !newQuantity) {
+                    alert('Vui lòng nhập đầy đủ thông tin!');
+                    return;
+                }
+
+                try {
+                    console.log('Sending data:', { productId, size: newSize, quantity: newQuantity }); // Log để debug
+
+                    const response = await fetch(`/api/product-quantity/${productId}`, {
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            size: size,
-                            quantity: quantity
-                         }),
-                     });
-                      const data = await response.json();
-                      if (response.ok) {
-                        document.querySelector(`#descQuantity-${rowIndex} b`).textContent = quantity;
-                      } else{
-                         console.error('Error updating quantity:', data.message || 'Failed to update product quantity');
-                        alert('Failed to update quantity')
-                      }
-                } catch(error){
-                 console.error('Error updating quantity:', error);
-                   alert('An error occurred while updating product quantity.')
+                            size: newSize,
+                            quantity: parseInt(newQuantity)
+                        })
+                    });
+
+                    const result = await response.json();
+                    console.log('Response:', result); // Log để debug
+
+                    if (response.ok) {
+                        // Reload page to get sorted sizes
+                        window.location.reload();
+                    } else {
+                        alert(result.message || 'Không thể thêm size mới!');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi khi thêm size mới!');
                 }
             });
         });
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const addSizeBtn = document.getElementById('addSizeBtn');
-        
-        addSizeBtn.addEventListener('click', async function() {
-            const productId = document.getElementById('productId').value;
-            const newSize = document.getElementById('newSize').value;
-            const newQuantity = document.getElementById('newQuantity').value;
-
-            // Validate dữ liệu
-            if (!productId || !newSize || !newQuantity) {
-                alert('Vui lòng nhập đầy đủ thông tin!');
-                return;
-            }
-
-            try {
-                console.log('Sending data:', { productId, size: newSize, quantity: newQuantity }); // Log để debug
-
-                const response = await fetch(`/api/product-quantity/${productId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        size: newSize,
-                        quantity: parseInt(newQuantity)
-                    })
-                });
-
-                const result = await response.json();
-                console.log('Response:', result); // Log để debug
-
-                if (response.ok) {
-                    // Thêm dòng mới vào bảng
-                    const tbody = document.querySelector('tbody');
-                    const rowCount = tbody.rows.length;
-                    const newRow = `
-                        <tr>
-                            <td>${rowCount + 1}</td>
-                            <td>
-                                <input type="hidden" name="sizes[]" value="${newSize}">
-                                ${newSize}
-                            </td>
-                            <td>
-                                <input type="number" class="form-control quantity" 
-                                    name="quantity[]" value="${newQuantity}" min="0">
-                            </td>
-                            <td>
-                                <span class="quantity-desc">Trong kho còn lại <b>${newQuantity}</b> sản phẩm</span>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-success update-quantity" 
-                                    data-size="${newSize}">Cập nhật</button>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.insertAdjacentHTML('beforeend', newRow);
-
-                    // Reset form
-                    document.getElementById('newSize').value = '';
-                    document.getElementById('newQuantity').value = '';
-
-                    alert('Thêm size mới thành công!');
-                } else {
-                    alert(result.message || 'Không thể thêm size mới!');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Đã xảy ra lỗi khi thêm size mới!');
-            }
-        });
-    });
-</script>
-
-<style>
-.table-responsive {
-    overflow-x: auto;
-}
-
-.form-control:focus {
-    border-color: #198754;
-    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
-}
-
-.btn-success {
-    padding: 0.375rem 0.75rem;
-}
-
-.table td {
-    vertical-align: middle;
-}
-
-.table input[type="number"] {
-    max-width: 120px;
-}
-
-.row {
-    align-items: flex-end;
-}
-
-@media (max-width: 768px) {
-    .d-flex.gap-2 {
-        flex-wrap: wrap;
-    }
-    
-    .d-flex.gap-2 input,
-    .d-flex.gap-2 button {
-        width: 100%;
-        margin-bottom: 0.5rem;
-    }
-}
-</style>
-<script>
-    mongoose.connection.on('connected', () => {
-        console.log('MongoDB connected successfully');
-    });
-    
-    mongoose.connection.on('error', (err) => {
-        console.error('MongoDB connection error:', err);
-    });
     </script>
+
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+        }
+
+        .btn-success {
+            padding: 0.375rem 0.75rem;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .table input[type="number"] {
+            max-width: 120px;
+        }
+
+        .row {
+            align-items: flex-end;
+        }
+
+        @media (max-width: 768px) {
+            .d-flex.gap-2 {
+                flex-wrap: wrap;
+            }
+
+            .d-flex.gap-2 input,
+            .d-flex.gap-2 button {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
