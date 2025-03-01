@@ -231,4 +231,9 @@ router.get('/api/voucher/check/:code', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/vouchers/check/${req.params.code}`);
 });
 
+// Proxy for check a voucher by code
+router.put('/api/voucher/updateUsage/:code', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/vouchers/updateUsage/${req.params.code}`,'put');
+});
+
 module.exports = router;

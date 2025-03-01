@@ -67,7 +67,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label letter-spacing fw-medium">Họ và tên</label>
-                                <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Nhập họ tên của bạn" required="">
+                                <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" id="name" style="font-size: 14px;" placeholder="Nhập họ tên của bạn" required="">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label letter-spacing fw-medium">Số điện thoại</label>
@@ -505,78 +505,52 @@
                 alert('Failed to delete cart item. Please try again.');
             }
             }
-        // Function to handle order form submission
-        async function handleOrderSubmit(event) {
-            event.preventDefault();
-            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
-            const address = getAddress();
-            const phoneNumber = document.getElementById('phoneNumber').value;
-        
-            try {
-                const orderData = {
-                    userId,
-                    address,
-                    phoneNumber,
-                    items: cart.items,
-                };
-                    let paymentResponse;
-                if(paymentMethod === 'COD'){
-                        const response = await fetch('/api/order', {
+            //ham xu ly dat hang
+            async function handleOrderSubmit(event) {
+                event.preventDefault();
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+                const address = getAddress();
+                const phoneNumber = document.getElementById('phoneNumber').value;
+                const voucherCode = document.getElementById('voucherCodeInput').value;
+                const name = document.getElementById('name').value;
+            
+                try {
+                    const orderData = {
+                        userId,
+                        name,
+                        address,
+                        phoneNumber,
+                        items: cart.items,
+                        voucherCode,
+                        paymentMethod
+                    };
+            
+                    const response = await fetch('/api/order', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({...orderData, paymentMethod: paymentMethod})
+                        body: JSON.stringify(orderData)
                     });
+            
                     if (!response.ok) {
                         throw new Error(`Failed to create order: ${response.statusText}`);
                     }
-                        paymentResponse = await response.json();
-                        if(paymentResponse.paymentUrl){
-                        // Delete cart after order is placed
-                        // const deleteCartResponse = await fetch(`/api/cart/${cart._id}`, {
-                        //     method: 'DELETE'
-                        // });
-                            window.location.href = paymentResponse.paymentUrl;
-                    }
-                        console.log("order info from backend: ", paymentResponse);
+            
+                    const paymentResponse = await response.json();
+            
+                    if (paymentResponse.paymentUrl) {
+                        window.location.href = paymentResponse.paymentUrl;
+                    } else {
                         alert('Order placed successfully!');
-                }else {
-                    // const response = await fetch(`${PAYMENT_API_URL}/${paymentMethod}`,{
-                        const response = await fetch('/api/order', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({...orderData, paymentMethod: paymentMethod})
-                    })
-                    if (!response.ok) {
-                        throw new Error(`Failed to process payment: ${response.statusText}`);
-                    }
-                        paymentResponse = await response.json();
-                        console.log("payment info from backend: ", paymentResponse);
-                    if(paymentResponse.paymentUrl){
-                            // Delete cart after order is placed
-                        //     const deleteCartResponse = await fetch(`/api/cart/${cart._id}`, {
-                        //     method: 'DELETE'
-                        // });
-                            window.location.href = paymentResponse.paymentUrl;
-                    } else{
-                        alert('Payment processed successfully');
                         // Handle case where no redirect is needed, or handle failed status
-                            console.log("payment info from backend: ", paymentResponse);
+                        console.log("Order info from backend: ", paymentResponse);
                     }
+                } catch (error) {
+                    console.error('Error submitting order:', error);
+                    alert('Không đủ số lượng sản phẩm trong kho. Vui lòng thử lại sau.');
                 }
-                
-                
-                
-            } catch(error) {
-                console.error('Error submitting order:', error);
-                alert('Không đủ số lượng sản phẩm trong kho. Vui lòng thử lại sau.');
             }
-        }
-        
-
         function decreaseQuantity(button) {
             const itemId = button.getAttribute('data-item-id');
             let quantityInput = document.getElementById(`quantity-${itemId}`);
