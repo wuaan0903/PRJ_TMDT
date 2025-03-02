@@ -3,16 +3,16 @@ import {
 
     createReview,
     getAllReviews,
-    getReviewById,
     updateReview,
-    deleteReview
+    deleteReview,
+    getReviewsByProductId
 } from '../controllers/reviewController.mjs';
 
 const router = express.Router();
 
 router.post('/',  createReview);
 router.get('/',  getAllReviews);
-router.get('/:id',  getReviewById);
+router.get('/:id',  getReviewsByProductId);
 router.put('/:id',  updateReview);
 router.delete('/:id',  deleteReview);
 

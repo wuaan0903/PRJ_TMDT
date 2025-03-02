@@ -7,32 +7,63 @@ import moment from 'moment-timezone';
 import CryptoJS from 'crypto-js'; // npm install crypto-js
 import { v1 as uuidv1 } from 'uuid'; // npm install uuid
 
-export const createOrder = async (userId, address, phoneNumber, items) => {
-  const order = new Order({
-    userId,
-    address,
-    phoneNumber,
-    status: 'pending'
-  });
 
-  await order.save();
+export const createOrder = async (userId,name, address, phoneNumber, items, voucherCode = null,paymentMethod) => {
+    // Tính tổng số tiền và giảm giá
+    let totalAmount = 0;
+    let discount = 0;
+  
+    // Fetch product prices and calculate total amount
+    for (const item of items) {
+      const productResponse = await axios.get(`http://localhost:3002/api/products/${item.productId}`);
+      const product = productResponse.data;
+      totalAmount += product.price * item.quantity;
+    }
+      // Kiểm tra mã giảm giá nếu có
+  if (voucherCode) {
+    const voucherResponse = await axios.get(`http://localhost:3002/api/vouchers/check/${voucherCode}`);
+    if (voucherResponse.status === 200) {
+      const voucher = voucherResponse.data;
+      if (voucher.isActive) {
+        if (voucher.type === 'percentage') {
+          discount = (totalAmount * voucher.discount) / 100;
+          if (voucher.maxDiscount && discount > voucher.maxDiscount) {
+            discount = voucher.maxDiscount;
+          }
+        } else if (voucher.type === 'fixed') {
+          discount = voucher.discount;
+        }
+      }
+    }
+  }
+    // Tính tổng số tiền sau khi áp dụng giảm giá
+    totalAmount -= discount;
 
-  const productOrders = items.map(item => new ProductOrder({
-    orderId: order._id,
-    productId: item.productId,
-    size: item.size,
-    quantity: item.quantity
-  }));
-
-  await ProductOrder.insertMany(productOrders);
-
-  //Fetch cart from api
-  const cart = await axios.get(`http://localhost:3003/api/cart/user/${userId}`);
-  //Delete cart from api
-  await axios.delete(`http://localhost:3003/api/cart/${cart.data._id}`);
-
-  return order;
-};
+    const order = new Order({
+      userId,
+      name,
+      address,
+      phoneNumber,
+      status: 'pending',
+      totalAmount,
+      discount,
+      paymentMethod,
+      products: items.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        size: item.size
+      }))
+    });
+  
+    await order.save();
+  
+    // Fetch cart from api
+    const cart = await axios.get(`http://localhost:3003/api/cart/user/${userId}`);
+    // Delete cart from api
+    await axios.delete(`http://localhost:3003/api/cart/${cart.data._id}`);
+  
+    return order;
+  };
 
 //Update order satatus
 export const updateOrderStatus = async (orderId, status) => {

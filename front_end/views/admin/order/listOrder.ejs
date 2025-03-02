@@ -184,12 +184,13 @@
         <section class="modall view">
             <span class="overlay"></span>
             <div class="modal-box">
-
+                <div id="orderDetailsContainer" style="width: 100%;">
+                    <!-- Nội dung chi tiết đơn hàng sẽ được thêm vào đây -->
+                </div>
             </div>
-
         </section>
         <div id="order-container">
-             <div class="loader" style="display: flex; justify-content: center; align-items: center;"><i class="bx bx-loader-circle bx-spin bx-rotate-90"></i></div>
+            <div class="loader" style="display: flex; justify-content: center; align-items: center;"><i class="bx bx-loader-circle bx-spin bx-rotate-90"></i></div>
         </div>
     </div>
 </main>
@@ -264,7 +265,7 @@
                     row.innerHTML = `
                     <td>#${order._id.slice(-2)}</td>
                          <td>${new Date(order.date).toLocaleTimeString()}</td>
-                        <td>${user.username || 'N/A'}</td>
+                        <td>${order.name || 'N/A'}</td>
                         <td>${order.phoneNumber}</td>
                          <td>${order.address}</td>
                          <td>${statusDropdown}</td>
@@ -284,7 +285,7 @@
     }
     async function fetchUser(userId) {
         try {
-            const response = await fetch(`/api/users/${userId}`);
+            const response = await fetch(`/api/account/${userId}`);
              if (!response.ok) {
                  return {name: 'N/A'}
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -368,25 +369,73 @@
             });
         });
     }
+
     async function viewSp(orderId) {
-        const modal = document.querySelector('.modall.view');
-        const modalContent = document.querySelector('.modal-box');
-        modalContent.innerHTML = '<div class="loader" style="display: flex; justify-content: center; align-items: center;"><i class="bx bx-loader-circle bx-spin bx-rotate-90"></i></div>'
-
-        
-
         try {
-            const response = await fetch(`/admin/order/order-product/${orderId}`);
+            const response = await fetch(`/api/orders/${orderId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            const html = await response.text();
-            modalContent.innerHTML = html;
+            const order = await response.json();
+    
+            // Fetch product details for each product in the order
+            const productDetailsPromises = order.products.map(product => 
+                fetch(`/api/product/${product.productId}`).then(res => res.json())
+            );
+            const productDetails = await Promise.all(productDetailsPromises);
+    
+            const orderDetailsContainer = document.getElementById('orderDetailsContainer');
+
+            orderDetailsContainer.innerHTML = `
+    <h2 class="mb-4">Chi tiết đơn hàng #${order._id.slice(-2)}</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Sản phẩm</th>
+                    <th>Size</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${order.products.map((product, index) => {
+                    const productDetail = productDetails[index];
+                    return `
+                        <tr>
+                            <td>
+                                <img src="http://localhost:3002/api/products/thumbnail/${productDetail.thumbnail}" 
+                                     alt="${productDetail.name}" 
+                                     class="img-fluid rounded" 
+                                     style="width: 80px; height: 100px; object-fit: cover;">
+                            </td>
+                            <td>${productDetail.name}</td>
+                            <td>${product.size}</td>
+                            <td>${product.quantity}</td>
+                            <td>${productDetail.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                            <td>${(productDetail.price * product.quantity).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+    </div>
+    <div class="">
+        <h5 class="text-danger">Giảm giá: ${order.discount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</h5>
+        <h5 class="text-success">Tổng tiền: ${order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</h5>
+    </div>
+`;
+
+
+
+            const modal = document.querySelector('.modall');
+            modal.classList.add('active');
         } catch (error) {
-            console.error('Error fetching modal content:', error);
-            modalContent.innerHTML = '<p>Failed to load order details.</p>';
+            console.error('Error fetching order details:', error);
+            alert('Đã xảy ra lỗi khi lấy chi tiết đơn hàng.');
         }
-        modal.classList.add('active');
     }
 
     const modals = document.querySelectorAll('.modall');
