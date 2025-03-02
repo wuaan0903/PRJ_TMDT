@@ -38,7 +38,50 @@ app.get("/search", (req, res) => {
   res.render("search"); // Renders the cart.ejs file
 } );
 
+app.get("/user/", (req, res) => {
+  res.render("user/layouts/index");   // Renders the profile.ejs file
+} );
+app.get("/user/profile", (req, res) => {
+  res.render("user/profile");   // Renders the profile.ejs file
+} );
 
+app.get("/user/orders", (req, res) => {
+  res.render("user/orders");   // Renders the orders.ejs file
+} );
+app.get("/user/vouchers", (req, res) => { 
+  res.render("user/vouchers");   // Renders the vouchers.ejs file
+} );
+app.get("/user/address", (req, res) => {
+  res.render("user/address");   // Renders the address.ejs file
+} );
+app.get("/user/reviews", (req, res) => {
+  res.render("user/reviews");   // Renders the reviews.ejs file
+} );
+app.get("/user/policies", (req, res) => {
+  res.render("user/policies");   // Renders the policies.ejs file
+} );
+// app.get('/admin', (req, res) => {
+//   res.render('admin/home'); // Renders the home.ejs file
+// });
+// app.get('/admin/home', (req, res) => {
+//   res.render('admin/home'); // Renders the home.ejs file
+// });
+app.get('/admin/orders', (req, res) => {
+  res.render('admin/order/listOrder'); // 
+});
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+app.get("/admin", (req, res) => {
+  res.render("admin/home"); // Renders the home.ejs file
+});
+app.get("/admin/home", (req, res) => {
+  res.render("admin/home"); // Renders the home.ejs file
+});
 app.get("/admin/orders", (req, res) => {
   res.render("admin/order/listOrder"); //
 
