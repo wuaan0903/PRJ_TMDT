@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.mjs'; // Make sure to import userRoutes
 import authRoutes from './routes/authRoutes.mjs';
+import addressRoutes from './routes/addressRoutes.mjs';
 import connectDB from './db/mongoose.js';
 
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', addressRoutes);
 
 connectDB().then(() => {  
   app.listen(PORT, () => {

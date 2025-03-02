@@ -1,5 +1,16 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
+
+const addressSchema = new mongoose.Schema({
+  nameKH: { type: String, required: true },
+  phoneNumber: { type: String, required: true,unique: true },
+  address: { type: String, required: true },
+  ward: { type: String, required: true },
+  district: { type: String, required: true },
+  city: { type: String, required: true },
+  defaultAddress: { type: Boolean, default: false }
+});
+
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
@@ -10,6 +21,7 @@ const userSchema = new mongoose.Schema({
     token: { type: String, required: false },
     createdAt: { type: Date, default: Date.now }
 }],
+  addresses: [addressSchema],
   createdAt: { type: Date, default: Date.now }
 });
 
