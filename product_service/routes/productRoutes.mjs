@@ -6,6 +6,8 @@ import {
     updateProduct, 
     deleteProduct,
     serveThumbnail,
+    searchProducts,
+    serveThumbnail,
     getProductsByCategory,
     serveBanner
 } from '../controllers/productController.mjs';
@@ -14,7 +16,7 @@ const router = express.Router();
 
 router.post('/',  createProduct);
 router.get('/',  getAllProducts);
-router.get('/category/:category', getProductsByCategory);
+router.get('/search',  searchProducts);
 router.get('/:id',  getProductById);
 router.put('/:id',  updateProduct);
 router.delete('/:id',  deleteProduct);

@@ -74,29 +74,7 @@
 
         
             <div class="owl-carousel owl-theme slider" id="new_product">
-                <div class="mb-4">
-                    <div class="product">
-                    <div class="image position-relative">
-                        <div class="img">
-                        <img src="http://localhost:3002/api/products/thumbnail/img_1734924695793.webp" alt="Áo Nỉ chui đầu Essentials" class="img-fluid w-100">
-                        </div>
-                        <!-- <div class="img-hover position-absolute top-0 start-0 w-100 h-100 ">
-                        <img src="" alt="Áo Nỉ chui đầu Essentials hover" class="img-fluid w-100">
-                        </div> -->
-                    </div>
-                    <a href="#" class="text-decoration-none">
-                        <h2 class="product-name mt-3">Áo Nỉ chui đầu Essentials</h2>
-                    </a>
-                    <h2 class="fs-6 fw-bold ps-3">199.000đ</h2>
-                    <div class="button text-center mt-3">
-                        <a href="/product/6768d9979740476c6f5780d3">
-                        <button class="btn btn-primary px-4 bg-menu">
-                            <div class="btn__txt">XEM NGAY</div>
-                        </button>
-                        </a>
-                    </div>
-                    </div>
-                </div>
+
             </div>
         
 
@@ -109,10 +87,9 @@
 <section class="banner-block">
 
 </section>
+
 <section class="products-section py-5 mx-5">
     <div >
-
-        
 
         <div id="product-collections-container">
             <!-- Product collections will be rendered here -->
@@ -120,4 +97,223 @@
     </div>
 </section>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const productCollectionsContainer = document.getElementById(
+        "product-collections-container"
+      );
+  
+      // Function to fetch collections
+      const fetchCollections = async () => {
+        try {
+          const response = await fetch("/api/collections");
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return await response.json();
+        } catch (error) {
+          console.error("Error fetching collections:", error);
+          productCollectionsContainer.innerHTML = "Failed to load collections.";
+          return [];
+        }
+      };
+  
+      // Function to fetch products by collection
+      const fetchProductsByCollection = async (collectionId) => {
+        try {
+            const response = await fetch(`/api/products`);
+            if(!response.ok){
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+            const allProducts = await response.json();
+            const categoriesResponse = await fetch(`/api/categories?collectionId=${collectionId}`)
+              const categories = await categoriesResponse.json();
+  
+              const productsInCollection = allProducts.filter(product => {
+                  return categories.some(category => String(category._id) === String(product.categories._id));
+              });
+           return productsInCollection
+        } catch (error) {
+          console.error("Error fetching products by collection:", error);
+          return [];
+        }
+      };
+  
+  
+  
+      // Function to render products by collection
+      const renderProductCollections = async (collections) => {
+        let collectionsHTML = "";
+        for (const collection of collections) {
+          const products = await fetchProductsByCollection(collection._id);
+  
+          let collectionHTML = `
+                      <div class="collection-container">
+                          <h4 class="fw-bold mb-3" style="text-transform: uppercase; ">${collection.name}</h4>
+                          <div class="owl-carousel owl-theme slider">
+                              ${products
+                                .map(
+                                  (product) => `
+                                      <div class="mb-4">
+                                          <div class="product">
+                                              <div class="image position-relative">
+                                                  <div class="img">
+                                                      <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}" alt="${product.name}" class="img-fluid w-100">
+                                                  </div>
+                                              </div>
+                                              <a href="/product/${product._id}" class="text-decoration-none">
+                                                  <h2 class="product-name mt-3">${product.name}</h2>
+                                              </a>
+                                              <h2 class="fs-6 fw-bold ps-3">${product.price.toLocaleString(
+                                                "vi-VN"
+                                              )} đ</h2>
+                                              <div class="button text-center mt-3">
+                                              <a href="/product/${product._id}">
+                                                  <button class="btn btn-primary px-4 bg-menu">
+                                                      <div class="btn__txt">XEM NGAY</div>
+                                                  </button>
+                                              </a>
+                                          </div>
+                                          </div>
+                                      </div>
+                                  `
+                                )
+                                .join("")}
+                          </div>
+                      </div>
+                  `;
+          collectionsHTML += collectionHTML;
+        }
+        productCollectionsContainer.innerHTML = collectionsHTML;
+  
+        // Initialize Owl Carousels after rendering
+        $(".slider").each(function () {
+          $(this).owlCarousel({
+            items: 1,
+            loop: true,
+            margin: 30,
+            animateIn: "animate__slideInLeft",
+            animateOut: "animate__slideOutRight",
+            nav: true,
+            autoplayTimeout: 20000,
+            autoplayHoverPause: true,
+            responsive: {
+              0: {
+                items: 2,
+              },
+              600: {
+                items: 2,
+              },
+              768: {
+                items: 3,
+              },
+              1024: {
+                items: 4,
+              },
+              1239: {
+                items: 5,
+              },
+            },
+          });
+        });
+      };
+  
+      // Main function to fetch and render data
+      const loadProductData = async () => {
+        const collections = await fetchCollections();
+        if (collections && collections.length > 0) {
+          renderProductCollections(collections);
+        } else {
+          productCollectionsContainer.innerHTML = "No collections found.";
+        }
+      };
+  
+      loadProductData();
+  
+      const productsSection = document.querySelector("#new_product");
+  
+      // Function to fetch product data from API
+      const fetchProducts = async () => {
+        try {
+          const response = await fetch("/api/products");
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const products = await response.json();
+          renderNewProducts(products);
+        } catch (error) {
+          console.error("Error fetching products:", error);
+          productsSection.innerHTML = `<tr><td colspan="8">Failed to load products. Please try again.</td></tr>`;
+        }
+      };
+  
+      // Function to render products to the table
+      const renderNewProducts = (products) => {
+        let tableRows = "";
+        products.forEach((product) => {
+          tableRows += `
+                          <div class="mb-4">
+                      <div class="product">
+                      <div class="image position-relative">
+                          <div class="img">
+                          <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}" alt="${product.name}" class="img-fluid w-100">
+                          </div>
+                          <!-- <div class="img-hover position-absolute top-0 start-0 w-100 h-100 ">
+                          <img src="" alt="${product.name} hover" class="img-fluid w-100">
+                          </div> -->
+                      </div>
+                      <a href="#" class="text-decoration-none">
+                          <h2 class="product-name mt-3">${product.name}</h2>
+                      </a>
+                      <h2 class="fs-6 fw-bold ps-3">${product.price.toLocaleString(
+                        "vi-VN"
+                      ) + "đ"}</h2>
+                      <div class="button text-center mt-3">
+                          <a href="/product/${product._id}">
+                          <button class="btn btn-primary px-4 bg-menu">
+                              <div class="btn__txt">XEM NGAY</div>
+                          </button>
+                          </a>
+                      </div>
+                      </div>
+                  </div>`;
+        });
+        productsSection.innerHTML = tableRows;
+  
+        // Dừng carousel cũ (nếu có)
+        $("#new_product").owlCarousel("destroy");
+  
+        // Khởi tạo lại Owl Carousel
+        $("#new_product").owlCarousel({
+          items: 1,
+          loop: true,
+          margin: 30,
+          animateIn: "animate__slideInLeft",
+          animateOut: "animate__slideOutRight",
+          nav: true,
+          autoplayTimeout: 20000,
+          autoplayHoverPause: true,
+          responsive: {
+            0: {
+              items: 2,
+            },
+            600: {
+              items: 2,
+            },
+            768: {
+              items: 3,
+            },
+            1024: {
+              items: 4,
+            },
+            1239: {
+              items: 5,
+            },
+          },
+        });
+      };
+  
+      fetchProducts();
+    });
+  </script>
 

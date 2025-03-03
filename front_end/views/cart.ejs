@@ -54,7 +54,11 @@
         }
     </style>
     <section style="padding-top: 82px;">
-        <div class="container my-5">
+        <div class="container my-5" style="
+        margin: 0;
+        max-width: 100%;
+        padding: 0 60px;
+    ">
             <div class="row">
                 <!-- Thông tin đặt hàng -->
                 <div class="col-lg-7">
@@ -63,7 +67,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label letter-spacing fw-medium">Họ và tên</label>
-                                <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Nhập họ tên của bạn" required="">
+                                <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" id="name" style="font-size: 14px;" placeholder="Nhập họ tên của bạn" required="">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label letter-spacing fw-medium">Số điện thoại</label>
@@ -79,9 +83,9 @@
                             <input type="text" class="form-control mb-2 rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Địa chỉ (ví dụ: 103 Vạn Phúc)" id="address" required="">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="citySelect">
+                                    <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="citySelect" >
                                         <option value="" selected="" disabled="">Chọn Tỉnh/Thành phố</option>
-                                        <option value="Hồ Chí Minh">Hồ Chí Minh</option><option value="Hà Nội">Hà Nội</option></select>
+                                    </select>
                                 </div>
                                 <div class="col-md-4">
                                     <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="districtSelect">
@@ -109,7 +113,10 @@
                                         <span class="payment-method-icon-wrapper me-2">
                                             <img src="https://mcdn.coolmate.me/image/October2024/mceclip2_42.png" alt="Thanh toán khi nhận hàng" class="img-fluid" style="max-width: 40px;">
                                         </span>
-                                        <strong>Thanh toán khi nhận hàng</strong>
+                                        <strong style="
+                                        font-size: 14px;
+                                        letter-spacing: -1px;
+                                    ">Thanh toán khi nhận hàng</strong>
                                     </label>
                                 </div>
 
@@ -123,7 +130,10 @@
                                         <span class="payment-method-icon-wrapper me-2">
                                             <img src="https://mcdn.coolmate.me/image/October2024/mceclip1_171.png" alt="Ví MoMo" class="img-fluid" style="max-width: 40px;">
                                         </span>
-                                        <strong>Ví MoMo</strong>
+                                        <strong style="
+                                        font-size: 14px;
+                                        letter-spacing: -1px;
+                                    ">Ví MoMo</strong>
                                     </label>
                                 </div>
 
@@ -138,8 +148,14 @@
                                             <img src="https://mcdn.coolmate.me/image/October2024/mceclip3_6.png" alt="Thanh toán qua ZaloPay" class="img-fluid" style="max-width: 40px;">
                                         </span>
                                         <div>
-                                            <strong>Thanh toán qua ZaloPay</strong><br>
-                                            <small class="fw-medium">Hỗ trợ mọi hình thức thanh toán <img src="https://mcdn.coolmate.me/image/October2024/mceclip0_27.png" alt="ZaloPay" style="height: 16px;"></small>
+                                            <strong style="
+                                            font-size: 14px;
+                                            letter-spacing: -1px;
+                                        ">Thanh toán qua ZaloPay</strong><br>
+                                            <small style="
+                                            font-size: 12px;
+                                            font-weight: 600;
+                                        ">Hỗ trợ mọi hình thức thanh toán <img src="https://mcdn.coolmate.me/image/October2024/mceclip0_27.png" alt="ZaloPay" style="height: 16px;"></small>
                                         </div>
                                     </label>
                                 </div>
@@ -155,8 +171,14 @@
                                             <img src="https://mcdn.coolmate.me/image/October2024/mceclip0_81.png" alt="Ví điện tử VNPAY" class="img-fluid" style="max-width: 40px;">
                                         </span>
                                         <div>
-                                            <strong>Ví điện tử VNPAY</strong><br>
-                                            <small class="fw-medium">Quét QR để thanh toán</small>
+                                            <strong style="
+                                            font-size: 14px;
+                                            letter-spacing: -1px;
+                                        ">Ví điện tử VNPAY</strong><br>
+                                            <small style="
+                                            font-size: 12px;
+                                            font-weight: 600;
+                                        ">Quét QR để thanh toán</small>
                                         </div>
                                     </label>
                                 </div>
@@ -198,32 +220,66 @@
                                     Xóa</button>
                             </div>
                  </div></div>
+                 
+                 <div class="d-flex">
+                    <input type="text" id="voucherCodeInput" class="form-control" placeholder="Nhập mã giảm giá" style="
+                    border-radius: 30px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    padding: 10px;
+                    margin-right: 10px;
+                    ">
+                    <button class="btn btn-dark" onclick="applyVoucher()" style="
+                    font-size: 14px;
+                    font-weight: 600;
+                    width: 250px;
+                    border-radius: 30px;
+                    ">Áp dụng Voucher</button>
+                </div>
 
                     <div class="pricing-info">
                         <!-- Divider -->
                         <div class="divider border-top my-2"></div>
                         <!-- Tạm tính -->
                         <div class="d-flex justify-content-between align-items-center my-3">
-                            <p class="mb-0 letter-spacing fw-medium">Tạm tính</p>
+                            <p class="mb-0 letter-spacing " style="
+                            font-size: 14px;
+                            font-weight: 600;
+                        ">Tạm tính</p>
                             <p class="mb-0 text-end">
-                                <span class="fw-medium" id="subtotal">199.000đ</span>
+                                <span style="
+                                font-size: 14px;
+                                font-weight: 600;
+                            " id="subtotal">199.000đ</span>
 
                             </p>
                         </div>
 
                         <!-- Giảm giá -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <p class="mb-0 letter-spacing fw-medium">Giảm giá</p>
+                            <p class="mb-0 letter-spacing" style="
+                            font-size: 14px;
+                            font-weight: 600;
+                            ">Giảm giá</p>
                             <p class="mb-0 text-end">
-                                <span class="price_text fw-medium">0đ</span>
+                                <span id="discountAmount" style="
+                                font-size: 14px;
+                                font-weight: 600;
+                                ">0đ</span>
                             </p>
                         </div>
 
                         <!-- Phí giao hàng -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <p class="mb-0 letter-spacing fw-medium">Phí giao hàng</p>
+                            <p class="mb-0 letter-spacing" style="
+                            font-size: 14px;
+                            font-weight: 600;
+                        ">Phí giao hàng</p>
                             <p class="mb-0 text-end">
-                                <span class="fw-medium">Miễn phí</span>
+                                <span style="
+                                font-size: 14px;
+                                font-weight: 600;
+                            ">Miễn phí</span>
                             </p>
                         </div>
 
@@ -251,3 +307,412 @@
 
 
     </section>
+
+
+    <script>
+        // Assume you have a way to get the userId (e.g., from user context, cookie, or local storage)
+        const cart = <%- JSON.stringify(cart) %>;
+        const userId = cart.userId;
+        const PRODUCT_API_URL = 'http://localhost:3002/api/products';
+        
+
+        async function fetchProduct(productId) {
+            try {
+                const response = await fetch(`${PRODUCT_API_URL}/${productId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch product price for ${productId}: ${response.statusText}`);
+                }
+                const productData = await response.json();
+                
+                return productData; // Assuming your product API returns price like this
+    
+            } catch (error) {
+                console.error(`Error fetching product price for ${productId}:`, error);
+                return null; // Or handle error as needed
+            }
+        }
+
+        function calculateTotals(items){
+                let subtotal = 0;
+                items.forEach(item => {
+                    subtotal += item.price * item.quantity;
+                    const test = item;
+                    const test2 = subtotal.toLocaleString('vi-VN') + 'đ';
+                })
+                
+                document.getElementById('subtotal').textContent =  subtotal.toLocaleString('vi-VN') + 'đ';
+                document.getElementById('total').textContent = subtotal.toLocaleString('vi-VN') + 'đ';
+            }
+
+        async function renderCartItems(items) {
+            const cartContainer = document.getElementById('cart-items-container');
+            if (!cartContainer) {
+                console.error("Cart container element not found!");
+                return;
+            }
+            cartContainer.innerHTML = '';
+    
+            if (!items || items.length === 0) {
+                cartContainer.innerHTML = '<p>Your cart is empty.</p>';
+                return;
+            }
+    
+            for (const item of items) {
+                const product = await fetchProduct(item.productId);
+                if (product === null) {
+                    continue; // Skip if price not found
+                }
+                //   item.price = product.price.toLocaleString('vi-VN') + 'đ';
+                item.price = product.price;
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('d-flex', 'justify-content-between', 'mb-3');
+                itemElement.innerHTML = `
+                    <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}" alt="Sản phẩm" class="me-3" style="height: 120px; object-fit: cover;">
+                        <div class="d-flex flex-column align-items-start justify-content-between w-100">
+                            <h6 class="mb-1 letter-spacing" style="
+    font-size: 14px;
+    font-weight: 600;
+">${product.name}</h6>
+                                <div class="d-flex w-100 justify-content-between">
+                                    <select id="size-${item._id}" class="form-select rounded-pill w-25 size-select" name="size" aria-label="Default select example" data-size="${item.size}" data-item-id="${item._id}" style="
+    font-size: 13px;
+    font-weight: 600;
+">
+                                        <option value="S" ${item.size === 'S' ? 'selected' : ''}>S</option>
+                                        <option value="M" ${item.size === 'M' ? 'selected' : ''}>M</option>
+                                        <option value="L" ${item.size === 'L' ? 'selected' : ''}>L</option>
+                                        <option value="XL" ${item.size === 'XL' ? 'selected' : ''}>XL</option>
+                                        <option value="2XL" ${item.size === '2XL' ? 'selected' : ''}>2XL</option>
+                                        <option value="3XL" ${item.size === '3XL' ? 'selected' : ''}>3XL</option>
+                                    </select>
+                                    <div class="quantity-area d-flex align-items-center ms-5">
+                                        <button type="button" class="qty-btn fw-bold" data-item-id="${item._id}" onclick="decreaseQuantity(this)">-</button>
+                                        <input type="text" id="quantity-${item._id}" name="quantity" value="${item.quantity}" min="1" class="form-control text-center quantity-input fw-bold" style="width: 40px;" data-item-id="${item._id}">
+                                        <button type="button" class="qty-btn fw-bold" data-item-id="${item._id}"  onclick="increaseQuantity(this)">+</button>
+                                    </div>
+                                    <div>
+                                        <p class=" fw-bold " style="
+    margin: 10px 0;
+">${product.price.toLocaleString('vi-VN') + 'đ'}</p>
+                                    </div>
+                                </div>
+                                    
+                                
+                                <button class="btn btn-light text-dark delete-button" data-item-id="${item._id}" style="
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+">
+                                    <i class='bx bx-trash'></i>
+                                    Xóa</button>
+                            </div>
+                `;
+                cartContainer.appendChild(itemElement);
+                
+            }
+                calculateTotals(items);
+                // Add event listeners for delete buttons
+                const deleteButtons = document.querySelectorAll('.delete-button');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const itemId = this.getAttribute('data-item-id');
+                        deleteCartItem(itemId, cart._id);
+                    });
+                });
+                    
+                
+                    // Add event listeners to quantity inputs
+                    const quantityInputs = document.querySelectorAll('.quantity-input');
+                    quantityInputs.forEach(input => {
+                        input.addEventListener('change', function () {
+                            const itemId = this.getAttribute('data-item-id');
+                            const quantity = parseInt(this.value) || 1;
+                            updateCartItemQuantity(itemId, quantity, cart._id);
+                        });
+                    });
+                    
+                    const sizeSelects = document.querySelectorAll('.size-select');
+                    sizeSelects.forEach(select => {
+                        select.addEventListener('change', function () {
+                            const itemId = this.closest('.d-flex.justify-content-between.mb-3').querySelector('.delete-button').getAttribute('data-item-id');
+                            const size = this.value;
+                            
+                            updateCartItemSize(itemId, size, cart._id);
+                        });
+                    });
+        }
+
+        async function updateCartItemSize(itemId, size, cartId) {
+            try {
+                        const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({size: size}),
+                        });
+        
+                        if (!response.ok) {
+                            throw new Error(`Failed to update cart item: ${response.statusText}`);
+                        }
+        
+                        const updatedCart = await response.json();
+                            console.log("updated cart after change size : ", updatedCart)
+                            //fetchCart(); we dont need to fetch again since cart is already passed in
+                            renderCartItems(updatedCart.items)
+        
+                    } catch (error) {
+                            console.error('Error updating cart item size:', error);
+                            alert('Failed to update cart item size. Please try again.');
+                    }
+        }
+
+        async function updateCartItemQuantity(itemId, quantity, cartId) {
+            try {
+                        const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ quantity: quantity }),
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`Failed to update cart item: ${response.statusText}`);
+                        }
+        
+                        const updatedCart = await response.json();
+                        console.log("updated cart after change quantity: ", updatedCart)
+                            //fetchCart(); we dont need to fetch again since cart is already passed in
+                            renderCartItems(updatedCart.items)
+        
+                    } catch (error) {
+                            console.error('Error updating cart item quantity:', error);
+                            alert('Failed to update cart item quantity. Please try again.');
+                    }
+        }
+
+        async function deleteCartItem(itemId, cartId) {
+            try {
+                const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
+                    method: 'DELETE'
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`Failed to delete cart item: ${response.statusText}`);
+                }
+        
+                const updatedCart = await response.json();
+                console.log("updated cart after delete: ", updatedCart)
+                // fetchCart(); we dont need to fetch again since cart is already passed in
+                renderCartItems(updatedCart.items)
+            } catch (error) {
+                console.error('Error deleting cart item:', error);
+                alert('Failed to delete cart item. Please try again.');
+            }
+            }
+            //ham xu ly dat hang
+            async function handleOrderSubmit(event) {
+                event.preventDefault();
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+                const address = getAddress();
+                const phoneNumber = document.getElementById('phoneNumber').value;
+                const voucherCode = document.getElementById('voucherCodeInput').value;
+                const name = document.getElementById('name').value;
+            
+                try {
+                    const orderData = {
+                        userId,
+                        name,
+                        address,
+                        phoneNumber,
+                        items: cart.items,
+                        voucherCode,
+                        paymentMethod
+                    };
+            
+                    const response = await fetch('/api/order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+            
+                    if (!response.ok) {
+                        throw new Error(`Failed to create order: ${response.statusText}`);
+                    }
+            
+                    const paymentResponse = await response.json();
+            
+                    if (paymentResponse.paymentUrl) {
+                        window.location.href = paymentResponse.paymentUrl;
+                    } else {
+                        alert('Order placed successfully!');
+                        // Handle case where no redirect is needed, or handle failed status
+                        console.log("Order info from backend: ", paymentResponse);
+                    }
+                } catch (error) {
+                    console.error('Error submitting order:', error);
+                    alert('Không đủ số lượng sản phẩm trong kho. Vui lòng thử lại sau.');
+                }
+            }
+        function decreaseQuantity(button) {
+            const itemId = button.getAttribute('data-item-id');
+            let quantityInput = document.getElementById(`quantity-${itemId}`);
+            let currentValue = parseInt(quantityInput.value) || 1;
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+            }
+            quantityInput.dispatchEvent(new Event('change'));
+        }
+        
+        function increaseQuantity(button) {
+            const itemId = button.getAttribute('data-item-id');
+            let quantityInput = document.getElementById(`quantity-${itemId}`);
+            let currentValue = parseInt(quantityInput.value) || 1;
+            quantityInput.value = currentValue + 1;
+            quantityInput.dispatchEvent(new Event('change'));
+        }
+        
+        
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            const citySelect = document.getElementById("citySelect");
+            const districtSelect = document.getElementById("districtSelect");
+            const wardSelect = document.getElementById("wardSelect");
+    
+            // Hàm lấy danh sách tỉnh/thành
+            async function fetchCities() {
+                const response = await fetch("https://provinces.open-api.vn/api/p/");
+                const cities = await response.json();
+                citySelect.innerHTML = `<option value="" selected disabled>Chọn Tỉnh/Thành phố</option>`;
+                cities.forEach(city => {
+                    citySelect.innerHTML += `<option value="${city.code}" style="
+    font-size: 14px;
+    font-weight: 500;
+">${city.name}</option>`;
+                });
+            }
+    
+            // Hàm lấy danh sách quận/huyện theo tỉnh/thành phố
+            async function fetchDistricts(provinceCode) {
+                const response = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
+                const province = await response.json();
+                districtSelect.innerHTML = `<option value="" selected disabled>Chọn Quận/Huyện</option>`;
+                wardSelect.innerHTML = `<option value="" selected disabled>Chọn Phường/Xã</option>`; // Reset danh sách phường/xã
+                province.districts.forEach(district => {
+                    districtSelect.innerHTML += `<option value="${district.code}" style="
+    font-size: 14px;
+    font-weight: 500;
+">${district.name}</option>`;
+                });
+            }
+    
+            // Hàm lấy danh sách phường/xã theo quận/huyện
+            async function fetchWards(districtCode) {
+                const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
+                const district = await response.json();
+                wardSelect.innerHTML = `<option value="" selected disabled>Chọn Phường/Xã</option>`;
+                district.wards.forEach(ward => {
+                    wardSelect.innerHTML += `<option value="${ward.code}" style="
+    font-size: 14px;
+    font-weight: 500;
+">${ward.name}</option>`;
+                });
+            }
+    
+            // Gọi danh sách tỉnh/thành phố khi trang load
+            await fetchCities();
+    
+            // Khi người dùng chọn tỉnh/thành phố, gọi API lấy danh sách quận/huyện
+            citySelect.addEventListener("change", async function () {
+                const provinceCode = this.value;
+                await fetchDistricts(provinceCode);
+            });
+    
+            // Khi người dùng chọn quận/huyện, gọi API lấy danh sách phường/xã
+            districtSelect.addEventListener("change", async function () {
+                const districtCode = this.value;
+                await fetchWards(districtCode);
+            });
+        });
+
+        function getAddress() {
+            const address = document.getElementById('address').value;
+            const citySelect = document.getElementById('citySelect');
+            const districtSelect = document.getElementById('districtSelect');
+            const wardSelect = document.getElementById('wardSelect');
+        
+            const city = citySelect.options[citySelect.selectedIndex].text;
+            const district = districtSelect.options[districtSelect.selectedIndex].text;
+            const ward = wardSelect.options[wardSelect.selectedIndex].text;
+        
+            return `${address}, ${ward}, ${district}, ${city}`;
+        }
+
+
+      document.addEventListener('DOMContentLoaded', () => {
+          
+          renderCartItems(cart.items);
+
+              const orderButton = document.getElementById('order-button');
+              if (orderButton) {
+                  orderButton.addEventListener('click', handleOrderSubmit);
+              }
+          });
+
+
+
+          async function applyVoucher() {
+            const voucherCode = document.getElementById('voucherCodeInput').value;
+            if (!voucherCode) {
+                alert('Vui lòng nhập mã giảm giá.');
+                return;
+            }
+        
+            try {
+                const response = await fetch(`/api/voucher/check/${voucherCode}`);
+                if (!response.ok) {
+                    throw new Error(`Lỗi HTTP! Trạng thái: ${response.status}`);
+                }
+                const voucher = await response.json();
+        
+                // Kiểm tra nếu voucher hợp lệ
+                if (voucher && voucher.isActive) {
+                    const discountAmount = calculateDiscount(voucher);
+                    updateTotal(discountAmount);
+                    alert('Áp dụng mã giảm giá thành công.');
+                } else {
+                    alert('Mã giảm giá không hợp lệ hoặc đã hết hạn.');
+                }
+            } catch (error) {
+                console.error('Lỗi khi áp dụng mã giảm giá:', error);
+                alert('Đã xảy ra lỗi khi áp dụng mã giảm giá.');
+            }
+        }
+        
+        function calculateDiscount(voucher) {
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/\D/g, ''));
+            let discountAmount = 0;
+        
+            if (voucher.type === 'percentage') {
+                discountAmount = (subtotal * voucher.discount) / 100;
+                if (voucher.maxDiscount && discountAmount > voucher.maxDiscount) {
+                    discountAmount = voucher.maxDiscount;
+                }
+            } else if (voucher.type === 'fixed') {
+                discountAmount = voucher.discount;
+            }
+        
+            return discountAmount;
+        }
+        
+        function updateTotal(discountAmount) {
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/\D/g, ''));
+            const total = subtotal - discountAmount;
+        
+            document.getElementById('discountAmount').textContent = discountAmount.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('total').textContent = total.toLocaleString('vi-VN') + 'đ';
+        }
+  </script>

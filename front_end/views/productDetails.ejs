@@ -49,46 +49,45 @@
                         <div class="row flex-column">
                             
                             <div class="col mb-2">
-                                <img src="http://localhost:3002/api/products/thumbnail/img_1734924492486.webp" alt="Thumbnail" class="img-fluid thumbnail-img" onclick="changeImage(this)">
+                                <img src="http://localhost:3002/api/products/thumbnail/<%= product.thumbnail %>"
+                                    alt="Thumbnail" class="img-fluid thumbnail-img"
+                                    onclick="changeImage(this)">
                             </div>
-                            
+
                         </div>
                     </div>
 
                     <!-- Thumbnail -->
                     <div class="flex-grow-1">
-                        <img id="mainImage" src="http://localhost:3002/api/products/thumbnail/img_1734924492486.webp" alt="Product" class="img-fluid product-image">
+                        <img id="mainImage"
+                            src="http://localhost:3002/api/products/thumbnail/<%= product.thumbnail %>"
+                            alt="Product" class="img-fluid product-image">
                     </div>
                 </div>
 
                 <!-- Product Details Section -->
                 <div class="col-md-5">
-                    <input type="hidden" id="productId" value="6768d8cc9740476c6f5780b8">
+                    <input type="hidden" id="productId" value="<%= product._id %>">
                      <input type="hidden" id="selectedSize" value="">
                     <h2 class="mb-3 fw-bold letter-spacing">
-                        Áo thun Relaxed Fit 84RISING Classic Venom
+                        <%= product.name %>
                     </h2>
 
                     <p class="fw-bold fs-4 ">
-                        
-                        399.000&nbsp;₫
+                        <% const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
+                        <%= formattedPrice %>
                      </p>
 
                     <h4 class="fs-6 fw-bold letter-spacing"> Đặc điểm nổi bật : </h4>
                     <ul>
-                        
-                            Chất liệu 100% Polyester
-Vải dệt Knit Pique thoáng khí
-Công nghệ ExDry thấm hút tốt, nhanh khô, thoáng mát
-Form dáng: Regular Fit
-Người mẫu: 182cm - 75kg, mặc áo XL
-Tự hào sản xuất tại Việt Nam
-                                
+                        <% if(product.description) { %>
+                            <%- product.description %>
+                                <% } %>
                     </ul>
 
                     <h4 class="fs-6 fw-medium letter-spacing"> Kích thước : </h4>
                     <div class="d-flex flex-wrap gap-2 mb-3">
-                         <button class="btn size-btn px-4 rounded-pill fw-bold" style="background: #d9d9d9;" data-size="S">S</button>
+                         <button class="btn size-btn px-4 rounded-pill fw-bold" style="background: #d9d9d9;"  data-size="S">S</button>
                         <button class="btn size-btn px-4 rounded-pill fw-bold" style="background: #d9d9d9;" data-size="M">M</button>
                         <button class="btn size-btn px-4 rounded-pill fw-bold" style="background: #d9d9d9;" data-size="L">L</button>
                         <button class="btn size-btn px-4 rounded-pill fw-bold" style="background: #d9d9d9;" data-size="XL">XL</button>
@@ -99,15 +98,16 @@ Tự hào sản xuất tại Việt Nam
 
                     <div class="quantity-area d-flex align-items-center mb-3">
                         <button type="button" class="qty-btn fw-bold" onclick="decreaseQuantity()">-</button>
-                        <input type="text" id="quantity" name="quantity" value="1" min="1" class="form-control text-center quantity-input fw-bold" style="width: 60px;">
+                        <input type="text" id="quantity" name="quantity" value="1" min="1"
+                            class="form-control text-center quantity-input fw-bold" style="width: 60px;">
                         <button type="button" class="qty-btn fw-bold" onclick="increaseQuantity()">+</button>
                     </div>
 
 
 
                     <div class="mb-3">
-                        <button class="btn bg-black text-light fw-bold fs-6 letter-spacing px-5 py-3 w-100 mb-3" onclick="addToCart()">THÊM
-                            VÀO GIỎ HÀNG</button>
+                        <button class="btn bg-black text-light fw-bold fs-6 letter-spacing px-5 py-3 w-100 mb-3"
+                            onclick="addToCart()">THÊM VÀO GIỎ HÀNG</button>
                             <button class="btn border-dark text-black fw-bold fs-6 letter-spacing px-5 py-3 w-100" onclick="viewCart()">
                                 XEM GIỎ HÀNG
                             </button>
@@ -115,22 +115,22 @@ Tự hào sản xuất tại Việt Nam
 
                     <ul class="list-unstyled d-flex flex-wrap">
                         <div class="w-50 py-3 d-flex">
-                            <i class="bx bx-refresh fs-2 px-1 me-2 btn border-dark"></i>
+                            <i class='bx bx-refresh fs-2 px-1 me-2 btn border-dark'></i>
                             <span class="fw-bold letter-spacing w-75" style="font-size: 15px;">Đổi trả cực dễ chỉ
                                 cần số điện thoại</span>
                         </div>
                         <div class="w-50 py-3 d-flex">
-                            <i class="bx bx-refresh bx-flip-horizontal fs-2 px-1 me-2 btn border-dark"></i>
+                            <i class='bx bx-refresh bx-flip-horizontal fs-2 px-1 me-2 btn border-dark'></i>
                             <span class="fw-bold letter-spacing w-75" style="font-size: 15px;">60 ngày đổi trả vì
                                 bất kỳ lý do gì</span>
                         </div>
                         <div class="w-50 py-3 d-flex">
-                            <i class="bx bxs-phone-call fs-2 px-1 me-2 btn border-dark"></i>
+                            <i class='bx bxs-phone-call fs-2 px-1 me-2 btn border-dark'></i>
                             <span class="fw-bold letter-spacing w-75" style="font-size: 15px;">Hotline 1900.27.27.37
                                 hỗ trợ từ 8h30 - 22h mỗi ngày</span>
                         </div>
                         <div class="w-50 py-3 d-flex">
-                            <i class="bx bx-current-location fs-2 px-1 me-2 btn border-dark"></i>
+                            <i class='bx bx-current-location fs-2 px-1 me-2 btn border-dark'></i>
                             <span class="fw-bold letter-spacing w-75" style="font-size: 15px;">Đến tận nơi nhận hàng
                                 trả, hoàn tiền trong 24h</span>
                         </div>
@@ -144,5 +144,356 @@ Tự hào sản xuất tại Việt Nam
 
     </div>
 </section>
+
+<div class="container py-5 m-0" style="max-width: 100%; padding: 0 70px;">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="p-5 bg-body-secondary text-center rounded me-5">
+                <h5 class="fw-bold" style="letter-spacing: -1px;font-size: 24px;">ĐÁNH GIÁ SẢN PHẨM</h5>
+                <h1 class="fw-bold" style="font-size: 50px;">4.9</h1>
+                <div class="mb-2" style="color: rgb(255 180 2);">
+                    <div class="fs-1">
+                        <i class='bx bxs-star' ></i>
+                        <i class='bx bxs-star' ></i>
+                        <i class='bx bxs-star' ></i>
+                        <i class='bx bxs-star' ></i>
+                        <i class='bx bxs-star' ></i>
+                    </div>
+                </div>
+                <p class="mb-0" style="letter-spacing: -1px;font-style: italic;font-weight: 500;">5 đánh giá</p>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="row mb-4">
+                <div class="col-md-2">
+                    <select class="form-select" style="
+                    border-radius: 30px;
+                    font-size: 14px;
+                    font-weight: 600;
+                        padding: 12px;
+                ">
+                        <option selected>Đánh giá</option>
+                        <option value="1">1 sao</option>
+                        <option value="2">2 sao</option>
+                        <option value="3">3 sao</option>
+                        <option value="4">4 sao</option>
+                        <option value="5">5 sao</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" style="
+                    border-radius: 30px;
+                    font-size: 14px;
+                    font-weight: 600;
+                        padding: 12px;
+                ">
+                        <option selected>Ảnh</option>
+                        <option value="có ảnh">Có ảnh</option>
+                        <option value="không ảnh">Không ảnh</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" style="
+                    border-radius: 30px;
+                    font-size: 14px;
+                    font-weight: 600;
+                        padding: 12px;
+                ">
+                        <option selected>Phản hồi</option>
+                        <option value="có phản hồi">Có phản hồi</option>
+                        <option value="không phản hồi">Không phản hồi</option>
+                    </select>
+                </div>
+            </div>
+            <div id="reviewsContainer" class="row">
+                <!-- Danh sách review sẽ được hiển thị ở đây -->
+            </div>
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#">&gt;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+<section class="products-section pt-5">
+    <div style="padding: 0 70px;">
+
+        <div class="heading-product">
+            <h3 class="fw-bold mb-4 text-center letter-spacing">GỢI Ý SẢN PHẨM</h3>
+        </div>
+
+
+        <div class="owl-carousel owl-theme slider" id="related-products-container">
+             <% if(relatedProducts && relatedProducts.length > 0){ %>
+                 <% relatedProducts.forEach(relatedProduct => { %>
+                    <div class=" mb-4">
+                        <div class="product">
+                           <div class="image position-relative">
+                                <div class="img">
+                                    <img src="http://localhost:3002/api/products/thumbnail/<%= relatedProduct.thumbnail %>"
+                                        alt="Sản phẩm" class="img-fluid w-100">
+                                </div>
+                               <div class="img-hover position-absolute top-0 start-0 w-100 h-100 ">
+                                    <img src="http://localhost:3002/api/products/thumbnail/<%= relatedProduct.thumbnail %>"
+                                        alt="Sản phẩm hover" class="img-fluid w-100">
+                                </div>
+                         </div>
+                         <a href="/product/<%= relatedProduct._id %>" class="text-decoration-none">
+                               <h2 class="product-name mt-3"><%= relatedProduct.name %></h2>
+                         </a>
+                          <h2 class="fs-6 fw-bold ps-3"><%= relatedProduct.price %> đ</h2>
+                             <div class="button text-center mt-3">
+                              <a href="/product/<%= relatedProduct._id %>">
+                                     <button class="btn btn-primary px-4 bg-menu">
+                                         <div class="btn__txt">XEM NGAY</div>
+                                 </button>
+                              </a>
+                              </div>
+                        </div>
+                    </div>
+
+                 <% }) %>
+             <% } %>
+         </div>
+
+
+    </div>
+</section>
+
+<script>
+
+   function changeImage(thumbnail) {
+       const mainImage = document.getElementById('mainImage');
+       mainImage.src = thumbnail.src;
+   }
+
+   function decreaseQuantity() {
+       let quantityInput = document.getElementById("quantity");
+       let currentValue = parseInt(quantityInput.value) || 1;
+       if (currentValue > 1) {
+           quantityInput.value = currentValue - 1;
+       }
+   }
+
+   function increaseQuantity() {
+       let quantityInput = document.getElementById("quantity");
+       let currentValue = parseInt(quantityInput.value) || 1;
+       quantityInput.value = currentValue + 1;
+   }
+
+
+   // JavaScript code here
+   const sizeButtons = document.querySelectorAll('.size-btn');
+
+   sizeButtons.forEach(button => {
+       button.addEventListener('click', () => {
+           sizeButtons.forEach(btn => {
+               btn.style.background = '#d9d9d9';
+               btn.style.color = '#000';
+           });
+           button.style.background = '#212121';
+           button.style.color = '#fff';
+           document.getElementById('selectedSize').value = button.getAttribute('data-size');
+       });
+   });
+
+   async function viewCart() {
+    try {
+        const userInfo = await fetch('/auth/user', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        if (!userInfo.ok) {
+            alert("Please login to view your cart");
+            window.location.href = '/login';
+            return;
+        }
+        const user = await userInfo.json();
+        if (!user.success) {
+            alert("Please login to view your cart");
+            window.location.href = '/login';
+            return;
+        }
+        const userId = user.user.user._id;
+        window.location.href = `/cart/${userId}`;
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        alert("Could not redirect to cart, please try again later.");
+    }
+}
+
+
+
+
+   async function addToCart() {
+       const productId = document.getElementById('productId').value;
+       const quantity = parseInt(document.getElementById('quantity').value);
+       const size = document.getElementById('selectedSize').value;
+        if(!size){
+             Swal.fire({
+                   icon: 'error',
+                   title: "Please select a size!",
+                    timer: 1500,
+                   timerProgressBar: true,
+                   showConfirmButton: false,
+               });
+             return;
+         }
+       try {
+         //1. get user info
+           const userInfo = await fetch('/auth/user', {
+               method: 'GET',
+               headers: {
+                   'Content-Type': 'application/json',
+               }
+           });
+           if (!userInfo.ok) {
+               alert("Please login to add items to your cart");
+               window.location.href = '/login';
+               return;
+           }
+           const user = await userInfo.json();
+           if (!user.success) {
+               alert("Please login to add items to your cart");
+               window.location.href = '/login';
+               return;
+           }
+           const userId = user.user.user._id;
+    
+            //3. get cart info
+            const cartResponse = await fetch(`/api/cart/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+
+            });
+              let cartData = null;
+           if(cartResponse.ok){
+                cartData = await cartResponse.json();
+                if(!cartData){
+                     //create the cart
+                     const createCart = await fetch(`/api/cart`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({userId: userId})                    });
+                   if(!createCart.ok){
+                         throw new Error(`HTTP error! status: ${createCart.status}`);
+                   }
+                   cartData = await createCart.json();
+               }
+          }else{
+            //create the cart
+            const createCart = await fetch(`/api/cart`, {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                 },
+                 body: JSON.stringify({userId: userId})
+               });
+               if(!createCart.ok){
+                   throw new Error(`HTTP error! status: ${createCart.status}`);
+               }
+               cartData = await createCart.json();
+          }
+
+
+            // add item to cart
+           const addItemResponse = await fetch(`/api/cart/item`, {
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({
+                    cartId: cartData._id,
+                    productId: productId,
+                    quantity: quantity,
+                    size: size
+               })
+            });
+            if(!addItemResponse.ok){
+                   throw new Error(`HTTP error! status: ${addItemResponse.status}`);
+              }
+           //    const addItemData = await addItemResponse.json();
+            if(addItemResponse.status === 200){
+
+                 Swal.fire({
+                   icon: 'success',
+                   title: "Thêm vào giỏ hàng thành công !",
+                   text: "Bạn đã thêm 1 sản phẩm vào giỏ hàng !",
+                   timer: 1500,
+                   timerProgressBar: true,
+                   showConfirmButton: false,
+               }).then(() => {
+                   window.location.reload();
+               });
+               }else{
+                   alert("Can't add to cart, please try again later");
+               }
+       } catch (error) {
+           console.error('Error adding to cart', error);
+           alert("Can't add to cart, please try again later");
+       }
+   }
+
+
+   document.addEventListener('DOMContentLoaded', () => {
+    const productId = document.getElementById('productId').value;
+    fetchReviews(productId);
+});
+
+async function fetchReviews(productId) {
+    try {
+        const response = await fetch(`/api/reviewProduct/${productId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const reviews = await response.json();
+        displayReviews(reviews);
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
+        alert('Không thể tải danh sách đánh giá.');
+    }
+}
+
+function displayReviews(reviews) {
+    const reviewsContainer = document.getElementById('reviewsContainer');
+    reviewsContainer.innerHTML = ''; // Xóa các review hiện có
+
+    if (reviews.length === 0) {
+        reviewsContainer.innerHTML = '<p>Không có đánh giá nào cho sản phẩm này.</p>';
+        return;
+    }
+
+    reviews.forEach(review => {
+        const reviewElement = document.createElement('div');
+        reviewElement.classList.add('list-group-item', 'pt-4', 'pb-3','border-top');
+        reviewElement.style.width = "50%"; // ✅ Thêm width = 50%
+    
+        reviewElement.innerHTML = `
+            <div class="fs-4">
+                ${'★'.repeat(review.rate)}${'☆'.repeat(5 - review.rate)}
+            </div>
+            <h5 class="fw-bold" style="font-size: 14px;">${review.user.username}</h5>
+            <p class="mt-4 mb-4" style="font-size: 13px; font-weight:600;">${review.comment}</p>
+            <h5 class="text-secondary" style="font-size: 13px;">${new Date(review.createdAt).toLocaleDateString()}</h5>
+        `;
+    
+        reviewsContainer.appendChild(reviewElement);
+    });
+    
+}
+
+
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>

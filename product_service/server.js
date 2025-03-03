@@ -6,6 +6,8 @@ import categoriesRoutes from './routes/categoriesRoutes.mjs';
 import collectionRoutes from './routes/collectionRoutes.mjs';
 import imageProductRoutes from './routes/imageProductRoutes.mjs';
 import quantityProductRoutes from './routes/quantityProductRoutes.mjs';
+import reviewRoutes from './routes/reviewRoutes.mjs';
+import voucherRoutes from './routes/voucherRoutes.mjs';
 import bannerRoutes from './routes/bannerRoutes.mjs';
 import voucherRoutes from './routes/voucherRoutes.mjs'; 
 import cors from 'cors';
@@ -25,6 +27,8 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/collection', collectionRoutes);
 app.use('/api/imageProduct', imageProductRoutes);
 app.use('/api/quantityProduct', quantityProductRoutes);
+app.use('/api/reviewProduct', reviewRoutes);
+app.use('/api/vouchers', voucherRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/vouchers', voucherRoutes);
 

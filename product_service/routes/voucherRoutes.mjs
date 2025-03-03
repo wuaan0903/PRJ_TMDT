@@ -1,27 +1,27 @@
-import express from "express";
-import {
-  createVoucher,
-  getVouchers,
-  getVoucherByCode,
-  updateVoucher,
-  deleteVoucher,
-} from "../controllers/voucherController.mjs";
+import express from 'express';
+import { createVoucher, getAllVouchers, getVoucherById, updateVoucher, deleteVoucher, checkVoucher,updaeStage } from '../controllers/voucherController.mjs';
 
 const router = express.Router();
 
-// Tạo mã giảm giá mới
-router.post("/", createVoucher);
+// Route để tạo voucher
+router.post('/', createVoucher);
 
-// Lấy tất cả mã giảm giá
-router.get("/", getVouchers);
+// Route để lấy tất cả vouchers
+router.get('/', getAllVouchers);
 
-// Lấy mã giảm giá theo mã code
-router.get("/:code", getVoucherByCode);
+// Route để lấy voucher theo ID
+router.get('/:id', getVoucherById);
 
-// Cập nhật mã giảm giá
-router.put("/:id", updateVoucher);
+// Route để cập nhật voucher theo ID
+router.patch('/:id', updateVoucher);
 
-// Xóa mã giảm giá
-router.delete("/:id", deleteVoucher);
+// Route để xóa voucher theo ID
+router.delete('/:id', deleteVoucher);
+
+// Route để check voucher
+router.get('/check/:code', checkVoucher);
+
+// Route để check voucher
+router.put('/updateUsage/:code', updaeStage);
 
 export default router;

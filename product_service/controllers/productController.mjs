@@ -185,6 +185,35 @@ export const serveThumbnail =  (req, res) => {
       });
 };
 
+
+// Hàm loại bỏ dấu tiếng Việt
+const removeDiacritics = (str) => {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
+
+export const searchProducts = async (req, res) => {
+    try {
+        const query = req.query.q;
+        if (!query) return res.status(400).json({ message: "Thiếu từ khóa tìm kiếm" });
+
+        // Chuẩn hóa từ khóa tìm kiếm
+        const normalizedQuery = removeDiacritics(query).toLowerCase();
+
+        // Tìm kiếm trực tiếp trong MongoDB thay vì lấy tất cả rồi lọc lại
+        const products = await Product.find();
+
+        // Lọc dữ liệu theo tên sản phẩm không dấu
+        const filteredProducts = products.filter((product) => {
+            const normalizedName = removeDiacritics(product.name).toLowerCase();
+            return normalizedName.includes(normalizedQuery);
+        });
+
+        res.status(200).json(filteredProducts);
+    } catch (err) {
+        res.status(500).json({ message: "Lỗi máy chủ", error: err.message });
+    }
+}
+
 // Serve product's thumbnail image
 export const serveBanner =  (req, res) => {
     const thumbnailPath = path.resolve("public/uploads/banner/" + req.params.filename);

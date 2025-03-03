@@ -2,6 +2,7 @@ import express from 'express';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 const router = express.Router();
@@ -29,6 +30,37 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Create (Add a new user)
+router.post('/', async (req, res) => {
+  try {
+    const { username, email, password, phone_number, role } = req.body;
+
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create a new user
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      phone_number,
+      role
+    });
+    // Save the user to the database
+    const savedUser = await newUser.save();
+
+    res.status(201).json(savedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Update
 router.patch('/:id', async (req, res) => {

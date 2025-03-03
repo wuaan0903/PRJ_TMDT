@@ -147,12 +147,21 @@
         <div class="header-action d-flex align-items-center">
             <!-- Search Bar -->
             <div class="input-group me-3">
-                <input type="text" class="form-control" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
-                <button class="btn btn-outline-light" type="button">
+                <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
+                <button class="btn btn-outline-light" type="button" onclick="searchProduct()">
                     <i class='bx bx-search-alt fs-4'></i>
                 </button>
             </div>
-
+            
+            <script>
+                function searchProduct() {
+                    const query = document.getElementById('searchInput').value.trim();
+                    if (query) {
+                        window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                    }
+                }
+            </script>
+        
             <!-- User Icon -->
             <!-- User Icon / Dropdown -->
             <div class="login" id="user-controls">
@@ -327,7 +336,7 @@
             </li>
             <li>
                 <i class="bx bxs-user-account" style="color: #000; transform: translateY(2px);"></i>
-                <a href="" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;">Tài khoản của tôi</a>
+                <a href="/user/profile" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;">Tài khoản của tôi</a>
                 <i class="bx bx-chevron-right" style="color: #000; transform: translateY(10px); float: right; font-size: 24px;"></i>
             </li>
             <li>

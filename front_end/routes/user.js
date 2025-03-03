@@ -137,7 +137,7 @@ router.get('/auth/logout', (req, res) => {
 });
 
 // Proxy to get user
-router.get('/api/users/:userId', async (req, res) => {
+router.get('/api/account/:userId', async (req, res) => {
   try {
     const backendResponse = await fetch(`${BACKEND_API_URL}/api/users/${req.params.userId}`, {
       method: 'GET',
@@ -158,4 +158,113 @@ router.get('/api/users/:userId', async (req, res) => {
     res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
   }
 });
+
+// Proxy to get users with role 'user'
+router.get('/api/account/role/user', async (req, res) => {
+  try {
+    const backendResponse = await fetch(`${BACKEND_API_URL}/api/users`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json();
+      return res.status(backendResponse.status).json(errorData);
+    }
+
+    const users = await backendResponse.json();
+    const usersWithUserRole = users.filter(user => user.role === 'user');
+    res.status(200).json(usersWithUserRole);
+
+  } catch (error) {
+    console.error('Error during proxy get users with role user', error);
+    res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
+  }
+});
+
+// Proxy to get users with role 'staff'
+router.get('/api/account/role/staff', async (req, res) => {
+  try {
+    const backendResponse = await fetch(`${BACKEND_API_URL}/api/users`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json();
+      return res.status(backendResponse.status).json(errorData);
+    }
+
+    const users = await backendResponse.json();
+    const usersWithUserRole = users.filter(user => user.role === 'staff');
+    res.status(200).json(usersWithUserRole);
+
+  } catch (error) {
+    console.error('Error during proxy get users with role user', error);
+    res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
+  }
+});
+
+// Proxy to create a new user or staff account
+router.post('/api/account', async (req, res) => {
+  try {
+    const { username, email, password, phone_number, role } = req.body;
+    const backendResponse = await fetch(`${BACKEND_API_URL}/api/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, email, password, phone_number, role })
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json();
+      return res.status(backendResponse.status).json(errorData);
+    }
+
+    const data = await backendResponse.json();
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Error during proxy create account', error);
+    res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
+  }
+});
+
+// Proxy to update a user or staff account
+router.patch('/api/account/:userId', async (req, res) => {
+  try {
+    const { username, email, phone_number, role, password } = req.body; // Thêm trường password
+    const updateData = { username, email, phone_number, role };
+
+    // Chỉ thêm trường password nếu có giá trị
+    if (password) {
+      updateData.password = password;
+    }
+
+    const backendResponse = await fetch(`${BACKEND_API_URL}/api/users/${req.params.userId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updateData)
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json();
+      return res.status(backendResponse.status).json(errorData);
+    }
+
+    const data = await backendResponse.json();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error during proxy update account', error);
+    res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
+  }
+});
+
+
 module.exports = router;

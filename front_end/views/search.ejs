@@ -1,0 +1,224 @@
+<%- layout('layouts/index') %>
+
+<!-- Import thư viện Owl Carousel -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
+<style>
+    /* Style sản phẩm */
+    .product {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-radius: 10px;
+        padding: 10px;
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        height: 100%;
+    }
+
+    .image {
+        width: 100%;
+        height: 380px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        border-radius: 10px;
+    }
+
+    .image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .product-name {
+        font-size: 1rem;
+        font-weight: bold;
+        color: #333;
+        text-decoration: none;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        padding-left: 10px;
+    }
+
+    .button {
+        text-align: left;
+        padding-left: 10px;
+    }
+
+    .btn-primary {
+        background-color: black;
+        border-radius: 30px;
+        padding: 8px 15px;
+        font-size: 1rem;
+        transition: background 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #444;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 15px;
+        }
+    }
+</style>
+
+<!-- Ô tìm kiếm đầu trang -->
+<section style="padding-top: 80px;">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3 mt-4">
+            <h5 class="fw-bold mb-0">Sản phẩm</h5>
+            <div class="d-flex gap-2">
+                <input id="searchInputTop" type="text" class="form-control form-control-sm rounded-pill" placeholder="Nhập từ khóa..." style="max-width: 250px;">
+
+                <!-- Dropdown danh mục -->
+                <select id="categorySelect" class="form-select form-select-sm rounded-pill" style="max-width: 150px;">
+                    <option value="">Danh mục</option>
+                </select>
+
+                <button id="searchBtnTop" class="btn btn-dark btn-sm rounded-pill px-3">
+                    <i class='bx bx-search-alt fs-4'></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <hr class="my-4">
+</section>
+
+<!-- Phần kết quả tìm kiếm -->
+<section style="padding-bottom: 30px;">
+    <div class="container">
+        <h4 class="fw-bold mb-4">KẾT QUẢ TÌM KIẾM</h4>
+        <div id="searchResultWrapper"></div>
+    </div>
+</section>
+
+<!-- Import thư viện jQuery & Owl Carousel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+<script>
+    document.getElementById('searchBtnTop').addEventListener('click', searchProducts);
+    document.getElementById('searchInputTop').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') searchProducts();
+    });
+
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    async function loadCategories() {
+        const categorySelect = document.getElementById('categorySelect');
+
+        try {
+            const response = await fetch('http://localhost:3002/api/categories'); // 📌 Gọi API danh mục
+            if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
+
+            const categories = await response.json();
+            categorySelect.innerHTML = `<option value="">Danh mục</option>`; // Reset danh mục
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.slug || category._id;
+                option.textContent = category.name;
+                categorySelect.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error('Lỗi khi tải danh mục:', error);
+            categorySelect.innerHTML = `<option value="">Lỗi tải danh mục</option>`;
+        }
+    }
+
+    
+    async function searchProducts() {
+        const query = document.getElementById('searchInputTop').value.trim();
+        const categories = document.getElementById('categorySelect').value;
+        const searchResultWrapper = document.getElementById('searchResultWrapper');
+
+        const queryParams = new URLSearchParams();
+        if (query) queryParams.append('q', query);
+        if (categories) queryParams.append('categories', categories);
+        window.history.pushState({}, '', `/search?${queryParams.toString()}`);
+
+        searchResultWrapper.innerHTML = `<p class="text-center text-muted">Đang tìm kiếm...</p>`;
+
+        try {
+            const response = await fetch(`http://localhost:3002/api/products/search?${queryParams.toString()}`);
+            if (!response.ok) throw new Error('Lỗi kết nối đến server');
+
+            const products = await response.json();
+            searchResultWrapper.innerHTML = '';
+            if (!products.length) {
+                searchResultWrapper.innerHTML = `<p class="text-center text-muted">Không tìm thấy sản phẩm nào!</p>`;
+                return;
+            }
+
+            let productHTML = `<div id="searchResults" class="owl-carousel owl-theme slider">`;
+
+            products.forEach(product => {
+                productHTML += `
+                    <div class="mb-4">
+                        <div class="product">
+                            <div class="image position-relative">
+                                <div class="img">
+                                    <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}" alt="${product.name}" class="img-fluid w-100">
+                                </div>
+                            </div>
+                            <a href="/product/${product._id}" class="text-decoration-none">
+                                <h2 class="product-name mt-3 ps-3">${product.name}</h2>
+                            </a>
+                            <h2 class="fs-6 fw-bold ps-3">${product.price.toLocaleString()}đ</h2>
+                            <div class="button text-center mt-3">
+                                <a href="/product/${product._id}">
+                                    <button class="btn btn-primary px-4 bg-menu">
+                                        <div class="btn__txt">XEM NGAY</div>
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            productHTML += `</div>`;
+            searchResultWrapper.innerHTML = productHTML;
+
+            $('#searchResults').owlCarousel({
+                loop: true,
+                margin: 20,
+                nav: true,
+                dots: false,
+                autoplay: true,
+                autoplayTimeout: 3000,
+                autoplayHoverPause: true,
+                responsive: { 0: { items: 1 }, 600: { items: 2 }, 1000: { items: 4 } }
+            });
+
+        } catch (error) {
+            console.error('Lỗi khi tìm kiếm sản phẩm:', error);
+            searchResultWrapper.innerHTML = `<p class="text-center text-danger">Có lỗi xảy ra, vui lòng thử lại!</p>`;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        loadCategories(); // Gọi API để load danh mục khi trang tải xong
+
+        const query = getQueryParam('q');
+        const categories = getQueryParam('categories'); 
+
+        if (query) document.getElementById('searchInputTop').value = query;
+        if (categories) document.getElementById('categorySelect').value = categories;
+
+        if (query || categories) searchProducts();
+    });
+</script>
