@@ -7,8 +7,6 @@ import {
     deleteProduct,
     serveThumbnail,
     searchProducts,
-    serveThumbnail,
-    getProductsByCategory,
     serveBanner
 } from '../controllers/productController.mjs';
 

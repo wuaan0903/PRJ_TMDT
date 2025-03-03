@@ -9,7 +9,7 @@ import quantityProductRoutes from './routes/quantityProductRoutes.mjs';
 import reviewRoutes from './routes/reviewRoutes.mjs';
 import voucherRoutes from './routes/voucherRoutes.mjs';
 import bannerRoutes from './routes/bannerRoutes.mjs';
-import voucherRoutes from './routes/voucherRoutes.mjs'; 
+
 import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 3002;
