@@ -160,30 +160,432 @@ padding: 0 50px;
 
             <!-- Nội dung bên phải -->
             <div class="col-md-9">
-                <div class="card shadow-sm border-0 p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="fw-bold">Địa chỉ của tôi</h2>
-                        <button class="btn btn-dark rounded-pill px-4 py-2">THÊM ĐỊA CHỈ MỚI</button>
-                    </div>
-                    <hr>
-                    <p class="text-muted">Sổ địa chỉ</p>
+                <div class="container" style="
+                background: #d9d9d9;
+                padding: 20px 40px;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                min-height: 442px;
+            ">
                     
-                    <!-- Danh sách địa chỉ -->
-                    <div class="list-group">
-                        <div class="list-group-item">
-                            <h5 class="mb-1">Nguyễn Văn A</h5>
-                            <p class="mb-1">123 Đường ABC, Phường XYZ, Quận 1, TP.HCM</p>
-                            <small>Số điện thoại: 0987 654 321</small>
-                        </div>
-                        <div class="list-group-item">
-                            <h5 class="mb-1">Trần Thị B</h5>
-                            <p class="mb-1">456 Đường DEF, Phường LMN, Quận 2, TP.HCM</p>
-                            <small>Số điện thoại: 0912 345 678</small>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
+                        <h2>Địa chỉ của tôi</h2>
+                        <button id="addAddressBtn" class="btn btn-dark" style="
+                        font-size: 14px;
+                        font-weight: 600;
+                        padding: 15px 30px;
+                        border-radius: 30px;
+                    ">THÊM ĐỊA CHỈ MỚI</button>
+                    </div>
+                    
+                    <div id="addressList" class="list-group">
+                        <!-- Địa chỉ 1 -->
+                        
+                        
                     </div>
                 </div>
             </div>
         </div>
     </div>
+<!-- Modal thêm địa chỉ mới -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="
+    max-width: 800px;
+    transform: translateY(200px);
+">
+        <div class="modal-content" style="
+        width: 800px;
+    ">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Thêm địa chỉ mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAddressForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            
+                            <label class="form-label letter-spacing fw-medium">Họ và tên</label>
+                            <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" id="nameKH" style="font-size: 14px;" placeholder="Nhập họ tên người nhận" required="">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            
+                            <label for="phoneNumber" class="form-label letter-spacing fw-medium">Số điện thoại</label>
+                            <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Nhập số điện thoại người nhận" id="phoneNumber" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="address" class="form-label letter-spacing fw-medium">Địa chỉ</label>
+                            <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Nhập địa chỉ người nhận" id="address" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="citySelect" >
+                                <option value="" selected="" >Chọn Tỉnh/Thành phố</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="districtSelect">
+                                  <option value="" selected="" >Chọn Quận/Huyện</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="wardSelect">
+                                <option value="" selected="" >Chọn Phường/Xã</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100">Lưu địa chỉ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
+
+<!-- Modal cập nhật địa chỉ -->
+<div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 800px; transform: translateY(200px);">
+        <div class="modal-content" style="width: 800px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAddressModalLabel">Cập nhật địa chỉ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAddressForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label letter-spacing fw-medium">Họ và tên</label>
+                            <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" id="editNameKH" style="font-size: 14px;" placeholder="Nhập họ tên người nhận" required="">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editPhoneNumber" class="form-label letter-spacing fw-medium">Số điện thoại</label>
+                            <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Nhập số điện thoại người nhận" id="editPhoneNumber" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="editAddress" class="form-label letter-spacing fw-medium">Địa chỉ</label>
+                            <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Nhập địa chỉ người nhận" id="editAddress" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="editCitySelect">
+                                <option value="" selected="" >Chọn Tỉnh/Thành phố</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="editDistrictSelect">
+                                <option value="" selected="" >Chọn Quận/Huyện</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="editWardSelect">
+                                <option value="" selected="" >Chọn Phường/Xã</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100">Lưu thay đổi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        let userId;
+
+        // Gọi API để lấy ID người dùng
+        fetch('/auth/user')
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    // Redirect to login page if not logged in
+                    window.location.href = '/login';
+                    throw new Error('Not logged in');
+                }
+            })
+            .then(userData => {
+                userId = userData.user.user._id;
+                console.log('User ID:', userId);
+                fetchAddresses(userId);
+            })
+            .catch(error => {
+                console.error('Error fetching user ID:', error);
+            });
+
+        // Hàm để gọi API lấy danh sách địa chỉ
+        async function fetchAddresses(userId) {
+            try {
+                const response = await fetch(`/api/account/${userId}/addresses`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const addresses = await response.json();
+                displayAddresses(addresses);
+            } catch (error) {
+                console.error('Error fetching addresses:', error);
+            }
+        }
+
+        // Hàm để hiển thị danh sách địa chỉ
+        function displayAddresses(addresses) {
+            const addressList = document.getElementById('addressList');
+            addressList.innerHTML = ''; // Xóa nội dung cũ
+
+            addresses.forEach((address, index) => {
+                const addressItem = document.createElement('div');
+                addressItem.className = 'list-group-item1 py-3';
+                addressItem.style.background = '#fff';
+                addressItem.style.padding = '20px';
+                addressItem.style.borderRadius = '16px';
+                addressItem.style.marginBottom = '10px';
+                addressItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 id="name${index}" style="
+                                font-size: 14px;
+                                font-weight: 600;
+                                letter-spacing: -1px;
+                                margin-bottom: 20px;
+                            ">${address.nameKH} ${address.defaultAddress ? '<span id="defaultBadge${index}" style="background: #fff; border-radius: 10px; padding: 6px; border: 1px solid; font-size: 12px; margin-left: 10px; font-weight: 500;"><i class="bx bxs-star"></i> Mặc định</span>' : ''}</h6>
+                            <p class="mb-1" id="phone${index}" style="
+                                font-size: 14px;
+                                font-weight: 500;
+                            ">${address.phoneNumber}</p>
+                            <p id="addressText${index}" style="
+                                font-size: 14px;
+                                font-weight: 500;
+                                letter-spacing: -1px;
+                                margin:0;
+                            ">${address.address}, ${address.ward}, ${address.district}, ${address.city}</p>
+                        </div>
+                        <div>
+                            <a href="#" class="pe-3" id="edit${index}" style="
+                                font-size: 14px;
+                                font-weight: 600;
+                                border-right: 1px solid #000;
+                                color: #273ccd;
+                                cursor: pointer;
+                            ">Cập nhật</a>
+                            <a href="#" class="ms-3" id="delete${index}" style="
+                                font-size: 14px;
+                                font-weight: 600;
+                                color: #273ccd;
+                                cursor: pointer;
+                            ">Xóa</a>
+                        </div>
+                    </div>
+                `;
+                addressList.appendChild(addressItem);
+
+                // Thêm sự kiện cho nút cập nhật và xóa
+                document.getElementById(`edit${index}`).addEventListener('click', () => editAddress(address));
+                document.getElementById(`delete${index}`).addEventListener('click', () => deleteAddress(address._id));
+            });
+        }
+
+        // Hàm để xử lý cập nhật địa chỉ
+        function editAddress(address) {
+            // Điền thông tin địa chỉ vào form cập nhật
+            document.getElementById('editNameKH').value = address.nameKH;
+            document.getElementById('editPhoneNumber').value = address.phoneNumber;
+            document.getElementById('editAddress').value = address.address;
+            document.getElementById('editCitySelect').value = address.city;
+            document.getElementById('editDistrictSelect').value = address.district;
+            document.getElementById('editWardSelect').value = address.ward;
+
+            // Hiển thị modal cập nhật địa chỉ
+            const editAddressModal = new bootstrap.Modal(document.getElementById('editAddressModal'));
+            editAddressModal.show();
+
+            // Xử lý sự kiện submit form cập nhật địa chỉ
+            document.getElementById('editAddressForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const updatedAddress = {
+                    nameKH: document.getElementById('editNameKH').value,
+                    phoneNumber: document.getElementById('editPhoneNumber').value,
+                    address: document.getElementById('editAddress').value,
+                    ward: document.getElementById('editWardSelect').options[editWardSelect.selectedIndex].text,
+                    district: document.getElementById('editDistrictSelect').options[editDistrictSelect.selectedIndex].text,
+                    city: document.getElementById('editCitySelect').options[editCitySelect.selectedIndex].text,
+                };
+
+                try {
+                    const response = await fetch(`/api/account/${userId}/addresses/${address._id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatedAddress)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    // Cập nhật địa chỉ thành công, gọi lại hàm fetchAddresses để cập nhật danh sách địa chỉ
+                    fetchAddresses(userId);
+
+                    // Đóng modal sau khi cập nhật thành công
+                    const editAddressModal = bootstrap.Modal.getInstance(document.getElementById('editAddressModal'));
+                    editAddressModal.hide();
+                } catch (error) {
+                    console.error('Error updating address:', error);
+                }
+            });
+        }
+
+        // Hàm để xử lý xóa địa chỉ
+        async function deleteAddress(addressId) {
+            try {
+                const response = await fetch(`/api/account/${userId}/addresses/${addressId}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                // Xóa địa chỉ thành công, gọi lại hàm fetchAddresses để cập nhật danh sách địa chỉ
+                fetchAddresses(userId);
+            } catch (error) {
+                console.error('Error deleting address:', error);
+            }
+        }
+
+        // Thêm sự kiện cho nút "THÊM ĐỊA CHỈ MỚI"
+        document.getElementById('addAddressBtn').addEventListener('click', function () {
+            const addAddressModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+            addAddressModal.show();
+        });
+
+        // Xử lý sự kiện submit form thêm địa chỉ mới
+        document.getElementById('addAddressForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const newAddress = {
+                nameKH: document.getElementById('nameKH').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                address: document.getElementById('address').value,
+                ward: document.getElementById('wardSelect').options[wardSelect.selectedIndex].text,
+                district: document.getElementById('districtSelect').options[districtSelect.selectedIndex].text,
+                city: document.getElementById('citySelect').options[citySelect.selectedIndex].text,
+                defaultAddress: false // Bạn có thể thêm logic để xác định địa chỉ mặc định nếu cần
+            };
+
+            try {
+                const response = await fetch(`/api/account/${userId}/addresses`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newAddress)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Thêm địa chỉ thành công, gọi lại hàm fetchAddresses để cập nhật danh sách địa chỉ
+                fetchAddresses(userId);
+
+                // Đóng modal sau khi thêm thành công
+                const addAddressModal = bootstrap.Modal.getInstance(document.getElementById('addAddressModal'));
+                addAddressModal.hide();
+            } catch (error) {
+                console.error('Error adding address:', error);
+            }
+        });
+
+        // Gọi hàm fetchAddresses khi trang được tải
+        fetchAddresses(userId);
+    });
+
+    document.addEventListener("DOMContentLoaded", async function () {
+        const citySelect = document.getElementById("citySelect");
+        const districtSelect = document.getElementById("districtSelect");
+        const wardSelect = document.getElementById("wardSelect");
+
+        const editCitySelect = document.getElementById("editCitySelect");
+        const editDistrictSelect = document.getElementById("editDistrictSelect");
+        const editWardSelect = document.getElementById("editWardSelect");
+
+        // Hàm lấy danh sách tỉnh/thành
+        async function fetchCities() {
+            const response = await fetch("https://provinces.open-api.vn/api/p/");
+            const cities = await response.json();
+            citySelect.innerHTML = `<option value="" selected >Chọn Tỉnh/Thành phố</option>`;
+            editCitySelect.innerHTML = `<option value="" selected >Chọn Tỉnh/Thành phố</option>`;
+            cities.forEach(city => {
+                citySelect.innerHTML += `<option value="${city.code}" style="font-size: 14px; font-weight: 500;">${city.name}</option>`;
+                editCitySelect.innerHTML += `<option value="${city.code}" style="font-size: 14px; font-weight: 500;">${city.name}</option>`;
+            });
+        }
+
+        // Hàm lấy danh sách quận/huyện theo tỉnh/thành phố
+        async function fetchDistricts(provinceCode, isEdit = false) {
+            const response = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
+            const province = await response.json();
+            if (isEdit) {
+                editDistrictSelect.innerHTML = `<option value="" selected >Chọn Quận/Huyện</option>`;
+                editWardSelect.innerHTML = `<option value="" selected >Chọn Phường/Xã</option>`; // Reset danh sách phường/xã
+                province.districts.forEach(district => {
+                    editDistrictSelect.innerHTML += `<option value="${district.code}" style="font-size: 14px; font-weight: 500;">${district.name}</option>`;
+                });
+            } else {
+                districtSelect.innerHTML = `<option value="" selected >Chọn Quận/Huyện</option>`;
+                wardSelect.innerHTML = `<option value="" selected >Chọn Phường/Xã</option>`; // Reset danh sách phường/xã
+                province.districts.forEach(district => {
+                    districtSelect.innerHTML += `<option value="${district.code}" style="font-size: 14px; font-weight: 500;">${district.name}</option>`;
+                });
+            }
+        }
+
+        // Hàm lấy danh sách phường/xã theo quận/huyện
+        async function fetchWards(districtCode, isEdit = false) {
+            const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
+            const district = await response.json();
+            if (isEdit) {
+                editWardSelect.innerHTML = `<option value="" selected >Chọn Phường/Xã</option>`;
+                district.wards.forEach(ward => {
+                    editWardSelect.innerHTML += `<option value="${ward.code}" style="font-size: 14px; font-weight: 500;">${ward.name}</option>`;
+                });
+            } else {
+                wardSelect.innerHTML = `<option value="" selected >Chọn Phường/Xã</option>`;
+                district.wards.forEach(ward => {
+                    wardSelect.innerHTML += `<option value="${ward.code}" style="font-size: 14px; font-weight: 500;">${ward.name}</option>`;
+                });
+            }
+        }
+
+        // Gọi danh sách tỉnh/thành phố khi trang load
+        await fetchCities();
+
+        // Khi người dùng chọn tỉnh/thành phố, gọi API lấy danh sách quận/huyện
+        citySelect.addEventListener("change", async function () {
+            const provinceCode = this.value;
+            await fetchDistricts(provinceCode);
+        });
+
+        editCitySelect.addEventListener("change", async function () {
+            const provinceCode = this.value;
+            await fetchDistricts(provinceCode, true);
+        });
+
+        // Khi người dùng chọn quận/huyện, gọi API lấy danh sách phường/xã
+        districtSelect.addEventListener("change", async function () {
+            const districtCode = this.value;
+            await fetchWards(districtCode);
+        });
+
+        editDistrictSelect.addEventListener("change", async function () {
+            const districtCode = this.value;
+            await fetchWards(districtCode, true);
+        });
+    });
+</script>
 </body>

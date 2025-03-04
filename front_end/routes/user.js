@@ -237,8 +237,8 @@ router.post('/api/account', async (req, res) => {
 // Proxy to update a user or staff account
 router.patch('/api/account/:userId', async (req, res) => {
   try {
-    const { username, email, phone_number, role, password } = req.body; // Thêm trường password
-    const updateData = { username, email, phone_number, role };
+    const { username, email, phone_number, role, password, birthDate, gender, height, weight } = req.body; // Thêm các trường mới
+    const updateData = { username, email, phone_number, role, birthDate, gender, height, weight };
 
     // Chỉ thêm trường password nếu có giá trị
     if (password) {
@@ -266,5 +266,131 @@ router.patch('/api/account/:userId', async (req, res) => {
   }
 });
 
+// Proxy to update user password
+router.patch('/api/account/:userId/password', async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const backendResponse = await fetch(`${BACKEND_API_URL}/api/users/${req.params.userId}/password`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json();
+      return res.status(backendResponse.status).json(errorData);
+    }
+
+    const data = await backendResponse.json();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error during proxy update password', error);
+    res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
+  }
+});
+
+
+
+// Lấy danh sách địa chỉ của người dùng
+router.get('/api/account/:userId/addresses', async (req, res) => {
+  try {
+    const backendResponse = await fetch(`${BACKEND_API_URL}/api/users/${req.params.userId}/addresses`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json();
+      return res.status(backendResponse.status).json(errorData);
+    }
+
+    const data = await backendResponse.json();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error during proxy get addresses', error);
+    res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
+  }
+});
+
+// Thêm địa chỉ mới cho người dùng
+router.post('/api/account/:userId/addresses', async (req, res) => {
+  const { nameKH, phoneNumber, address, ward, district, city, defaultAddress } = req.body;
+  try {
+    const backendResponse = await fetch(`${BACKEND_API_URL}/api/users/${req.params.userId}/addresses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ nameKH, phoneNumber, address, ward, district, city, defaultAddress })
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json();
+      return res.status(backendResponse.status).json(errorData);
+    }
+
+    const data = await backendResponse.json();
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Error during proxy add address', error);
+    res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
+  }
+});
+
+
+
+// Cập nhật địa chỉ của người dùng
+router.put('/api/account/:userId/addresses/:addressId', async (req, res) => {
+  const { address, ward, district, city, default: isDefault } = req.body;
+  try {
+    const backendResponse = await fetch(`${BACKEND_API_URL}/api/users/${req.params.userId}/addresses/${req.params.addressId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ address, ward, district, city, default: isDefault })
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json();
+      return res.status(backendResponse.status).json(errorData);
+    }
+
+    const data = await backendResponse.json();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error during proxy update address', error);
+    res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
+  }
+});
+
+
+
+// Xóa địa chỉ của người dùng
+router.delete('/api/account/:userId/addresses/:addressId', async (req, res) => {
+  try {
+    const backendResponse = await fetch(`${BACKEND_API_URL}/api/users/${req.params.userId}/addresses/${req.params.addressId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json();
+      return res.status(backendResponse.status).json(errorData);
+    }
+
+    const data = await backendResponse.json();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error during proxy delete address', error);
+    res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
+  }
+});
 
 module.exports = router;

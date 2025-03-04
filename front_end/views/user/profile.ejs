@@ -236,6 +236,8 @@ padding-bottom: 40px;
                                 letter-spacing: -1px;
                             "></span>
                         </li>
+                        <span id="birthDate1" style="display: none;"></span>
+
                         <li  class="list-group-item1">
                             <strong style="
                                 width: 250px;
@@ -274,14 +276,14 @@ padding-bottom: 40px;
                 <div class="card-header bg-dark text-white fw-bold">THÔNG TIN ĐĂNG NHẬP</div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
-                        <li id="email" class="list-group-item1">
+                        <li  class="list-group-item1">
                             <strong style="
                                 width: 250px;
                                 font-weight: 600;
                                 color: #858585;
                                 letter-spacing: -1px;
                             ">Email:</strong>
-                            <span style="
+                            <span id="email" style="
                                 margin: 0;
                                 font-size: 16px;
                                 font-weight: 600;
@@ -303,7 +305,7 @@ padding-bottom: 40px;
                             ">**********************</span>
                         </li>
                     </ul>
-                    <button class="btn btn-dark w-100 mt-3 fw-bold">CẬP NHẬT</button>
+                    <button id="SavePassBtn" class="btn btn-dark w-100 mt-3 fw-bold">CẬP NHẬT</button>
                 </div>
             </div>
         </div>
@@ -355,7 +357,38 @@ padding-bottom: 40px;
     </div>
 </div>
 
+<!-- Modal cập nhật mật khẩu -->
+<div class="modal fade" id="editPasswordModal" tabindex="-1" aria-labelledby="editPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPasswordModalLabel">Cập nhật mật khẩu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPasswordForm">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
+                        <input type="password" class="form-control" id="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmNewPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                        <input type="password" class="form-control" id="confirmNewPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100">Lưu thay đổi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+
+    
     document.addEventListener("DOMContentLoaded", async function () {
         let userId;
 
@@ -392,6 +425,10 @@ padding-bottom: 40px;
                 document.getElementById('phoneNumber').textContent = user.phone_number;
                 document.getElementById('gender').textContent = user.gender || 'Chưa cập nhật!';
                 document.getElementById('birthDate').textContent = user.birthDate ? new Date(user.birthDate).toLocaleDateString() : 'Hãy cập nhật ngày sinh để nhận quà đặc biệt';
+                document.getElementById('birthDate1').textContent = user.birthDate 
+    ? new Date(user.birthDate).toISOString().split('T')[0]  // Giữ định dạng YYYY-MM-DD
+    : 'Hãy cập nhật ngày sinh để nhận quà đặc biệt';
+
                 document.getElementById('height').textContent = user.height ? `${user.height} cm` : 'Chưa cập nhật!';
                 document.getElementById('weight').textContent = user.weight ? `${user.weight} kg` : 'Chưa cập nhật!';
                 document.getElementById('email').textContent = user.email;
@@ -406,13 +443,19 @@ padding-bottom: 40px;
             document.getElementById('editFullName').value = document.getElementById('fullName').textContent;
             document.getElementById('editPhoneNumber').value = document.getElementById('phoneNumber').textContent;
             document.getElementById('editGender').value = document.getElementById('gender').textContent.toLowerCase();
-            document.getElementById('editBirthDate').value = document.getElementById('birthDate').textContent !== 'Hãy cập nhật ngày sinh để nhận quà đặc biệt' ? new Date(document.getElementById('birthDate').textContent).toISOString().split('T')[0] : '';
+            document.getElementById('editBirthDate').value = document.getElementById('birthDate1').textContent !== 'Hãy cập nhật ngày sinh để nhận quà đặc biệt' ? new Date(document.getElementById('birthDate1').textContent).toISOString().split('T')[0] : '';
             document.getElementById('editHeight').value = document.getElementById('height').textContent !== 'Chưa cập nhật!' ? parseInt(document.getElementById('height').textContent) : '';
             document.getElementById('editWeight').value = document.getElementById('weight').textContent !== 'Chưa cập nhật!' ? parseInt(document.getElementById('weight').textContent) : '';
 
             // Hiện modal chỉnh sửa thông tin người dùng
             const editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
             editUserModal.show();
+        });
+
+         // Thêm sự kiện cho nút cập nhật mật khẩu để hiện modal cập nhật mật khẩu
+         document.getElementById('SavePassBtn').addEventListener('click', function () {
+            const editPasswordModal = new bootstrap.Modal(document.getElementById('editPasswordModal'));
+            editPasswordModal.show();
         });
 
         // Xử lý sự kiện submit form chỉnh sửa thông tin người dùng
@@ -429,8 +472,8 @@ padding-bottom: 40px;
             };
 
             try {
-                const response = await fetch(`/api/users/${userId}`, {
-                    method: 'PUT',
+                const response = await fetch(`/api/account/${userId}`, {
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -449,6 +492,46 @@ padding-bottom: 40px;
                 editUserModal.hide();
             } catch (error) {
                 console.error('Error updating user info:', error);
+            }
+        });
+
+        // Xử lý sự kiện submit form cập nhật mật khẩu
+        document.getElementById('editPasswordForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+            if (newPassword !== confirmNewPassword) {
+                alert('Mật khẩu mới và xác nhận mật khẩu mới không khớp.');
+                return;
+            }
+
+            const passwordUpdateInfo = {
+                currentPassword,
+                newPassword
+            };
+            try {
+                const response = await fetch(`/api/account/${userId}/password`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(passwordUpdateInfo)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Đóng modal sau khi cập nhật thành công
+                const editPasswordModal = bootstrap.Modal.getInstance(document.getElementById('editPasswordModal'));
+                editPasswordModal.hide();
+                alert('Cập nhật mật khẩu thành công.');
+            } catch (error) {
+                console.error('Error updating password:', error);
+                alert('Đã xảy ra lỗi khi cập nhật mật khẩu.');
             }
         });
     });

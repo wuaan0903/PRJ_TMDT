@@ -87,17 +87,26 @@ router.delete('/:userId/addresses/:addressId', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        // Kiểm tra nếu user không có địa chỉ nào
+        if (!user.addresses || user.addresses.length === 0) {
+            return res.status(404).json({ message: 'No addresses found for this user' });
+        }
+
+        // Tìm địa chỉ cần xóa
         const addressToDelete = user.addresses.id(req.params.addressId);
         if (!addressToDelete) {
             return res.status(404).json({ message: 'Address not found' });
         }
 
-        addressToDelete.remove();
+        // Xóa địa chỉ bằng pull()
+        user.addresses.pull(req.params.addressId);
         await user.save();
+
         res.status(200).json({ message: 'Address deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 export default router;
