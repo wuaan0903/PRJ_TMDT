@@ -68,6 +68,28 @@
         background: #dc3545 !important;
         color: #fff !important;
     }
+
+    .voucher-card {
+        background: #f1f1f1;
+        border-radius: 10px;
+        padding: 15px;
+        position: relative;
+        transition: all 0.2s ease-in-out;
+    }
+    .voucher-card:hover{
+        background: #bdbdbd;
+    }
+    .voucher-card::before{
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 15px;
+        height: 20px;
+        background: #d9d9d9;
+        border-radius: 50%;
+        transform: translateY(-50%);
+    }
+    .voucher-card::before { left: -5px; }
 </style>
 
 <!-- Bootstrap Grid Layout -->
@@ -161,30 +183,124 @@ padding: 0 50px;
         <!-- Nội dung chính bên phải -->
         <div class="col-md-9">
             <!-- Voucher được đặt trong khung giống khung của sidebar -->
-            <div class="sidebar">
-                <h2 class="fw-bold">Ví voucher</h2>
-                
-                <!-- Mã Voucher -->
-                <div class="card bg-light mt-3 p-3 d-flex flex-row align-items-center">
-                    <div class="fw-bold text-uppercase bg-white px-3 py-2 rounded border me-3">WELCOME8HLKN</div>
-                    <div class="flex-grow-1">
-                        <p class="mb-1">Giảm 15% tối đa 50K cho đơn bất kỳ (Không áp dụng cho danh mục SALE)</p>
-                        <small class="text-muted">HSD: 29.03.2025 <a href="#" class="text-primary">Điều kiện</a></small>
+            <div class="container" style="
+            background: #d9d9d9;
+            padding: 20px 40px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            min-height: 442px;
+        ">
+                <h2 style="
+                padding-top: 10px;
+                margin-bottom: 20px;
+            ">Ví voucher</h2>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="voucher-card p-3">
+                            <h5 class="fw-bold" style="
+                            font-size: 16px;
+                        ">CM10</h5>
+                            <p style="
+                            font-size: 12px;
+                            font-weight: 600;
+                        ">Giảm 10% đơn từ 600K (giảm tối đa 100K, trừ Outlet, Mix & Match)</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="text-muted fst-italic" style="
+                            font-size: 12px;
+                            font-weight: 600;
+                            margin-bottom: 5px;
+                        ">HSD: 31.03.2025</p>
+                            <a href="#" class=" text-decoration-none fw-medium" style="color: #273ccd;">Điều kiện</a>                            
+                        </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="voucher-card p-3">
+                            <h5 class="fw-bold" style="
+                            font-size: 16px;
+                        ">CM10</h5>
+                            <p style="
+                            font-size: 12px;
+                            font-weight: 600;
+                        ">Giảm 10% đơn từ 600K (giảm tối đa 100K, trừ Outlet, Mix & Match)</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="text-muted fst-italic" style="
+                            font-size: 12px;
+                            font-weight: 600;
+                            margin-bottom: 5px;
+                        ">HSD: 31.03.2025</p>
+                            <a href="#" class=" text-decoration-none fw-medium" style="color: #273ccd;">Điều kiện</a>                            
+                        </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+        
+                <!-- Banner -->
+                <div class="mt-4 position-relative">
+                    <div class="position-relative overflow-hidden text-white rounded">
+                        <img src="https://mcdn.coolmate.me/image/September2023/mceclip0_96.jpg" class="img-fluid w-100 h-100 object-fit-cover" alt="Khuyến mãi">
+                        <div class="position-absolute top-50 start-0 translate-middle-y text-start ps-5">
+                            <h2 class="text-dark">Nhiều ưu đãi hấp dẫn<br>đang chờ bạn</h2>
+                            <a href="#" class="btn btn-dark mt-3 px-4 py-2">KHÁM PHÁ NGAY →</a>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Banner Ưu đãi có thể click -->
-                <a href="https://coolmate.me/khuyen-mai" target="_blank" class="position-relative mt-4 d-block text-decoration-none">
-                    <img src="https://mcdn.coolmate.me/image/September2023/mceclip0_96.jpg" class="img-fluid rounded shadow-sm" alt="Ưu đãi">
-                    <div class="position-absolute top-50 start-0 translate-middle-y text-dark ps-4">
-                        <h4 class="fw-bold">Nhiều ưu đãi hấp dẫn<br>đang chờ bạn</h4>
-                        <button class="btn btn-dark rounded-pill mt-2">KHÁM PHÁ NGAY <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </a>
+                
             </div>
+            
         </div>
     </div>
 </div>
 
 <!-- FontAwesome icons -->
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const userId = 'user-id'; // Thay thế bằng ID người dùng thực tế
+
+        // Hàm để gọi API lấy danh sách voucher
+        async function fetchVouchers() {
+            try {
+                const response = await fetch(`/api/vouchers`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const vouchers = await response.json();
+                displayVouchers(vouchers);
+            } catch (error) {
+                console.error('Error fetching vouchers:', error);
+            }
+        }
+
+        // Hàm để hiển thị danh sách voucher
+        function displayVouchers(vouchers) {
+            const voucherContainer = document.querySelector('.row.g-3');
+            voucherContainer.innerHTML = ''; // Xóa nội dung cũ
+
+            vouchers.forEach(voucher => {
+                const voucherCard = document.createElement('div');
+                voucherCard.className = 'col-md-4';
+                voucherCard.innerHTML = `
+                    <div class="voucher-card p-3">
+                        <h5 class="fw-bold" style="font-size: 16px;">${voucher.code}</h5>
+                        <p style="font-size: 12px; font-weight: 600;">Giảm ${voucher.discount}${voucher.type === 'percentage' ? '%' : 'đ'} đơn từ ${voucher.minOrderValue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+ (giảm tối đa ${voucher.maxDiscount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+đ)</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="text-muted fst-italic" style="font-size: 12px; font-weight: 600; margin-bottom: 5px;">HSD: ${new Date(voucher.expirationDate).toLocaleDateString()}</p>
+                            <a href="#" class="text-decoration-none fw-medium" style="color: #273ccd;">Điều kiện</a>
+                        </div>
+                    </div>
+                `;
+                voucherContainer.appendChild(voucherCard);
+            });
+        }
+
+        // Gọi hàm fetchVouchers khi trang được tải
+        fetchVouchers();
+    });
+</script>

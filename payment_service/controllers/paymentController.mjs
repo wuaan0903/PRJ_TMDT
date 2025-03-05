@@ -4,7 +4,7 @@ import axios from 'axios';
 
 
 export const placeOrder = async (req, res) => {
-    const { userId,name, address, phoneNumber, items, paymentMethod, voucherCode } = req.body;
+    const { userId,name,email, address, phoneNumber, items, paymentMethod, voucherCode } = req.body;
     const { clientIp } = req.params;
 
     try {
@@ -27,7 +27,7 @@ export const placeOrder = async (req, res) => {
         // 2. Create order after stock check
         let order;
         if (paymentMethod === 'COD') {
-            order = await createOrder(userId,name, address, phoneNumber, items, voucherCode, paymentMethod);
+            order = await createOrder(userId,name,email, address, phoneNumber, items, voucherCode, paymentMethod);
         } else if (paymentMethod === 'momo') {
             order = await createOrder(userId, address, phoneNumber, items, voucherCode,paymentMethod);
         } else if (paymentMethod === 'vnpay') {

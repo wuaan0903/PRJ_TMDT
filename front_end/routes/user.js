@@ -316,6 +316,29 @@ router.get('/api/account/:userId/addresses', async (req, res) => {
   }
 });
 
+// Lấy địa chỉ mặc định của người dùng
+router.get('/api/account/:userId/addresses/default', async (req, res) => {
+  try {
+    const backendResponse = await fetch(`${BACKEND_API_URL}/api/users/${req.params.userId}/addresses/default`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.json();
+      return res.status(backendResponse.status).json(errorData);
+    }
+
+    const data = await backendResponse.json();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error during proxy get default address', error);
+    res.status(500).json({ message: 'An error occurred while processing your request. Please try again later.' });
+  }
+});
+
 // Thêm địa chỉ mới cho người dùng
 router.post('/api/account/:userId/addresses', async (req, res) => {
   const { nameKH, phoneNumber, address, ward, district, city, defaultAddress } = req.body;
@@ -345,14 +368,14 @@ router.post('/api/account/:userId/addresses', async (req, res) => {
 
 // Cập nhật địa chỉ của người dùng
 router.put('/api/account/:userId/addresses/:addressId', async (req, res) => {
-  const { address, ward, district, city, default: isDefault } = req.body;
+  const { nameKH,phoneNumber, address, ward, district, city, defaultAddress } = req.body;
   try {
     const backendResponse = await fetch(`${BACKEND_API_URL}/api/users/${req.params.userId}/addresses/${req.params.addressId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ address, ward, district, city, default: isDefault })
+      body: JSON.stringify({ nameKH,phoneNumber, address, ward, district, city, defaultAddress })
     });
 
     if (!backendResponse.ok) {

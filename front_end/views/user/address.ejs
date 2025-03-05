@@ -189,13 +189,8 @@ padding: 0 50px;
     </div>
 <!-- Modal thêm địa chỉ mới -->
 <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="
-    max-width: 800px;
-    transform: translateY(200px);
-">
-        <div class="modal-content" style="
-        width: 800px;
-    ">
+    <div class="modal-dialog" style="max-width: 800px; transform: translateY(200px);">
+        <div class="modal-content" style="width: 800px;">
             <div class="modal-header">
                 <h5 class="modal-title" id="addAddressModalLabel">Thêm địa chỉ mới</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -204,12 +199,10 @@ padding: 0 50px;
                 <form id="addAddressForm">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            
                             <label class="form-label letter-spacing fw-medium">Họ và tên</label>
                             <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" id="nameKH" style="font-size: 14px;" placeholder="Nhập họ tên người nhận" required="">
                         </div>
                         <div class="col-md-6 mb-3">
-                            
                             <label for="phoneNumber" class="form-label letter-spacing fw-medium">Số điện thoại</label>
                             <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Nhập số điện thoại người nhận" id="phoneNumber" required>
                         </div>
@@ -222,20 +215,26 @@ padding: 0 50px;
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="citySelect" >
-                                <option value="" selected="" >Chọn Tỉnh/Thành phố</option>
+                            <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="citySelect">
+                                <option value="" selected="" disabled="">Chọn Tỉnh/Thành phố</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="districtSelect">
-                                  <option value="" selected="" >Chọn Quận/Huyện</option>
+                                <option value="" selected="" disabled="">Chọn Quận/Huyện</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="wardSelect">
-                                <option value="" selected="" >Chọn Phường/Xã</option>
+                                <option value="" selected="" disabled="">Chọn Phường/Xã</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="defaultAddressCheckbox">
+                        <label class="form-label letter-spacing fw-medium" for="defaultAddressCheckbox">
+                            Đặt làm mặc định
+                        </label>
                     </div>
                     <button type="submit" class="btn btn-dark w-100">Lưu địa chỉ</button>
                 </form>
@@ -274,19 +273,25 @@ padding: 0 50px;
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="editCitySelect">
-                                <option value="" selected="" >Chọn Tỉnh/Thành phố</option>
+                                <option value="" selected="" disabled="">Chọn Tỉnh/Thành phố</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="editDistrictSelect">
-                                <option value="" selected="" >Chọn Quận/Huyện</option>
+                                <option value="" selected="" disabled="">Chọn Quận/Huyện</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="editWardSelect">
-                                <option value="" selected="" >Chọn Phường/Xã</option>
+                                <option value="" selected="" disabled="">Chọn Phường/Xã</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="editDefaultAddressCheckbox">
+                        <label class="form-label letter-spacing fw-medium" for="editDefaultAddressCheckbox">
+                            Đặt làm mặc định
+                        </label>
                     </div>
                     <button type="submit" class="btn btn-dark w-100">Lưu thay đổi</button>
                 </form>
@@ -294,6 +299,8 @@ padding: 0 50px;
         </div>
     </div>
 </div>
+
+
 <script>
     document.addEventListener("DOMContentLoaded", async function () {
         let userId;
@@ -389,48 +396,50 @@ padding: 0 50px;
             });
         }
 
-        // Hàm để xử lý cập nhật địa chỉ
-        function editAddress(address) {
-            // Điền thông tin địa chỉ vào form cập nhật
-            document.getElementById('editNameKH').value = address.nameKH;
-            document.getElementById('editPhoneNumber').value = address.phoneNumber;
-            document.getElementById('editAddress').value = address.address;
-            document.getElementById('editCitySelect').value = address.city;
-            document.getElementById('editDistrictSelect').value = address.district;
-            document.getElementById('editWardSelect').value = address.ward;
+// Hàm để xử lý cập nhật địa chỉ
+function editAddress(address) {
+    // Điền thông tin địa chỉ vào form cập nhật
+    document.getElementById('editNameKH').value = address.nameKH;
+    document.getElementById('editPhoneNumber').value = address.phoneNumber;
+    document.getElementById('editAddress').value = address.address;
+    document.getElementById('editCitySelect').value = address.city;
+    document.getElementById('editDistrictSelect').value = address.district;
+    document.getElementById('editWardSelect').value = address.ward;
+    document.getElementById('editDefaultAddressCheckbox').checked = address.defaultAddress;
 
-            // Hiển thị modal cập nhật địa chỉ
-            const editAddressModal = new bootstrap.Modal(document.getElementById('editAddressModal'));
-            editAddressModal.show();
+    // Hiển thị modal cập nhật địa chỉ
+    const editAddressModal = new bootstrap.Modal(document.getElementById('editAddressModal'));
+    editAddressModal.show();
 
-            // Xử lý sự kiện submit form cập nhật địa chỉ
-            document.getElementById('editAddressForm').addEventListener('submit', async function (event) {
-                event.preventDefault();
+    // Xử lý sự kiện submit form cập nhật địa chỉ
+    document.getElementById('editAddressForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
 
-                const updatedAddress = {
-                    nameKH: document.getElementById('editNameKH').value,
-                    phoneNumber: document.getElementById('editPhoneNumber').value,
-                    address: document.getElementById('editAddress').value,
-                    ward: document.getElementById('editWardSelect').options[editWardSelect.selectedIndex].text,
-                    district: document.getElementById('editDistrictSelect').options[editDistrictSelect.selectedIndex].text,
-                    city: document.getElementById('editCitySelect').options[editCitySelect.selectedIndex].text,
-                };
+        const updatedAddress = {
+            nameKH: document.getElementById('editNameKH').value,
+            phoneNumber: document.getElementById('editPhoneNumber').value,
+            address: document.getElementById('editAddress').value,
+            ward: document.getElementById('editWardSelect').options[editWardSelect.selectedIndex].text,
+            district: document.getElementById('editDistrictSelect').options[editDistrictSelect.selectedIndex].text,
+            city: document.getElementById('editCitySelect').options[editCitySelect.selectedIndex].text,
+            defaultAddress: document.getElementById('editDefaultAddressCheckbox').checked
+        };
 
-                try {
-                    const response = await fetch(`/api/account/${userId}/addresses/${address._id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(updatedAddress)
-                    });
+        try {
+            const response = await fetch(`/api/account/${userId}/addresses/${address._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedAddress)
+            });
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
 
-                    // Cập nhật địa chỉ thành công, gọi lại hàm fetchAddresses để cập nhật danh sách địa chỉ
-                    fetchAddresses(userId);
+            // Cập nhật địa chỉ thành công, gọi lại hàm fetchAddresses để cập nhật danh sách địa chỉ
+            fetchAddresses(userId);
 
                     // Đóng modal sau khi cập nhật thành công
                     const editAddressModal = bootstrap.Modal.getInstance(document.getElementById('editAddressModal'));
@@ -474,7 +483,7 @@ padding: 0 50px;
                 ward: document.getElementById('wardSelect').options[wardSelect.selectedIndex].text,
                 district: document.getElementById('districtSelect').options[districtSelect.selectedIndex].text,
                 city: document.getElementById('citySelect').options[citySelect.selectedIndex].text,
-                defaultAddress: false // Bạn có thể thêm logic để xác định địa chỉ mặc định nếu cần
+                defaultAddress: document.getElementById('defaultAddressCheckbox').checked
             };
 
             try {
