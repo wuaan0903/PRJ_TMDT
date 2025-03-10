@@ -37,6 +37,8 @@ app.get("/search", (req, res) => {
   res.render("search"); // Renders the cart.ejs file
 } );
 
+app.get('/filter', productController.renderProductSortByCategory);
+
 app.get("/user/", (req, res) => {
   res.render("user/layouts/index");   // Renders the profile.ejs file
 } );
