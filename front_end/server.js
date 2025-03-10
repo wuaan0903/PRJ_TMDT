@@ -48,6 +48,10 @@ app.get("/user/profile", (req, res) => {
 app.get("/user/orders", (req, res) => {
   res.render("user/orders");   // Renders the orders.ejs file
 } );
+
+app.get("/user/orders/:id", (req, res) => {
+  res.render("user/orderDetail");   // 
+} );
 app.get("/user/vouchers", (req, res) => { 
   res.render("user/vouchers");   // Renders the vouchers.ejs file
 } );
@@ -60,12 +64,7 @@ app.get("/user/reviews", (req, res) => {
 app.get("/user/policies", (req, res) => {
   res.render("user/policies");   // Renders the policies.ejs file
 } );
-// app.get('/admin', (req, res) => {
-//   res.render('admin/home'); // Renders the home.ejs file
-// });
-// app.get('/admin/home', (req, res) => {
-//   res.render('admin/home'); // Renders the home.ejs file
-// });
+
 app.get('/admin/orders', (req, res) => {
   res.render('admin/order/listOrder'); // 
 });

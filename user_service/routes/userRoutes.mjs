@@ -63,19 +63,20 @@ router.post('/', async (req, res) => {
 });
 
 // Update
+// Update
 router.patch('/:id', async (req, res) => {
   try {
-      const { username, email, password, phone_number, role } = req.body;
-        
+    const { username, email, password, phone_number, role, birthDate, gender, height, weight } = req.body; // Thêm các trường mới
+    
     // Ensure the password is encrypted if provided
-      let updateData = {username, email, phone_number, role};
-      if(password){
-        const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(password, salt);
-        updateData.password = hash
-      }
+    let updateData = { username, email, phone_number, role, birthDate, gender, height, weight };
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(password, salt);
+      updateData.password = hash;
+    }
 
-      const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, {
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true, // Ensures that Mongoose's schema validation runs
     });
@@ -86,6 +87,39 @@ router.patch('/:id', async (req, res) => {
     res.status(200).json(updatedUser);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+
+// Route to update password
+router.patch('/:id/password', async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if the current password is correct
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+    const updateData = { password: hashedNewPassword };
+
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      runValidators: true, // Ensures that Mongoose's schema validation runs
+    });
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

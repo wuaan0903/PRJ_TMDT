@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 
 const addressSchema = new mongoose.Schema({
   nameKH: { type: String, required: true },
-  phoneNumber: { type: String, required: true,unique: true },
+  phoneNumber: { type: String, required: true, unique: true },
   address: { type: String, required: true },
   ward: { type: String, required: true },
   district: { type: String, required: true },
@@ -14,20 +14,22 @@ const addressSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
-  phone_number: { type: String, required: true, unique: true},
-  role: {type: String,default: 'user',enum:['user','admin','staff'], required: true},
+  phone_number: { type: String, required: true, unique: true },
+  role: { type: String, default: 'user', enum: ['user', 'admin', 'staff'], required: true },
   password: { type: String, required: true },
   refreshTokens: [{
     token: { type: String, required: false },
     createdAt: { type: Date, default: Date.now }
-}],
+  }],
   addresses: [addressSchema],
+  birthDate: { type: Date, required: false },
+  gender: { type: String, enum: ['male', 'female', 'other'], required: false },
+  height: { type: Number, required: false },
+  weight: { type: Number, required: false },
   createdAt: { type: Date, default: Date.now }
 });
 
-
-
-userSchema.pre('save', async function (next) {  
+userSchema.pre('save', async function (next) {
   const user = this;
 
   if (user.isModified('password')) {
@@ -35,7 +37,7 @@ userSchema.pre('save', async function (next) {
     const hash = await bcrypt.hash(user.password, salt);
 
     user.password = hash;
-  } 
+  }
 
   next();
 });
@@ -43,8 +45,7 @@ userSchema.pre('save', async function (next) {
 userSchema.statics.findByCredentials = async (email, password) => {
   try {
     const userPassword = await User.findOne({ email }).select('password');
-    const user = await User.findOne({ email});
-    // console.log(user)
+    const user = await User.findOne({ email });
     if (!user) {
       throw new Error('Unable to login!');
     }
@@ -56,14 +57,11 @@ userSchema.statics.findByCredentials = async (email, password) => {
     }
 
     return user;
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     throw error;
   }
-
-
-}
+};
 
 const User = mongoose.model('User', userSchema);
 export default User;

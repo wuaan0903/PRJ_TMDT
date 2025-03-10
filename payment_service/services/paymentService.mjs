@@ -8,7 +8,7 @@ import CryptoJS from 'crypto-js'; // npm install crypto-js
 import { v1 as uuidv1 } from 'uuid'; // npm install uuid
 
 
-export const createOrder = async (userId,name, address, phoneNumber, items, voucherCode = null,paymentMethod) => {
+export const createOrder = async (userId,name,email, address, phoneNumber, items, voucherCode = null,paymentMethod) => {
     // Tính tổng số tiền và giảm giá
     let totalAmount = 0;
     let discount = 0;
@@ -42,6 +42,7 @@ export const createOrder = async (userId,name, address, phoneNumber, items, vouc
     const order = new Order({
       userId,
       name,
+      email,
       address,
       phoneNumber,
       status: 'pending',

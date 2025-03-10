@@ -75,8 +75,8 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label letter-spacing fw-medium">Email</label>
-                            <input type="email" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Theo dõi đơn hàng sẽ được gửi qua Email và ZNS" required="">
+                            <label class="form-label letter-spacing fw-medium" >Email</label>
+                            <input type="email" id="email" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" style="font-size: 14px;" placeholder="Theo dõi đơn hàng sẽ được gửi qua Email và ZNS" required="">
                         </div>
                         <div class="mb-3">
                             <label class="form-label letter-spacing fw-medium">Địa chỉ</label>
@@ -310,6 +310,39 @@
 
 
     <script>
+            document.addEventListener("DOMContentLoaded", async function () {
+                // Hàm để gọi API lấy địa chỉ mặc định
+                async function fetchDefaultAddress(userId) {
+                    try {
+                        const response = await fetch(`/api/account/${userId}/addresses/default`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        const defaultAddress = await response.json();
+                        fillAddressForm(defaultAddress);
+                    } catch (error) {
+                        console.error('Error fetching default address:', error);
+                    }
+                }
+        
+                // Hàm để điền dữ liệu vào các trường thông tin đặt hàng
+                function fillAddressForm(data) {
+                    const { email, defaultAddress } = data;
+                    document.getElementById('name').value = defaultAddress.nameKH;
+                    document.getElementById('phoneNumber').value = defaultAddress.phoneNumber;
+                    document.getElementById('address').value = defaultAddress.address;
+                    document.getElementById('citySelect').value = defaultAddress.city;
+                    document.getElementById('districtSelect').value = defaultAddress.district;
+                    document.getElementById('wardSelect').value = defaultAddress.ward;
+                    document.getElementById('email').value = email;
+                }
+        
+                // Gọi hàm fetchDefaultAddress khi trang được tải
+                const userId = cart.userId; // Giả sử bạn đã có userId từ trước
+                fetchDefaultAddress(userId);
+            });
+        
+        
         // Assume you have a way to get the userId (e.g., from user context, cookie, or local storage)
         const cart = <%- JSON.stringify(cart) %>;
         const userId = cart.userId;
@@ -519,11 +552,13 @@
                 const phoneNumber = document.getElementById('phoneNumber').value;
                 const voucherCode = document.getElementById('voucherCodeInput').value;
                 const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
             
                 try {
                     const orderData = {
                         userId,
                         name,
+                        email,
                         address,
                         phoneNumber,
                         items: cart.items,

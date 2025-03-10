@@ -1,41 +1,33 @@
 <%- layout('../layouts/index') %>
+
 <style>
-    /* FAQ Styles */
-    .faq-container {
-        max-width: 900px;
-        margin: auto;
-    }
-    .accordion-button {
-        background-color: #f8f9fa;
-        font-weight: bold;
-    }
-    .accordion-button:not(.collapsed) {
-        background-color: #e0e0e0;
-    }
-    /* Định dạng Header */
-    .custom-header {
-        background: #fff;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        border-radius: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .custom-header i {
-        font-size: 24px;
-        color: #fbc02d;
-    }
-    /* Sidebar - dùng chung cho sidebar */
+    /* định dạng Header */
+     .custom-header {
+                background: #fff;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                border-radius: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+        /* Tăng kích thước icon */
+        .custom-header i {
+            font-size: 24px;
+            color: #fbc02d; /* Màu vàng giống vương miện */
+        }
+    /* Sidebar */
     .sidebar {
-        background: #fff;
+        background: #d9d9d9;
         border-radius: 8px;
         padding: 15px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         height: fit-content;
     }
+
     .list-group-item {
-        border: 1px solid #ddd;
+        
         font-size: 16px;
         padding: 12px 15px;
         display: flex;
@@ -46,81 +38,122 @@
         text-decoration: none;
         border-radius: 8px;
         background: #fff;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        
     }
+
     .list-group-item i {
         font-size: 18px;
     }
+
+    /* Hover */
     .list-group-item:hover {
         background: #000;
         color: #fff !important;
         transform: translateY(-3px);
     }
+
+    /* Active */
     .list-group-item.active {
         background: #000 !important;
         color: #fff !important;
     }
+
+    /* Logout - Đăng xuất */
     .list-group-item.text-danger {
         font-weight: bold;
     }
+
+    /* Hover riêng cho Đăng xuất */
     .list-group-item.text-danger:hover {
         background: #dc3545 !important;
         color: #fff !important;
     }
 </style>
 
-<div class="container mt-5 pt-5 mb-4">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="custom-header">
-                <div class="left">
-                    <h4>Hi, <span class="fw-bold">Cấp Nguyễn</span> <i class='bx bx-crown'></i></h4>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Row chứa Sidebar bên trái và Nội dung chính bên phải -->
+<!-- Bootstrap Grid Layout -->
+<div class="container pt-5" style="
+margin: 0;
+margin-top: 60px;
+max-width: 100%;
+padding: 0 50px;
+">
     <div class="row">
+        <ul class="side-menu top">
+        <div class="custom-header ">
+            <!-- Bên trái -->
+            <div class="left">
+                <h4>Hi, <span class="fw-bold">Cấp Nguyễn</span> <i class='bx bx-crown' ></i></h4>
+        </div>
+        </ul>
         <!-- Sidebar bên trái -->
         <div class="col-md-3">
             <div class="sidebar">
                 <ul class="side-menu top list-unstyled">
-                    <li class="mb-2">
-                        <a href="/user/profile" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center">
-                            <i class="fas fa-user"></i> Thông tin tài khoản
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="/user/orders" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center">
-                            <i class="fas fa-shopping-bag"></i> Lịch sử đơn hàng
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="/user/vouchers" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center">
-                            <i class="fas fa-gift"></i> Ví Voucher
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="/user/address" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center">
-                            <i class="fas fa-map-marker-alt"></i> Sổ địa chỉ
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="/user/reviews" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center">
-                            <i class="fas fa-star"></i> Đánh giá & Phản hồi
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="/user/policies" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center text-white bg-dark fw-bold">
-                            <i class="fas fa-question-circle"></i> Chính sách & Câu hỏi thường gặp
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/auth/logout" class="list-group-item list-group-item-action text-danger rounded-3 d-flex align-items-center">
-                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                        </a>
-                    </li>
+                    <div class="row g-2" id="user-sidebar">
+                        <div class="col-12">
+                            <a href="/user/profile" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100 " style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-user"></i> Thông tin tài khoản
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/orders" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-shopping-bag"></i> Lịch sử đơn hàng
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/vouchers" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-gift"></i> Ví Voucher
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/address" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-map-marker-alt"></i> Sổ địa chỉ
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/reviews" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-star"></i> Đánh giá & Phản hồi
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/policies" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100 text-white bg-dark" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-question-circle"></i> Chính sách & Câu hỏi thường gặp
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/auth/logout" class="list-group-item list-group-item-action text-danger rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                            </a>
+                        </div>
+                    </div>
                 </ul>
             </div>
         </div>
