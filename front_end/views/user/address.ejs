@@ -81,8 +81,9 @@ padding: 0 50px;
         <ul class="side-menu top">
         <div class="custom-header ">
             <!-- Bên trái -->
-            <div class="left">
-                <h4>Hi, <span class="fw-bold">Cấp Nguyễn</span> <i class='bx bx-crown' ></i></h4>
+            <div id="nameKH" class="left">
+                <h4>Hi, <span class="fw-bold"></span> <i class='bx bx-crown' ></i></h4>
+            </div>  
         </div>
         </ul>
         <!-- Sidebar bên trái -->
@@ -319,6 +320,10 @@ padding: 0 50px;
             .then(userData => {
                 userId = userData.user.user._id;
                 console.log('User ID:', userId);
+                const nameKH = document.getElementById('nameKH');
+                nameKH.innerHTML = `
+                <h4>Hi, <span class="fw-bold">${userData.user.user.username}</span> <i class='bx bx-crown' ></i></h4>
+                `;
                 fetchAddresses(userId);
             })
             .catch(error => {

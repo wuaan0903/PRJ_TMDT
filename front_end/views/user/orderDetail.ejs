@@ -1,0 +1,591 @@
+<%- layout('../layouts/index') %>
+
+<style>
+    /* định dạng Header */
+     .custom-header {
+                background: #fff;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                border-radius: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+        /* Tăng kích thước icon */
+        .custom-header i {
+            font-size: 24px;
+            color: #fbc02d; /* Màu vàng giống vương miện */
+        }
+    /* Sidebar */
+    .sidebar {
+        background: #d9d9d9;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        height: fit-content;
+    }
+
+    .list-group-item {
+        
+        font-size: 16px;
+        padding: 12px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #333;
+        transition: all 0.3s ease-in-out;
+        text-decoration: none;
+        border-radius: 8px;
+        background: #fff;
+        
+    }
+
+    .list-group-item i {
+        font-size: 18px;
+    }
+
+    /* Hover */
+    .list-group-item:hover {
+        background: #000;
+        color: #fff !important;
+        transform: translateY(-3px);
+    }
+
+    /* Active */
+    .list-group-item.active {
+        background: #000 !important;
+        color: #fff !important;
+    }
+
+    /* Logout - Đăng xuất */
+    .list-group-item.text-danger {
+        font-weight: bold;
+    }
+
+    /* Hover riêng cho Đăng xuất */
+    .list-group-item.text-danger:hover {
+        background: #dc3545 !important;
+        color: #fff !important;
+    }
+
+    .order-container {
+        
+
+        padding: 20px 40px;
+        margin-bottom: 30px;
+        border-radius: 10px;
+        min-height: 442px;
+        background: #d9d9d9;
+    }
+    .order-header {
+        font-size: 30px;
+        font-weight: 700;
+        padding-top: 10px;
+        margin-bottom: 20px;
+    }
+    .order-card {
+        background: #212121;
+        color: #fff;
+        padding: 10px 24px;
+        border-radius: 5px;
+    }
+    .order-item {
+        background: #f1f1f1;
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        
+    }
+    .btn-custom {
+        background: #f1f1f1;
+        color: rgb(0, 0, 0);
+        border: 1px solid #000000;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 8px 36px;
+    }
+    .btn-custom:hover {
+        background: #000;
+        color: #fff;
+    }
+    .order{
+        margin-bottom: 20px;
+    }
+
+    .btn-completed{
+        color: #007d43;
+        border: 1px solid #007d43;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 16px;
+        background: #fff;
+        padding: 6px 10px;
+        transform: translateY(-5px);
+    }
+    .btn-cancelled{
+        color: #ed2121;
+        border: 1px solid #ed2121;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 16px;
+        background: #fff;
+        padding: 6px 10px;
+        transform: translateY(-5px);
+    }
+    .btn-pending{
+        color: #f0ad4e;
+        border: 1px solid #f0ad4e;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 16px;
+        background: #fff;
+        padding: 6px 10px;
+        transform: translateY(-5px);
+    }
+    .btn-processing{
+        color: #0275d8;
+        border: 1px solid #0275d8;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 16px;
+        background: #fff;
+        padding: 6px 10px;
+        transform: translateY(-5px);
+    }
+    
+
+</style>
+
+<!-- Bootstrap Grid Layout -->
+<div class="container pt-5" style="
+margin: 0;
+margin-top: 60px;
+max-width: 100%;
+padding: 0 50px;
+">
+    <div class="row">
+        <ul class="side-menu top">
+        <div class="custom-header ">
+            <!-- Bên trái -->
+            <div id="nameKH" class="left">
+                <h4>Hi, <span class="fw-bold"></span> <i class='bx bx-crown' ></i></h4>
+            </div> 
+        </div>
+        </ul>
+        <!-- Sidebar bên trái -->
+        <div class="col-md-3">
+            <div class="sidebar">
+                <ul class="side-menu top list-unstyled">
+                    <div class="row g-2" id="user-sidebar">
+                        <div class="col-12">
+                            <a href="/user/profile" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center  w-100 " style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-user"></i> Thông tin tài khoản
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/orders" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100 text-white bg-dark" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-shopping-bag"></i> Lịch sử đơn hàng
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/vouchers" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-gift"></i> Ví Voucher
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/address" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-map-marker-alt"></i> Sổ địa chỉ
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/reviews" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-star"></i> Đánh giá & Phản hồi
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/policies" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-question-circle"></i> Chính sách & Câu hỏi thường gặp
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/auth/logout" class="list-group-item list-group-item-action text-danger rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                </ul>
+            </div>
+        </div>
+
+            <!-- Nội dung bên phải -->
+            <div class="col-md-9">
+
+                <div class="container" style="
+                padding: 20px 40px;
+                margin-bottom: 30px;
+                border-radius: 10px;
+                min-height: 442px;
+                border: 1px solid #e7e7e7;
+            ">
+                    <h4 class="order-header">Thông tin đơn hàng <span>#30980444022</span> <button class=""></button></h4>
+                
+                    <div class="order-info" style="font-size: 14px; letter-spacing: -1px; font-weight: 500;">
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Ngày đặt hàng:</span> 
+                            <span>18:18 08.03.2025</span>
+                        </p>
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Tên người nhận:</span> 
+                            <span>Trần Thanh Vũ</span>
+                        </p>
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Email:</span> 
+                            <span>tricklerquanzk@gmail.com</span>
+                        </p>
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Số điện thoại:</span> 
+                            <span>091511222</span>
+                        </p>
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Phương thức thanh toán:</span> 
+                            <span>COD</span>
+                        </p>
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Địa chỉ giao hàng:</span> 
+                            <span>Hà Nội, Thị trấn Đất Đỏ, Huyện Long Đất, Bà Rịa - Vũng Tàu</span>
+                        </p>
+                    </div>
+                    
+
+                    
+                    <!-- <table class="table mt-2" style="
+                    font-size: 14px;
+                    letter-spacing: -1px;
+                    font-weight: 500;
+                ">
+                        <tr style="
+                        background: #212529;
+                        color: #fff;
+                    ">
+                          <th>Ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Giá niêm yết</th>
+                            <th>Biến thể</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                        <tr>
+                            <td><img src="http://localhost:3002/api/products/thumbnail/img_1735090393092.webp" alt="product" style="
+                                width: 80px;
+                            "></td>
+                            <td style="
+                            align-content: center;
+                        ">Quần dài nam thể thao co giãn đa năng</td>
+                            <td style="
+                            align-content: center;
+                        ">1</td>
+                            <td style="
+                            align-content: center;
+                        ">289.000đ</td>
+                            <td style="
+                            align-content: center;
+                        ">XL</td>
+                            <td style="
+                            align-content: center;
+                        ">289.000đ</td>
+                        </tr>
+                        <tr>
+                            <td><img src="http://localhost:3002/api/products/thumbnail/img_1735090393092.webp" alt="product" style="
+                                width: 80px;
+                            "></td>
+                            <td style="
+                            align-content: center;
+                        ">Quần dài nam thể thao co giãn đa năng</td>
+                            <td style="
+                            align-content: center;
+                        ">1</td>
+                            <td style="
+                            align-content: center;
+                        ">289.000đ</td>
+                            <td style="
+                            align-content: center;
+                        ">XL</td>
+                            <td style="
+                            align-content: center;
+                        ">289.000đ</td>
+                        </tr>
+
+                    </table> -->
+                    
+                    <!-- <div >
+                        <div class="d-flex justify-content-between" style="
+                        font-size: 14px;
+                            font-weight: 500;
+                        letter-spacing: -1px;
+                        padding: 16px 0;
+                        border-bottom: 1px solid #dddddd;
+                    ">
+                            <strong>Mã giảm giá:</strong> 
+                            <span>******05</span>
+                        </div>
+                        <div class="d-flex justify-content-between" style="
+                        font-size: 14px;
+                            font-weight: 500;
+                        letter-spacing: -1px;
+                        padding: 16px 0;
+                        border-bottom: 1px solid #dddddd;
+                    ">
+                            <strong>Tổng giá trị sản phẩm:</strong> 
+                            <span>731.000đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between" style="
+                        font-size: 14px;
+                            font-weight: 500;
+                        letter-spacing: -1px;
+                        padding: 16px 0;
+                        border-bottom: 1px solid #dddddd;
+                    ">
+                            <strong>Tổng khuyến mãi:</strong> 
+                            <span>-36.550đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between" style="
+                        font-size: 14px;
+
+                            font-weight: 500;
+                        letter-spacing: -1px;
+                        padding: 16px 0;
+                        border-bottom: 1px solid #dddddd;
+                    ">
+                            <strong>Phí giao hàng:</strong> 
+                            <span>0đ</span>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="p-3 total-box d-flex justify-content-between" style="
+                    background: #212529;
+                    color: #Fff;
+                ">
+                <span class="fw-bold ">Tổng thanh toán:</span>
+                <span class="fw-bold">694.450đ</span>
+                </div>
+                </div> -->
+            </div>
+
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const statusMap = {
+                'pending': 'Chờ xác nhận',
+                'processing': 'Đang giao hàng',
+                'completed': 'Hoàn thành',
+                'cancelled': 'Đã hủy'
+            };
+                    // Gọi API để lấy ID người dùng
+        fetch('/auth/user')
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                // Redirect to login page if not logged in
+                window.location.href = '/login';
+                throw new Error('Not logged in');
+            }
+        })
+        .then(userData => {
+            userId = userData.user.user._id;
+            const nameKH = document.getElementById('nameKH');
+            nameKH.innerHTML = `
+            <h4>Hi, <span class="fw-bold">${userData.user.user.username}</span> <i class='bx bx-crown' ></i></h4>
+            `;
+           
+        })
+        .catch(error => {
+            console.error('Error fetching user ID:', error);
+        });
+
+            const url = new URL(window.location.href);
+            const pathSegments = url.pathname.split('/');
+            const orderId = pathSegments.pop(); // Lấy phần tử cuối cùng
+
+            // Hàm để gọi API lấy thông tin đơn hàng
+            async function fetchOrderDetails(orderId) {
+                try {
+                    const response = await fetch(`/api/orders/${orderId}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const order = await response.json();
+                    const productDetails = await fetchProductDetails(order.products);
+                    displayOrderDetails(order, productDetails);
+                } catch (error) {
+                    console.error('Error fetching order details:', error);
+                }
+            }
+    
+            // Hàm để gọi API lấy chi tiết sản phẩm
+            async function fetchProductDetails(products) {
+                const productIds = products.map(product => product.productId);
+                const uniqueProductIds = [...new Set(productIds)];
+                const productDetails = await Promise.all(uniqueProductIds.map(async productId => {
+                    const response = await fetch(`http://localhost:3002/api/products/${productId}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                }));
+                return productDetails.reduce((acc, product) => {
+                    acc[product._id] = product;
+                    return acc;
+                }, {});
+            }
+    
+            // Hàm để hiển thị thông tin đơn hàng
+            function displayOrderDetails(order, productDetails) {
+                document.querySelector('.order-header span').textContent = `#${order._id}`;
+                
+                const orderButton = document.querySelector('.order-header button');
+                let statusText = "Không xác định";
+                let statusClass = "secondary"; // Mặc định nếu không khớp trạng thái nào
+            
+                if (order.status === 'pending') {
+                    statusText = "Chờ xác nhận";
+                    statusClass = "btn-pending";
+                } else if (order.status === 'processing') {
+                    statusText = "Đang giao hàng";
+                    statusClass = "btn-processing";
+                } else if (order.status === 'completed') {
+                    statusText = "Hoàn thành";
+                    statusClass = "btn-completed";
+                } else if (order.status === 'cancelled') {
+                    statusText = "Đã hủy";
+                    statusClass = "btn-cancelled";
+                }
+            
+                // Xóa các class cũ liên quan đến màu
+                orderButton.classList.remove('btn-outline-primary', 'btn-sm');
+            
+                // Thêm class mới
+                orderButton.classList.add(`${statusClass}`);
+                orderButton.textContent = statusText;
+
+                document.querySelector('.order-info').innerHTML = "";
+
+                document.querySelector('.order-info').innerHTML = `
+                    <div style="font-size: 14px; letter-spacing: -1px; font-weight: 500;">
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Ngày đặt hàng:</span> 
+                            <span>${new Date(order.date).toLocaleString()}</span>
+                        </p>
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Tên người nhận:</span> 
+                            <span>${order.name}</span>
+                        </p>
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Email:</span> 
+                            <span>${order.email}</span>
+                        </p>
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Số điện thoại:</span> 
+                            <span>${order.phoneNumber}</span>
+                        </p>
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Phương thức thanh toán:</span> 
+                            <span>${order.paymentMethod}</span>
+                        </p>
+                        <p>
+                            <span style="display: inline-block; width: 200px; font-weight: bold;">Địa chỉ giao hàng:</span> 
+                            <span>${order.address}</span>
+                        </p>
+                    </div>
+                    
+                    <table class="table mt-2" style="font-size: 14px; letter-spacing: -1px; font-weight: 500;">
+                        <tr style="background: #212529; color: #fff;">
+                            <th>Ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Giá niêm yết</th>
+                            <th>Biến thể</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                        ${order.products.map(product => {
+                            const productDetail = productDetails[product.productId];
+                            return `
+                        <tr>
+                            <td><img src="http://localhost:3002/api/products/thumbnail/${productDetail.thumbnail}" alt="product" style="width: 80px;"></td>
+                            <td style="
+    align-content: center;
+">${productDetail.name}</td>
+                            <td style="
+    align-content: center;
+">${product.quantity}</td>
+                            <td style="
+    align-content: center;
+">${(productDetail.price || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                            <td style="
+    align-content: center;
+">${product.size}</td>
+                            <td style="
+    align-content: center;
+">${(productDetail.price * product.quantity || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                        </tr>
+                        `;
+                        }).join('')}
+                    </table>
+                    
+                    <div>
+                        <div class="d-flex justify-content-between" style="font-size: 14px; font-weight: 500; letter-spacing: -1px; padding: 16px 0; border-bottom: 1px solid #dddddd;">
+                            <strong>Tổng giá trị sản phẩm:</strong> 
+                            <span>${order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                        </div>
+                        <div class="d-flex justify-content-between" style="font-size: 14px; font-weight: 500; letter-spacing: -1px; padding: 16px 0; border-bottom: 1px solid #dddddd;">
+                            <strong>Tổng khuyến mãi:</strong> 
+                            <span>${order.discount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                        </div>
+                        <div class="d-flex justify-content-between" style="font-size: 14px; font-weight: 500; letter-spacing: -1px; padding: 16px 0; border-bottom: 1px solid #dddddd;">
+                            <strong>Phí giao hàng:</strong> 
+                            <span>0đ</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 total-box d-flex justify-content-between" style="background: #212529; color: #Fff;">
+                        <span class="fw-bold">Tổng thanh toán:</span>
+                        <span class="fw-bold">${(order.totalAmount - order.discount).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                    </div>
+                `;
+            }
+    
+            // Gọi hàm fetchOrderDetails khi trang được tải
+            fetchOrderDetails(orderId);
+        });
+    </script>

@@ -147,13 +147,26 @@
         <div class="header-action d-flex align-items-center">
             <!-- Search Bar -->
             <div class="input-group me-3">
-                <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
-                <button class="btn btn-outline-light" type="button" onclick="searchProduct()">
-                    <i class='bx bx-search-alt fs-4'></i>
-                </button>
+                <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm sản phẩm..." 
+                    aria-label="Search" style="
+                    font-size: 14px;
+                    font-weight: 600;
+                    letter-spacing: -1px;
+                    border-radius: 20px;
+                " onkeydown="handleEnter(event)">
+                
+                <i onclick="searchProduct()" class='bx bx-search-alt fs-4' style="
+                    transform: translate3d(-30px, 6px, 10px);
+                    color: #000;
+                "></i>
             </div>
             
             <script>
+                function handleEnter(event) {
+                    if (event.key === "Enter") { // Kiểm tra nếu phím Enter được nhấn
+                        searchProduct(); // Gọi hàm tìm kiếm
+                    }
+                }
                 function searchProduct() {
                     const query = document.getElementById('searchInput').value.trim();
                     if (query) {
