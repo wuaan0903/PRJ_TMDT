@@ -25,23 +25,17 @@
         padding: 5px 10px;
         font-size: 12px;
     }
-
-    .filter-item{
+    .filter-item {
         align-items: center;
         display: flex;
         margin-bottom: 8px;
     }
-    .filter-label{
-        align-items: center;
+    .filter-label {
         cursor: pointer;
         display: flex;
         font-size: 14px;
         font-weight: 500;
-        letter-spacing: 0;
-        line-height: 24px;
         padding-left: 16px;
-        position: relative;
-        vertical-align: middle;
     }
 </style>
 
@@ -49,32 +43,22 @@
     <!-- Filter Section -->
     <div class="row">
         <div class="col-md-3">
-            <h5 style="
-            color: #a3a3a3;
-            font-size: .875rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            letter-spacing: -1px;
-        ">Nhóm sản phẩm</h5>
-            <ul class=" mb-4 p-0">
+            <h5 class="text-secondary fw-bold mb-3">Nhóm sản phẩm</h5>
+            <ul class="mb-4 p-0">
                 <% if (category && category.collection_id) { %>
                     <li class="filter-item">
-                            <input type="radio" name="collection" id="<%= category.collection_id._id %>" value="<%= category.collection_id._id %>" checked>
-                            <label for="<%= category.collection_id._id %>" class="filter-label"><%= category.collection_id.name %></label>
+                        <input type="radio" name="collection" id="<%= category.collection_id._id %>" 
+                               value="<%= category.collection_id._id %>" checked>
+                        <label for="<%= category.collection_id._id %>" class="filter-label">
+                            <%= category.collection_id.name %>
+                        </label>
                     </li>
-                    
-                  <% } %>
+                <% } %>
             </ul>
-            <h5 style="
-            color: #a3a3a3;
-            font-size: .875rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            letter-spacing: -1px;
-        ">Sắp xếp theo</h5>
 
-            <ul class=" mb-4 p-0">
-                 <li class="filter-item">
+            <h5 class="text-secondary fw-bold mb-3">Sắp xếp theo</h5>
+            <ul class="mb-4 p-0">
+                <li class="filter-item">
                     <input type="radio" name="sort" id="newest" value="newest" checked>
                     <label for="newest" class="filter-label">Mới nhất</label>
                 </li>
@@ -92,47 +76,45 @@
         <!-- Product Grid -->
         <div class="col-md-9">
             <% if (category) { %>
-                 <h5 class="fw-bold fs-4"><%= category.name %></h5>
-             <% } %>
-            <p class="fw-bold letter-spacing"><%= products.length %> kết quả</p>
-            
+                <h5 class="fw-bold fs-4"><%= category.name %></h5>
+            <% } %>
+            <p class="fw-bold"><%= Array.isArray(products) ? products.length : 0 %> kết quả</p>
+
             <div class="row" id="product-list">
-                <!-- Product Cards will be rendered here -->
-                <% products.forEach(product => { %>
-                <div class="col-6 col-sm-6 col-lg-3 mb-4">
-                    <div class="product">
-                        <div class="image position-relative">
-                            <div class="img">
-                                <img
-                                    src="http://localhost:3002/api/products/thumbnail/<%= product.thumbnail %>"
-                                    alt="<%= product.name %>"
-                                    class="img-fluid w-100">
-                            </div>
-                            <div class="img-hover position-absolute top-0 start-0 w-100 h-100 ">
-                                <img
-                                    src="http://localhost:3002/api/products/thumbnail/<%= product.thumbnail %>"
-                                    alt="<%= product.name %>"
-                                    class="img-fluid w-100">
+                <% if (Array.isArray(products) && products.length > 0) { %>
+                    <% products.forEach(product => { %>
+                        <div class="col-6 col-sm-6 col-lg-3 mb-4">
+                            <div class="product">
+                                <div class="image position-relative">
+                                    <div class="img">
+                                        <img src="<%= product.thumbnail ? 'http://localhost:3002/api/products/thumbnail/' + product.thumbnail : '/images/default-thumbnail.jpg' %>" 
+                                             alt="<%= product.name %>" class="img-fluid w-100">
+                                    </div>
+                                    <div class="img-hover position-absolute top-0 start-0 w-100 h-100">
+                                        <img src="<%= product.thumbnail ? 'http://localhost:3002/api/products/thumbnail/' + product.thumbnail : '/images/default-thumbnail.jpg' %>" 
+                                             alt="<%= product.name %>" class="img-fluid w-100">
+                                    </div>
+                                </div>
+
+                                <a href="/product/<%= product._id %>" class="text-decoration-none">
+                                    <h2 class="product-name mt-3"><%= product.name %></h2>
+                                </a>
+                                <h2 class="fs-6 fw-bold ps-3"><%= product.price ? product.price.toLocaleString('vi-VN') + ' đ' : 'Liên hệ' %></h2>
+
+                                <div class="button text-center mt-3">
+                                    <a href="/product/<%= product._id %>">
+                                        <button class="btn btn-primary px-4 bg-menu">
+                                            <div class="btn__txt">XEM NGAY</div>
+                                        </button>
+                                    </a>
+                                </div>
                             </div>
                         </div>
-
-                        <a href="/product/<%= product._id %>" class="text-decoration-none">
-                            <h2 class="product-name mt-3"><%= product.name %></h2>
-                        </a>
-                            <h2 class="fs-6 fw-bold ps-3"><%= product.price.toLocaleString('vi-VN') %> đ</h2>
-
-                        <div class="button text-center mt-3">
-                            <a href="/product/<%= product._id %>">
-                                <button class="btn btn-primary px-4 bg-menu">
-                                    <div class="btn__txt">XEM NGAY</div>
-                                </button>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <% }); %>
+                    <% }); %>
+                <% } else { %>
+                    <p class="text-muted">Không có sản phẩm nào.</p>
+                <% } %>
             </div>
         </div>
     </div>
 </div>
-
