@@ -201,7 +201,7 @@ padding: 0 50px;
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label letter-spacing fw-medium">Họ và tên</label>
-                            <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" id="nameKH" style="font-size: 14px;" placeholder="Nhập họ tên người nhận" required="">
+                            <input type="text" class="form-control rounded-pill fw-medium letter-spacing py-2 px-3" id="nameKH1" style="font-size: 14px;" placeholder="Nhập họ tên người nhận" required="">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="phoneNumber" class="form-label letter-spacing fw-medium">Số điện thoại</label>
@@ -482,7 +482,7 @@ function editAddress(address) {
             event.preventDefault();
 
             const newAddress = {
-                nameKH: document.getElementById('nameKH').value,
+                nameKH: document.getElementById('nameKH1').value,
                 phoneNumber: document.getElementById('phoneNumber').value,
                 address: document.getElementById('address').value,
                 ward: document.getElementById('wardSelect').options[wardSelect.selectedIndex].text,
