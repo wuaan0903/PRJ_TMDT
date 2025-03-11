@@ -147,13 +147,26 @@
         <div class="header-action d-flex align-items-center">
             <!-- Search Bar -->
             <div class="input-group me-3">
-                <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
-                <button class="btn btn-outline-light" type="button" onclick="searchProduct()">
-                    <i class='bx bx-search-alt fs-4'></i>
-                </button>
+                <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm sản phẩm..." 
+                    aria-label="Search" style="
+                    font-size: 14px;
+                    font-weight: 600;
+                    letter-spacing: -1px;
+                    border-radius: 20px;
+                " onkeydown="handleEnter(event)">
+                
+                <i onclick="searchProduct()" class='bx bx-search-alt fs-4' style="
+                    transform: translate3d(-30px, 6px, 10px);
+                    color: #000;
+                "></i>
             </div>
             
             <script>
+                function handleEnter(event) {
+                    if (event.key === "Enter") { // Kiểm tra nếu phím Enter được nhấn
+                        searchProduct(); // Gọi hàm tìm kiếm
+                    }
+                }
                 function searchProduct() {
                     const query = document.getElementById('searchInput').value.trim();
                     if (query) {
@@ -336,12 +349,23 @@
             </li>
             <li>
                 <i class="bx bxs-user-account" style="color: #000; transform: translateY(2px);"></i>
-                <a href="" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;">Tài khoản của tôi</a>
+                <a href="/user/profile" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;">Tài khoản của tôi</a>
                 <i class="bx bx-chevron-right" style="color: #000; transform: translateY(10px); float: right; font-size: 24px;"></i>
             </li>
             <li>
                 <i class="bx bxs-cart" style="color: #000; transform: translateY(2px);"></i>
-                <a href="" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;"">Danh sách đơn hàng</a>
+                <a href="/user/orders" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;"">Lịch sử đơn hàng</a>
+                <i class="bx bx-chevron-right" style="color: #000; transform: translateY(10px); float: right; font-size: 24px;"></i>
+            </li>
+            <li>
+                <i class='bx bxs-gift' style="color: #000; transform: translateY(2px);"></i>
+                <a href="/user/vouchers" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;"">Ví voucher</a>
+                
+                <i class="bx bx-chevron-right" style="color: #000; transform: translateY(10px); float: right; font-size: 24px;"></i>
+            </li>
+            <li>
+                <i class='bx bx-location-plus' style="color: #000; transform: translateY(2px);"></i>
+                <a href="/user/address" style="padding: 10px 50px 10px 0;color: #000;font-size: 14px;font-weight: 600;"">Danh sách địa chỉ</a>
                 <i class="bx bx-chevron-right" style="color: #000; transform: translateY(10px); float: right; font-size: 24px;"></i>
             </li>
             <li>

@@ -1,0 +1,401 @@
+<%- layout('../layouts/index') %>
+
+<style>
+    /* định dạng Header */
+     .custom-header {
+                background: #fff;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                border-radius: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+        /* Tăng kích thước icon */
+        .custom-header i {
+            font-size: 24px;
+            color: #fbc02d; /* Màu vàng giống vương miện */
+        }
+    /* Sidebar */
+    .sidebar {
+        background: #d9d9d9;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        height: fit-content;
+    }
+
+    .list-group-item {
+        
+        font-size: 16px;
+        padding: 12px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #333;
+        transition: all 0.3s ease-in-out;
+        text-decoration: none;
+        border-radius: 8px;
+        background: #fff;
+        
+    }
+
+    .list-group-item i {
+        font-size: 18px;
+    }
+
+    /* Hover */
+    .list-group-item:hover {
+        background: #000;
+        color: #fff !important;
+        transform: translateY(-3px);
+    }
+
+    /* Active */
+    .list-group-item.active {
+        background: #000 !important;
+        color: #fff !important;
+    }
+
+    /* Logout - Đăng xuất */
+    .list-group-item.text-danger {
+        font-weight: bold;
+    }
+
+    /* Hover riêng cho Đăng xuất */
+    .list-group-item.text-danger:hover {
+        background: #dc3545 !important;
+        color: #fff !important;
+    }
+
+    .order-container {
+        
+
+        padding: 20px 40px;
+        margin-bottom: 30px;
+        border-radius: 10px;
+        min-height: 442px;
+        background: #d9d9d9;
+    }
+    .order-header {
+        font-size: 30px;
+        font-weight: 500;
+        padding-top: 10px;
+        margin-bottom: 20px;
+    }
+    .order-card {
+        background: #212121;
+        color: #fff;
+        padding: 10px 24px;
+        border-radius: 5px;
+    }
+    .order-item {
+        background: #f1f1f1;
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        
+    }
+    .btn-custom {
+        background: #f1f1f1;
+        color: rgb(0, 0, 0);
+        border: 1px solid #000000;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 8px 36px;
+    }
+
+    .btn-custom1 {
+        background: #000;
+        color: #fff;
+        border: 1px solid #000000;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 8px 36px;
+    }
+    .btn-custom:hover {
+        background: #000;
+        color: #fff;
+    }
+    .btn-custom1:hover {
+        border: 1px solid #000000;
+        background: #222222;
+        color: #fff;
+    }
+    .order{
+        margin-bottom: 20px;
+    }
+
+</style>
+
+<!-- Bootstrap Grid Layout -->
+<div class="container pt-5" style="
+margin: 0;
+margin-top: 60px;
+max-width: 100%;
+padding: 0 50px;
+">
+    <div class="row">
+        <ul class="side-menu top">
+        <div class="custom-header ">
+            <!-- Bên trái -->
+            <div id="nameKH" class="left">
+                <h4>Hi, <span class="fw-bold"></span> <i class='bx bx-crown' ></i></h4>
+            </div> 
+        </div>
+        </ul>
+        <!-- Sidebar bên trái -->
+        <div class="col-md-3">
+            <div class="sidebar">
+                <ul class="side-menu top list-unstyled">
+                    <div class="row g-2" id="user-sidebar">
+                        <div class="col-12">
+                            <a href="/user/profile" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center  w-100 " style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-user"></i> Thông tin tài khoản
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/orders" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100 text-white bg-dark" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-shopping-bag"></i> Lịch sử đơn hàng
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/vouchers" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-gift"></i> Ví Voucher
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/address" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-map-marker-alt"></i> Sổ địa chỉ
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/reviews" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-star"></i> Đánh giá & Phản hồi
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/user/policies" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-question-circle"></i> Chính sách & Câu hỏi thường gặp
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="/auth/logout" class="list-group-item list-group-item-action text-danger rounded-3 d-flex align-items-center w-100" style="
+                            font-size: 15px;
+                            letter-spacing: -1px;
+                            font-weight: 600;
+                        ">
+                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                </ul>
+            </div>
+        </div>
+
+            <!-- Nội dung bên phải -->
+            <div class="col-md-9">
+
+                <div class="container" style="
+                padding: 0;
+            ">
+                    <div class="order-container">
+                        <h2 class="order-header">Lịch sử đơn hàng</h2>
+                        <p>Đơn hàng của bạn: <strong id="order-count">0 đơn hàng</strong></p>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            let userId;
+
+            const statusMap = {
+                'pending': 'Chờ xác nhận',
+                'processing': 'Đang giao hàng',
+                'completed': 'Hoàn thành',
+                'cancelled': 'Đã hủy'
+            };
+    
+            // Gọi API để lấy ID người dùng
+            fetch('/auth/user')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        // Redirect to login page if not logged in
+                        window.location.href = '/login';
+                        throw new Error('Not logged in');
+                    }
+                })
+                .then(userData => {
+                    userId = userData.user.user._id;
+                    console.log('User ID:', userId);
+                    const nameKH = document.getElementById('nameKH');
+                nameKH.innerHTML = `
+                <h4>Hi, <span class="fw-bold">${userData.user.user.username}</span> <i class='bx bx-crown' ></i></h4>
+                `;
+                    fetchOrders(userId);
+                })
+                .catch(error => {
+                    console.error('Error fetching user ID:', error);
+                });
+    
+                // Hàm để gọi API lấy danh sách đơn hàng
+            async function fetchOrders(userId) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/orders/user/${userId}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const orders = await response.json();
+                    const productDetails = await fetchProductDetails(orders);
+                    // Sắp xếp danh sách đơn hàng theo ngày
+                    orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    displayOrders(orders, productDetails);
+                    displayOrderCount(orders.length);
+                } catch (error) {
+                    console.error('Error fetching orders:', error);
+                }
+            }
+    
+            // Hàm để gọi API lấy chi tiết sản phẩm
+            async function fetchProductDetails(orders) {
+                const productIds = orders.flatMap(order => order.products.map(product => product.productId));
+                const uniqueProductIds = [...new Set(productIds)];
+                const productDetails = await Promise.all(uniqueProductIds.map(async productId => {
+                    const response = await fetch(`http://localhost:3002/api/products/${productId}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                }));
+                return productDetails.reduce((acc, product) => {
+                    acc[product._id] = product;
+                    return acc;
+                }, {});
+            }
+    
+            // Hàm để hiển thị số lượng đơn hàng
+            function displayOrderCount(count) {
+                const orderCountElement = document.getElementById('order-count');
+                orderCountElement.textContent = `${count} đơn hàng`;
+            }
+    
+            // Hàm để hiển thị danh sách đơn hàng
+            function displayOrders(orders, productDetails) {
+                const orderContainer = document.querySelector('.order-container');
+                
+    
+                orders.forEach(order => {
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'order';
+                    orderElement.innerHTML = `
+                        <div class="order-card d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>#${order._id}</strong>
+                                <p style="margin: 0;">${new Date(order.date).toLocaleDateString()}</p>
+                            </div>
+                            <button class="btn btn-light" style="
+                            border-radius: 16px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            letter-spacing: -1px;
+                        ">${statusMap[order.status] || 'Không xác định'}</button>
+                        </div>
+                        
+                        ${order.products.map(product => {
+                            const productDetail = productDetails[product.productId];
+                            return `
+                            <div class="order-item d-flex align-items-center">
+                                <img src="http://localhost:3002/api/products/thumbnail/${productDetail.thumbnail}" class="me-3" alt="Sản phẩm" style="
+                                width: 100px;
+                            ">
+                                <div>
+                                    <p style="
+                                    font-size: 14px;
+                                    letter-spacing: -1px;
+                                "><strong>${productDetail.name}</strong></p>
+                                    <p style="
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                    letter-spacing: -1px;
+                                    color: #626262;
+                                    margin-bottom: 10px;
+                                ">Size : ${product.size}</p>
+                                    <p style="
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                    letter-spacing: -1px;
+                                    margin-bottom: 10px;
+                                ">x${product.quantity}</p>
+
+                                <p style="
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                    letter-spacing: -1px;
+                                    margin-bottom: 10px;
+                                    font-weight: 700;
+                                ">${productDetail.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</p>
+                                </div>
+                                
+                            </div>
+                            `;
+                        }).join('')}
+                        
+                        <div class="d-flex justify-content-between fw-bold" style="
+                        padding: 10px 20px;
+                        background: #f1f1f1;
+                    ">
+                        <div>
+                        <a href="http://localhost:3000/user/orders/${order._id}" class="btn btn-custom">Chi tiết</a>
+                        ${order.status !== 'completed' && order.status !== 'cancelled' ? '<button class="btn btn-custom1">Hủy đơn</button>' : ''}
+
+                        </div>
+
+                            
+                            <span style="
+                            align-content: center;
+                            font-size: 18px;
+                            font-weight: 600;
+                        ">${order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                        </div>
+                    `;
+                    orderContainer.appendChild(orderElement);
+                });
+            }
+    
+            // Gọi hàm fetchOrders khi trang được tải
+            fetchOrders();
+        });
+    </script>

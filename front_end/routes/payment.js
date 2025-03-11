@@ -47,6 +47,11 @@ router.get('/api/orders/:id', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/payments/${req.params.id}`, 'get');
 });
 
+// Get order by user ID
+router.get('/api/orders/user/:id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/payments/user/${req.params.id}`, 'get');
+});
+
 // Get Product Order by order ID
 router.get('/api/payments/productOrders/:orderId', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/payments/productOrders/${req.params.orderId}`, 'get');

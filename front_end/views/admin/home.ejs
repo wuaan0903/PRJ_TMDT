@@ -1,5 +1,6 @@
 <%- layout('layouts/index') %>
 
+
 <main id="view-panel">
     <!-- BOX INFO -->
     <ul class="box-info p-0">
@@ -51,19 +52,35 @@
         </div>
 
         <!-- TODO LIST -->
-        <div class="todo">
-            <div class="head">
-                <h3>Danh mục</h3>
-                <div>
-                    <i class='bx bx-plus'></i>
-                    <i class='bx bx-filter'></i>
+        <div>
+            <h3 class="mb-3 text-center">Quản lý Banner</h3>
+        
+            <!-- Form nhập banner -->
+            <div class="card p-3 mb-3">
+                <input type="hidden" id="bannerId">
+                <div class="mb-2">
+                    <label class="form-label">Tiêu đề:</label>
+                    <input type="text" class="form-control" id="bannerTitle">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Liên kết:</label>
+                    <input type="text" class="form-control" id="bannerLink">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Hình ảnh:</label>
+                    <input type="file" class="form-control" id="bannerImage" accept="image/*">
+                    <img id="previewImage" class="mt-2" style="max-width:150px; display:none;">
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success" onclick="saveBanner()">Thêm</button>
+                    <button class="btn btn-primary" onclick="updateBanner()">Cập nhật</button>
+                    <button class="btn btn-danger" onclick="deleteBanner()">Xóa</button>
                 </div>
             </div>
-            <ul class="todo-list p-0">
-                
-            </ul>
+        
+            <h4 class="mb-3 text-center">Danh sách Banner</h4>
+            <div id="bannerList" class="row"></div>
         </div>
-    </div>
 </main>
 
 <script>
@@ -90,7 +107,119 @@
 
 
     // Check user role on page load
-    document.addEventListener('DOMContentLoaded', async function() {
-        await checkUserRole();
+    document.addEventListener("DOMContentLoaded", fetchBanners);
+
+    async function fetchBanners() {
+    const response = await fetch("http://localhost:3002/api/banners");
+    const banners = await response.json();
+    const bannerList = document.getElementById("bannerList");
+    bannerList.innerHTML = "";
+
+    banners.forEach(banner => {
+        const card = document.createElement("div");
+        card.classList.add("col-md-4", "mb-3");
+        card.innerHTML = `
+            <div class="card border-primary" onclick="editBanner('${banner._id}', '${banner.title}', '${banner.link}', '${banner.imageUrl}')">
+                <img src="http://localhost:3002/api/products/banner/${banner.imageUrl}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">${banner.title}</h5>
+                    <p><a href="${banner.link}" target="_blank">${banner.link}</a></p>
+                </div>
+            </div>
+        `;
+        bannerList.appendChild(card);
     });
+    }
+
+    function editBanner(id, title, link, imageUrl) {
+    document.getElementById("bannerId").value = id;
+    document.getElementById("bannerTitle").value = title;
+    document.getElementById("bannerLink").value = link;
+    document.getElementById("previewImage").src = imageUrl;
+    document.getElementById("previewImage").style.display = "block";
+    }
+
+async function saveBanner() {
+    const title = document.getElementById("bannerTitle").value;
+    const link = document.getElementById("bannerLink").value;
+    const imageFile = document.getElementById("bannerImage").files[0];
+
+    if (!title || !link || !imageFile) {
+        alert("Vui lòng nhập đầy đủ thông tin!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("link", link);
+    formData.append("image", imageFile);
+
+    const response = await fetch("http://localhost:3002/api/banners", {
+        method: "POST",
+        body: formData
+    });
+
+    if (response.ok) {
+        fetchBanners();
+        resetForm();
+    } else {
+        alert("Có lỗi khi thêm banner!");
+    }
+}
+
+async function updateBanner() {
+    const id = document.getElementById("bannerId").value;
+    if (!id) {
+        alert("Vui lòng chọn một banner để cập nhật!");
+        return;
+    }
+
+    const title = document.getElementById("bannerTitle").value;
+    const link = document.getElementById("bannerLink").value;
+    const imageFile = document.getElementById("bannerImage").files[0];
+
+    if (!title || !link) {
+        alert("Tiêu đề và liên kết không được để trống!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("link", link);
+    if (imageFile) formData.append("image", imageFile);
+
+    const response = await fetch(`http://localhost:3002/api/banners/${id}`, {
+        method: "PUT",
+        body: formData
+    });
+
+    if (response.ok) {
+        fetchBanners();
+        resetForm();
+    } else {
+        alert("Có lỗi khi cập nhật banner!");
+    }
+}
+
+async function deleteBanner() {
+    const id = document.getElementById("bannerId").value;
+    if (!id) {
+        alert("Vui lòng chọn banner để xóa!");
+        return;
+    }
+    if (confirm("Bạn có chắc muốn xóa banner này không?")) {
+        await fetch(`http://localhost:3002/api/banners/${id}`, { method: "DELETE" });
+        fetchBanners();
+        resetForm();
+    }
+}
+
+function resetForm() {
+    document.getElementById("bannerId").value = "";
+    document.getElementById("bannerTitle").value = "";
+    document.getElementById("bannerLink").value = "";
+    document.getElementById("previewImage").style.display = "none";
+    const fileInput = document.getElementById("bannerImage");
+    fileInput.value = ""; // Reset file input
+}
 </script>
