@@ -40,6 +40,8 @@ app.get("/search", (req, res) => {
 
 app.get('/filter', productController.renderProductSortByCategory);
 
+
+
 app.get("/user/", (req, res) => {
   res.render("user/layouts/index");   // Renders the profile.ejs file
 } );
