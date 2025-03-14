@@ -128,6 +128,15 @@
         margin-bottom: 20px;
     }
 
+    .star-rating {
+        font-size: 24px;
+        color: #ddd;
+        cursor: pointer;
+    }
+    .star-rating .fas.selected {
+        color: #fbc02d;
+    }
+
 </style>
 
 <!-- Bootstrap Grid Layout -->
@@ -228,13 +237,35 @@ padding: 0 50px;
                     <div class="order-container">
                         <h2 class="order-header">Lịch sử đơn hàng</h2>
                         <p>Đơn hàng của bạn: <strong id="order-count">0 đơn hàng</strong></p>
+                        <div class="order-container1">
 
+                        </div>
                     </div>
                 </div>
             </div>
 
         </div>
     </div>
+
+<!-- Modal đánh giá sản phẩm -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="
+        transform: translateY(100px);
+    ">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel">Đánh giá sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="productReviews" class="mb-3">
+                    <!-- Các trường đánh giá cho từng sản phẩm sẽ được điền vào đây -->
+                </div>
+                <button type="submit" class="btn btn-primary" style="background: #111111;border: none;width: 100%;font-size: 14px;font-weight: 500;" id="submitReviews">Hoàn thành</button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script>
         document.addEventListener("DOMContentLoaded", async function () {
@@ -270,6 +301,8 @@ padding: 0 50px;
                 .catch(error => {
                     console.error('Error fetching user ID:', error);
                 });
+
+                let productDetails1 = {};
     
                 // Hàm để gọi API lấy danh sách đơn hàng
             async function fetchOrders(userId) {
@@ -280,6 +313,7 @@ padding: 0 50px;
                     }
                     const orders = await response.json();
                     const productDetails = await fetchProductDetails(orders);
+                    productDetails1=productDetails;
                     // Sắp xếp danh sách đơn hàng theo ngày
                     orders.sort((a, b) => new Date(b.date) - new Date(a.date));
                     displayOrders(orders, productDetails);
@@ -311,89 +345,245 @@ padding: 0 50px;
                 const orderCountElement = document.getElementById('order-count');
                 orderCountElement.textContent = `${count} đơn hàng`;
             }
-    
-            // Hàm để hiển thị danh sách đơn hàng
-            function displayOrders(orders, productDetails) {
-                const orderContainer = document.querySelector('.order-container');
-                
-    
-                orders.forEach(order => {
-                    const orderElement = document.createElement('div');
-                    orderElement.className = 'order';
-                    orderElement.innerHTML = `
-                        <div class="order-card d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>#${order._id}</strong>
-                                <p style="margin: 0;">${new Date(order.date).toLocaleDateString()}</p>
-                            </div>
-                            <button class="btn btn-light" style="
-                            border-radius: 16px;
-                            font-size: 12px;
-                            font-weight: 700;
-                            letter-spacing: -1px;
-                        ">${statusMap[order.status] || 'Không xác định'}</button>
-                        </div>
-                        
-                        ${order.products.map(product => {
-                            const productDetail = productDetails[product.productId];
-                            return `
-                            <div class="order-item d-flex align-items-center">
-                                <img src="http://localhost:3002/api/products/thumbnail/${productDetail.thumbnail}" class="me-3" alt="Sản phẩm" style="
-                                width: 100px;
-                            ">
+
+
+                // Hàm để hiển thị danh sách đơn hàng
+                function displayOrders(orders, productDetails) {
+                    const orderContainer = document.querySelector('.order-container1');
+                    orderContainer.innerHTML = '';
+
+                    orders.forEach(order => {
+                        const orderElement = document.createElement('div');
+                        orderElement.className = 'order';
+                        orderElement.innerHTML = `
+                            <div class="order-card d-flex justify-content-between align-items-center">
                                 <div>
-                                    <p style="
-                                    font-size: 14px;
-                                    letter-spacing: -1px;
-                                "><strong>${productDetail.name}</strong></p>
-                                    <p style="
-                                    font-size: 14px;
-                                    font-weight: 500;
-                                    letter-spacing: -1px;
-                                    color: #626262;
-                                    margin-bottom: 10px;
-                                ">Size : ${product.size}</p>
-                                    <p style="
-                                    font-size: 14px;
-                                    font-weight: 500;
-                                    letter-spacing: -1px;
-                                    margin-bottom: 10px;
-                                ">x${product.quantity}</p>
-
-                                <p style="
-                                    font-size: 14px;
-                                    font-weight: 500;
-                                    letter-spacing: -1px;
-                                    margin-bottom: 10px;
-                                    font-weight: 700;
-                                ">${productDetail.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</p>
+                                    <strong>#${order._id}</strong>
+                                    <p style="margin: 0;">${new Date(order.date).toLocaleDateString()}</p>
                                 </div>
-                                
+                                <button class="btn btn-light" style="
+                                border-radius: 16px;
+                                font-size: 12px;
+                                font-weight: 700;
+                                letter-spacing: -1px;
+                            ">${statusMap[order.status] || 'Không xác định'}</button>
                             </div>
-                            `;
-                        }).join('')}
-                        
-                        <div class="d-flex justify-content-between fw-bold" style="
-                        padding: 10px 20px;
-                        background: #f1f1f1;
-                    ">
-                        <div>
-                        <a href="http://localhost:3000/user/orders/${order._id}" class="btn btn-custom">Chi tiết</a>
-                        ${order.status !== 'completed' && order.status !== 'cancelled' ? '<button class="btn btn-custom1">Hủy đơn</button>' : ''}
-
-                        </div>
-
                             
-                            <span style="
-                            align-content: center;
-                            font-size: 18px;
-                            font-weight: 600;
-                        ">${order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                            ${order.products.map(product => {
+                                const productDetail = productDetails[product.productId];
+                                return `
+                                <div class="order-item d-flex align-items-center">
+                                    <img src="http://localhost:3002/api/products/thumbnail/${productDetail.thumbnail}" class="me-3" alt="Sản phẩm" style="
+                                    width: 100px;
+                                ">
+                                    <div>
+                                        <p style="
+                                        font-size: 14px;
+                                        letter-spacing: -1px;
+                                    "><strong>${productDetail.name}</strong></p>
+                                        <p style="
+                                        font-size: 14px;
+                                        font-weight: 500;
+                                        letter-spacing: -1px;
+                                        color: #626262;
+                                        margin-bottom: 10px;
+                                    ">Size : ${product.size}</p>
+                                        <p style="
+                                        font-size: 14px;
+                                        font-weight: 500;
+                                        letter-spacing: -1px;
+                                        margin-bottom: 10px;
+                                    ">x${product.quantity}</p>
+
+                                    <p style="
+                                        font-size: 14px;
+                                        font-weight: 500;
+                                        letter-spacing: -1px;
+                                        margin-bottom: 10px;
+                                        font-weight: 700;
+                                    ">${productDetail.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</p>
+                                    </div>
+                                    
+                                </div>
+                                `;
+                            }).join('')}
+                            
+                            <div class="d-flex justify-content-between fw-bold" style="
+                            padding: 10px 20px;
+                            background: #f1f1f1;
+                        ">
+                            <div>
+                            <a href="http://localhost:3000/user/orders/${order._id}" class="btn btn-custom">Chi tiết</a>
+                            ${order.status !== 'completed' && order.status !== 'cancelled' && order.status !=='processing' ? '<button id="cancellOrder" class="btn btn-custom1 cancellOrder">Hủy đơn</button>' : ''}
+                            ${order.status === 'completed' && order.rating === false ? `<button id="reviewOrder" class="btn btn-custom1 reviewOrder" data-order-id='${order._id}'>Đánh giá</button>` : ''}
+
+                            </div>
+
+                                
+                                <span style="
+                                align-content: center;
+                                font-size: 18px;
+                                font-weight: 600;
+                            ">${order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                            </div>
+                        `;
+                        orderContainer.appendChild(orderElement);
+                    });
+
+                    // Thêm sự kiện click cho nút "Đánh giá"
+                    document.querySelectorAll('.reviewOrder').forEach(button => {
+                        button.addEventListener('click', function () {
+                            const orderId = this.getAttribute('data-order-id');
+                            const products = orders.find(order => order._id === orderId).products;
+                            console.log(products);
+                            showReviewModal(orderId, products);
+                        });
+                    });
+                }
+
+
+            // Hàm để hiển thị modal đánh giá
+            function showReviewModal(orderId, products) {
+                const reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
+
+                // Điền thông tin sản phẩm và các trường đánh giá vào modal
+                const productReviews = document.getElementById('productReviews');
+                productReviews.innerHTML = products.map((product, index) => {
+                    // Lấy thông tin sản phẩm từ productDetails bằng productId
+                    const productDetail = productDetails1[product.productId];
+                
+                    // Kiểm tra nếu sản phẩm tồn tại trong productDetails
+                    if (!productDetail) return '';
+                
+                    return `
+                        <div class="product-review mb-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="http://localhost:3002/api/products/thumbnail/${productDetail.thumbnail}" alt="Sản phẩm" style="width: 80px; margin-right: 20px;">
+                                <div>
+                                    <p style="font-size: 14px; font-weight: 600; margin: 0;">${productDetail.name}</p>
+                                    <p style="font-size: 14px; font-weight: 500; color: #626262; margin: 0;">Size: ${product.size}</p>
+                                    <p style="font-size: 14px; font-weight: 500; margin: 0;">x${product.quantity}</p>
+                                    <p style="font-size: 14px; font-weight: 700; margin: 0;">${productDetail.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</p>
+                                </div>
+                            </div>
+                            <div class="mb-3 d-flex align-items-center"> 
+                                <label for="rating${index}" class="form-label m-0 pe-5" style="
+    font-size: 14px;
+    font-weight: 500;
+">Chất lượng sản phẩm</label>
+                                <div id="rating${index}" class="star-rating">
+                                    <i class="fas fa-star selected" data-value="1"></i>
+                                    <i class="fas fa-star selected" data-value="2"></i>
+                                    <i class="fas fa-star selected" data-value="3"></i>
+                                    <i class="fas fa-star selected" data-value="4"></i>
+                                    <i class="fas fa-star selected" data-value="5"></i>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewContent${index}" class="form-label" style="
+    font-size: 14px;
+    font-weight: 500;
+">Nội dung đánh giá</label>
+                                <textarea class="form-control" style="
+    font-size: 14px;
+    font-weight: 500;
+" id="reviewContent${index}" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewImage${index}" class="form-label" style="
+    font-size: 14px;
+    font-weight: 500;
+">Thêm ảnh sản phẩm</label>
+                                <input class="form-control" style="
+    font-size: 14px;
+    font-weight: 500;
+" type="file" id="reviewImage${index}" accept="image/*">
+                            </div>
                         </div>
                     `;
-                    orderContainer.appendChild(orderElement);
+                }).join('');
+                
+                reviewModal.show();
+
+                // Xử lý sự kiện click vào sao để chọn đánh giá
+                document.querySelectorAll('.star-rating .fas').forEach(star => {
+                    star.addEventListener('click', function () {
+                        const value = this.getAttribute('data-value');
+                        const ratingId = this.parentElement.id;
+                        document.querySelectorAll(`#${ratingId} .fas`).forEach(s => {
+                            s.classList.remove('selected');
+                            if (s.getAttribute('data-value') <= value) {
+                                s.classList.add('selected');
+                            }
+                        });
+                    });
+                });
+
+                // Xử lý sự kiện submit form đánh giá
+                document.getElementById('submitReviews').addEventListener('click', async function (event) {
+                    event.preventDefault();
+                
+                    const reviews = products.map((product, index) => {
+                        const stars = document.querySelectorAll(`#rating${index} .fas.selected`);
+                        const rating = stars.length > 0 ? stars[stars.length - 1].getAttribute('data-value') : 0;
+
+                        const reviewContent = document.getElementById(`reviewContent${index}`).value;
+                        
+                        return {
+                            product_id: product.productId,
+                            user_id: userId,
+                            comment: reviewContent,
+                            rate: rating
+                        };
+                    });
+                
+                    try {
+                        for (const review of reviews) {
+                            console.log('Review data:', review);
+                            const response = await fetch(`/api/review/`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(review)
+                            });
+                
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                        }
+
+
+                        // Gọi API để cập nhật order.rating thành true
+                        const updateRatingResponse = await fetch(`/api/orders/rating/${orderId}`, {
+                            method: 'PUT'
+                        });
+
+                        if (!updateRatingResponse.ok) {
+                            throw new Error(`HTTP error! Status: ${updateRatingResponse.status}`);
+                        }
+                
+                        // Đóng modal sau khi đánh giá thành công
+                        reviewModal.hide();
+                        fetchOrders(userId);
+                    } catch (error) {
+                        console.error('Error submitting review:', error);
+                    }
                 });
             }
+            
+                // Xử lý sự kiện click vào sao để chọn đánh giá
+            document.querySelectorAll('#rating .fas').forEach(star => {
+                star.addEventListener('click', function () {
+                    const value = this.getAttribute('data-value');
+                    document.querySelectorAll('#rating .fas').forEach(s => {
+                        s.classList.remove('selected');
+                        if (s.getAttribute('data-value') <= value) {
+                            s.classList.add('selected');
+                        }
+                    });
+                });
+            });
     
             // Gọi hàm fetchOrders khi trang được tải
             fetchOrders();

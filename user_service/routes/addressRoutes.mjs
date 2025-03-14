@@ -10,7 +10,9 @@ router.get('/:userId/addresses', async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.status(200).json(user.addresses);
+        res.status(200).json(
+            {email: user.email,
+            addresses: user.addresses});
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -48,10 +50,12 @@ router.post('/:userId/addresses', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Nếu defaultAddress = true, đặt tất cả địa chỉ khác về false
+        // Nếu địa chỉ này được đặt làm mặc định, cập nhật các địa chỉ khác
         if (defaultAddress) {
             user.addresses.forEach(addr => {
-                addr.defaultAddress = false;
+                if (addr._id.toString() !== req.params.addressId) {
+                    addr.defaultAddress = false;
+                }
             });
         }
 
@@ -68,7 +72,7 @@ router.post('/:userId/addresses', async (req, res) => {
 
 // Cập nhật địa chỉ của người dùng
 router.put('/:userId/addresses/:addressId', async (req, res) => {
-    const { nameKH,phoneNumber,address, ward, district, city, defaultAddress =true } = req.body;
+    const { nameKH,phoneNumber,address, ward, district, city, defaultAddress } = req.body;
     try {
         const user = await User.findById(req.params.userId);
         if (!user) {
@@ -88,7 +92,7 @@ router.put('/:userId/addresses/:addressId', async (req, res) => {
         addressToUpdate.district = district;
         addressToUpdate.city = city;
         
-        addressToUpdate.defaultAddress = true; 
+        addressToUpdate.defaultAddress = defaultAddress; 
 
 
         // Nếu địa chỉ này được đặt làm mặc định, cập nhật các địa chỉ khác
