@@ -194,22 +194,60 @@ const removeDiacritics = (str) => {
 export const searchProducts = async (req, res) => {
     try {
         const query = req.query.q;
-        if (!query) return res.status(400).json({ message: "Thiếu từ khóa tìm kiếm" });
+        const categoryId = req.query.categories;
 
-        // Chuẩn hóa từ khóa tìm kiếm
-        const normalizedQuery = removeDiacritics(query).toLowerCase();
+        if (!query && !categoryId) {
+            return res.status(400).json({ 
+                message: "Cần ít nhất một trong hai: từ khóa tìm kiếm hoặc danh mục" 
+            });
+        }
 
-        // Tìm kiếm trực tiếp trong MongoDB thay vì lấy tất cả rồi lọc lại
-        const products = await Product.find();
+        let products = [];
 
-        // Lọc dữ liệu theo tên sản phẩm không dấu
-        const filteredProducts = products.filter((product) => {
-            const normalizedName = removeDiacritics(product.name).toLowerCase();
-            return normalizedName.includes(normalizedQuery);
-        });
+        // Trường hợp 1: Tìm theo từ khóa
+        if (query && !categoryId) {
+            const normalizedQuery = removeDiacritics(query).toLowerCase();
+            products = await Product.find({
+                $or: [
+                    { name: { $regex: query, $options: 'i' } }, // Có dấu
+                    { normalized_name: { $regex: normalizedQuery, $options: 'i' } } // Không dấu
+                ]
+            });
+        }
 
-        res.status(200).json(filteredProducts);
+        // Trường hợp 2: Tìm theo danh mục
+        if (categoryId && !query) {
+            const category = await Categories.findById(categoryId);
+            if (!category) {
+                return res.status(404).json({ message: "Không tìm thấy danh mục" });
+            }
+            products = await Product.find({ categories: categoryId });
+        }
+
+        // Trường hợp 3: Tìm theo từ khóa & danh mục
+        if (query && categoryId) {
+            const normalizedQuery = removeDiacritics(query).toLowerCase();
+            const category = await Categories.findById(categoryId);
+            if (!category) {
+                return res.status(404).json({ message: "Không tìm thấy danh mục" });
+            }
+            products = await Product.find({
+                categories: categoryId,
+                $or: [
+                    { name: { $regex: query, $options: 'i' } }, // Có dấu
+                    { normalized_name: { $regex: normalizedQuery, $options: 'i' } } // Không dấu
+                ]
+            });
+        }
+
+        // Nếu không tìm thấy sản phẩm nào
+        if (products.length === 0) {
+            return res.status(404).json({ message: "Không tìm thấy sản phẩm phù hợp" });
+        }
+
+        res.status(200).json(products);
     } catch (err) {
+        console.error("Error:", err);
         res.status(500).json({ message: "Lỗi máy chủ", error: err.message });
     }
-}
+};

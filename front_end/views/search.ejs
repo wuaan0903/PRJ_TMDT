@@ -124,11 +124,12 @@
             if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
 
             const categories = await response.json();
+        
             categorySelect.innerHTML = `<option value="">Danh mục</option>`; // Reset danh mục
-
+            console.log(categorySelect);
             categories.forEach(category => {
                 const option = document.createElement('option');
-                option.value = category.slug || category._id;
+                option.value = category._id;
                 option.textContent = category.name;
                 categorySelect.appendChild(option);
             });
@@ -139,7 +140,6 @@
         }
     }
 
-    
     async function searchProducts() {
         const query = document.getElementById('searchInputTop').value.trim();
         const categories = document.getElementById('categorySelect').value;
@@ -157,6 +157,7 @@
             if (!response.ok) throw new Error('Lỗi kết nối đến server');
 
             const products = await response.json();
+            console.log(products);
             searchResultWrapper.innerHTML = '';
             if (!products.length) {
                 searchResultWrapper.innerHTML = `<p class="text-center text-muted">Không tìm thấy sản phẩm nào!</p>`;
@@ -206,7 +207,7 @@
 
         } catch (error) {
             console.error('Lỗi khi tìm kiếm sản phẩm:', error);
-            searchResultWrapper.innerHTML = `<p class="text-center text-danger">Có lỗi xảy ra, vui lòng thử lại!</p>`;
+            searchResultWrapper.innerHTML = `<p class="text-center text-danger">Không tìm thấy sản phẩm !</p>`;
         }
     }
 
