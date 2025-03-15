@@ -62,7 +62,15 @@
             <div class="row">
                 <!-- Thông tin đặt hàng -->
                 <div class="col-lg-7">
-                    <h4 class="mb-3 fw-bold letter-spacing fs-3">Thông tin đặt hàng</h4>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h4 class="mb-3 fw-bold letter-spacing fs-3">Thông tin đặt hàng</h4>
+                        <select id="addressSelect" class="form-select rounded-pill fw-medium letter-spacing py-2 px-3 w-50" style="border: 1px solid; height: 36px; font-size: 12px;">
+                            <option value="">Chọn từ sổ địa chỉ</option>
+                        </select>
+
+                    </div>
+                    
+
                     <form id="order-form">
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -219,7 +227,9 @@
                                     <i class="bx bx-trash"></i>
                                     Xóa</button>
                             </div>
-                 </div></div>
+                    </div>
+                
+                </div>
                  
                  <div class="d-flex">
                     <input type="text" id="voucherCodeInput" class="form-control" placeholder="Nhập mã giảm giá" style="
@@ -324,22 +334,130 @@
                         console.error('Error fetching default address:', error);
                     }
                 }
+
+                // Hàm để gọi API lấy danh sách địa chỉ của người dùng
+                async function fetchAddresses(userId) {
+                    try {
+                        const response = await fetch(`/api/account/${userId}/addresses`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        populateAddressSelect(data);
+                    } catch (error) {
+                        console.error('Error fetching addresses:', error);
+                    }
+                }
+
+                // Hàm để hiển thị danh sách địa chỉ trong phần <select>
+                function populateAddressSelect(data) {
+                    const addressSelect = document.getElementById('addressSelect');
+                    addressSelect.innerHTML = '<option value="">Chọn từ sổ địa chỉ</option>';
+                    const addresses = data.addresses;
+                    addresses.forEach((address, index) => {
+                        addressSelect.innerHTML += `<option value="${index}" style="
+    font-size: 14px;
+    font-weight: 500;
+">${address.address}, ${address.ward}, ${address.district}, ${address.city}</option>`;
+                    });
+
+                    // Thêm sự kiện thay đổi cho phần <select>
+                    addressSelect.addEventListener('change', function () {
+                        const selectedIndex = this.value;
+                        if (selectedIndex !== "") {
+                            const data1 = {
+                                email : data.email,
+                                defaultAddress: addresses[selectedIndex]
+                            }
+                            fillAddressForm(data1);
+                        }
+                    });
+                }
+
+                async function getCityValueByName(cityName) {
+                    const response = await fetch("https://provinces.open-api.vn/api/p/");
+                    const cities = await response.json();
+                
+                    // Tìm tỉnh có tên trùng với cityName
+                    const city = cities.find(c => c.name.trim() === cityName.trim());
+                
+                    return city ? city.code : null; // Trả về mã tỉnh hoặc null nếu không tìm thấy
+                }
+                async function getDistrictValueByName(cityCode, districtName) {
+                    const response = await fetch(`https://provinces.open-api.vn/api/p/${cityCode}?depth=2`);
+                    const province = await response.json();
+                    const district = province.districts.find(d => d.name.trim() === districtName.trim());
+                    return district ? district.code : null;
+                }
+                
+                async function getWardValueByName(districtCode, wardName) {
+                    const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
+                    const district = await response.json();
+                    const ward = district.wards.find(w => w.name.trim() === wardName.trim());
+                    return ward ? ward.code : null;
+                }
+
+                // Hàm lấy danh sách quận/huyện theo tỉnh/thành phố
+        async function fetchDistricts(provinceCode, isEdit = false) {
+            const response = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
+            const province = await response.json();
+            if (isEdit) {
+                districtSelect.innerHTML = `<option value="" selected >Chọn Quận/Huyện</option>`;
+                wardSelect.innerHTML = `<option value="" selected >Chọn Phường/Xã</option>`; // Reset danh sách phường/xã
+                province.districts.forEach(district => {
+                    districtSelect.innerHTML += `<option value="${district.code}" style="font-size: 14px; font-weight: 500;">${district.name}</option>`;
+                });
+            } else {
+                districtSelect.innerHTML = `<option value="" selected >Chọn Quận/Huyện</option>`;
+                wardSelect.innerHTML = `<option value="" selected >Chọn Phường/Xã</option>`; // Reset danh sách phường/xã
+                province.districts.forEach(district => {
+                    districtSelect.innerHTML += `<option value="${district.code}" style="font-size: 14px; font-weight: 500;">${district.name}</option>`;
+                });
+            }
+        }
+
+        // Hàm lấy danh sách phường/xã theo quận/huyện
+        async function fetchWards(districtCode, isEdit = false) {
+            const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
+            const district = await response.json();
+            if (isEdit) {
+                wardSelect.innerHTML = `<option value="" selected >Chọn Phường/Xã</option>`;
+                district.wards.forEach(ward => {
+                    wardSelect.innerHTML += `<option value="${ward.code}" style="font-size: 14px; font-weight: 500;">${ward.name}</option>`;
+                });
+            } else {
+                wardSelect.innerHTML = `<option value="" selected >Chọn Phường/Xã</option>`;
+                district.wards.forEach(ward => {
+                    wardSelect.innerHTML += `<option value="${ward.code}" style="font-size: 14px; font-weight: 500;">${ward.name}</option>`;
+                });
+            }
+        }
+        
         
                 // Hàm để điền dữ liệu vào các trường thông tin đặt hàng
-                function fillAddressForm(data) {
+                async function fillAddressForm(data) {
                     const { email, defaultAddress } = data;
                     document.getElementById('name').value = defaultAddress.nameKH;
                     document.getElementById('phoneNumber').value = defaultAddress.phoneNumber;
                     document.getElementById('address').value = defaultAddress.address;
-                    document.getElementById('citySelect').value = defaultAddress.city;
-                    document.getElementById('districtSelect').value = defaultAddress.district;
-                    document.getElementById('wardSelect').value = defaultAddress.ward;
+
+                    const cityCode = await getCityValueByName(defaultAddress.city);
+                    document.getElementById('citySelect').value = cityCode;
+                    // Lấy danh sách huyện theo tỉnh đã chọn
+                    await fetchDistricts(cityCode, true);
+                    districtCode = await getDistrictValueByName(cityCode, defaultAddress.district);
+                    document.getElementById('districtSelect').value = districtCode;
+                    await fetchWards(districtCode, true);
+                    wardCode = await getWardValueByName(districtCode, defaultAddress.ward);
+                    document.getElementById('wardSelect').value = wardCode;
+                    
                     document.getElementById('email').value = email;
                 }
         
                 // Gọi hàm fetchDefaultAddress khi trang được tải
                 const userId = cart.userId; // Giả sử bạn đã có userId từ trước
                 fetchDefaultAddress(userId);
+                fetchAddresses(userId);
             });
         
         

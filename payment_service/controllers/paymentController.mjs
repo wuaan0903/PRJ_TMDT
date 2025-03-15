@@ -1,7 +1,7 @@
 // paymentController.mjs
 import { createOrder, processPayment, getOrderById, getOrdersByUser, createVnPayPaymentUrl, getOrders, getProductsByOrderId, updateOrderStatus, createZaloPayPaymentRequest, deleteOrder } from '../services/paymentService.mjs';
 import axios from 'axios';
-
+import Order from '../models/Order.js'; // Giả sử bạn có model Order
 
 export const placeOrder = async (req, res) => {
     const { userId,name,email, address, phoneNumber, items, paymentMethod, voucherCode } = req.body;
@@ -146,6 +146,28 @@ export const updateOrderStatusCon = async (req, res) => {
     res.status(500).send('Server error');
   }
 }
+
+
+export const updateOrderRating = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+      const order = await Order.findById(orderId);
+
+      if (!order) {
+          return res.status(404).json({ message: 'Order not found' });
+      }
+
+      order.rating = true;
+      await order.save();
+
+      res.status(200).json({ message: 'Order rating updated successfully' });
+  } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+
 
 //VNPAY CALLBACK
 export const vnpayCallback = async (req, res) => {

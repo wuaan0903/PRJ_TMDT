@@ -62,5 +62,9 @@ router.put('/api/orders/:id', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/payments/${req.params.id}`, 'put');
 });
 
+router.put('/api/orders/rating/:id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/payments/rating/${req.params.id}`, 'put');
+});
+
 
 module.exports = router;
