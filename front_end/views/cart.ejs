@@ -52,6 +52,12 @@
             /* Đảm bảo có màu đúng */
             opacity: 1;
         }
+        button.disabled {
+            background-color: #ccc !important;
+            cursor: not-allowed !important;
+            border: none;
+
+        }
     </style>
     <section style="padding-top: 82px;">
         <div class="container my-5" style="
@@ -199,9 +205,10 @@
                 <!-- Giỏ hàng -->
                 <div class="col-lg-5">
                     <h4 class="mb-3 fw-bold letter-spacing fs-3">Giỏ hàng</h4>
-                    <div class="border p-3 mb-3" style="max-height: 420px; overflow-y: scroll;" id="cart-items-container"><div class="d-flex justify-content-between mb-3">
-                    <img src="http://localhost:3002/api/products/thumbnail/img_1739764847669.webp" alt="Sản phẩm" class="me-3" style="height: 120px; object-fit: cover;">
-                        <div class="d-flex flex-column align-items-start justify-content-between w-100">
+                    <div class="border p-3 mb-3" style="max-height: 420px; overflow-y: scroll;" id="cart-items-container">
+                        <div class="d-flex justify-content-between mb-3">
+                            <img src="http://localhost:3002/api/products/thumbnail/img_1739764847669.webp" alt="Sản phẩm" class="me-3" style="height: 120px; object-fit: cover;">
+                            <div class="d-flex flex-column align-items-start justify-content-between w-100">
                             <h6 class="mb-1 fw-medium letter-spacing">Áo Nỉ chui đầu Essentials</h6>
                                 <div class="d-flex w-100 justify-content-between">
                                     <select id="size-67b2b476638c8666ec776a36" class="form-select rounded-pill w-25 fw-medium size-select" name="size" aria-label="Default select example" data-size="L" data-item-id="67b2b476638c8666ec776a36">
@@ -226,8 +233,10 @@
                                 <button class="btn btn-light text-dark fw-medium delete-button" data-item-id="67b2b476638c8666ec776a36">
                                     <i class="bx bx-trash"></i>
                                     Xóa</button>
+                            
                             </div>
-                    </div>
+                        </div>
+                
                 
                 </div>
                  
@@ -260,7 +269,7 @@
                                 <span style="
                                 font-size: 14px;
                                 font-weight: 600;
-                            " id="subtotal">199.000đ</span>
+                            " id="subtotal">0đ</span>
 
                             </p>
                         </div>
@@ -300,7 +309,7 @@
                         <div class="d-flex justify-content-between align-items-center pricing-info__total mt-3">
                             <p class="pricing-info__total_title mb-0 text-black fw-bold letter-spacing">Tổng</p>
                             <p class="mb-0 text-end">
-                                <span class="total text-black fw-bold" id="total">199.000đ</span>
+                                <span class="total text-black fw-bold" id="total">0đ</span>
 
                             </p>
                         </div>
@@ -495,104 +504,134 @@
                 document.getElementById('total').textContent = subtotal.toLocaleString('vi-VN') + 'đ';
             }
 
-        async function renderCartItems(items) {
-            const cartContainer = document.getElementById('cart-items-container');
-            if (!cartContainer) {
-                console.error("Cart container element not found!");
-                return;
-            }
-            cartContainer.innerHTML = '';
-    
-            if (!items || items.length === 0) {
-                cartContainer.innerHTML = '<p>Your cart is empty.</p>';
-                return;
-            }
-    
-            for (const item of items) {
-                const product = await fetchProduct(item.productId);
-                if (product === null) {
-                    continue; // Skip if price not found
+            async function renderCartItems(items) {
+                const cartContainer = document.getElementById('cart-items-container');
+                const voucherButton = document.querySelector('button[onclick="applyVoucher()"]');
+                const orderButton = document.getElementById('order-button');
+            
+                if (!cartContainer) {
+                    console.error("Cart container element not found!");
+                    return;
                 }
-                //   item.price = product.price.toLocaleString('vi-VN') + 'đ';
-                item.price = product.price;
-                const itemElement = document.createElement('div');
-                itemElement.classList.add('d-flex', 'justify-content-between', 'mb-3');
-                itemElement.innerHTML = `
-                    <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}" alt="Sản phẩm" class="me-3" style="height: 120px; object-fit: cover;">
+            
+                cartContainer.innerHTML = '';
+            
+                if (!items || items.length === 0) {
+                    // Hiển thị thông báo giỏ hàng trống
+                    cartContainer.innerHTML = '<p class="text-center fw-bold" style="font-size: 16px;margin:0;">Giỏ hàng đang trống! Hãy mua sắm ngay nhé!</p>';
+            
+                    // Vô hiệu hóa các nút
+                    if (voucherButton) {
+                        voucherButton.disabled = true;
+                        voucherButton.classList.add('disabled');
+                    }
+                    if (orderButton) {
+                        orderButton.disabled = true;
+                        orderButton.classList.add('disabled');
+                    }
+            
+                    return;
+                }
+            
+                // Nếu giỏ hàng không trống, bật lại các nút
+                if (voucherButton) {
+                    voucherButton.disabled = false;
+                    voucherButton.classList.remove('disabled');
+                }
+                if (orderButton) {
+                    orderButton.disabled = false;
+                    orderButton.classList.remove('disabled');
+                }
+            
+                for (const item of items) {
+                    const product = await fetchProduct(item.productId);
+                    if (product === null) {
+                        continue; // Skip if product not found
+                    }
+            
+                    item.price = product.price;
+                    const itemElement = document.createElement('div');
+                    itemElement.classList.add('d-flex', 'justify-content-between', 'mb-3');
+                    itemElement.innerHTML = `
+                        <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}" alt="Sản phẩm" class="me-3" style="height: 120px; object-fit: cover;">
                         <div class="d-flex flex-column align-items-start justify-content-between w-100">
-                            <h6 class="mb-1 letter-spacing" style="
-    font-size: 14px;
-    font-weight: 600;
-">${product.name}</h6>
-                                <div class="d-flex w-100 justify-content-between">
-                                    <select id="size-${item._id}" class="form-select rounded-pill w-25 size-select" name="size" aria-label="Default select example" data-size="${item.size}" data-item-id="${item._id}" style="
-    font-size: 13px;
-    font-weight: 600;
-">
-                                        <option value="S" ${item.size === 'S' ? 'selected' : ''}>S</option>
-                                        <option value="M" ${item.size === 'M' ? 'selected' : ''}>M</option>
-                                        <option value="L" ${item.size === 'L' ? 'selected' : ''}>L</option>
-                                        <option value="XL" ${item.size === 'XL' ? 'selected' : ''}>XL</option>
-                                        <option value="2XL" ${item.size === '2XL' ? 'selected' : ''}>2XL</option>
-                                        <option value="3XL" ${item.size === '3XL' ? 'selected' : ''}>3XL</option>
-                                    </select>
-                                    <div class="quantity-area d-flex align-items-center ms-5">
-                                        <button type="button" class="qty-btn fw-bold" data-item-id="${item._id}" onclick="decreaseQuantity(this)">-</button>
-                                        <input type="text" id="quantity-${item._id}" name="quantity" value="${item.quantity}" min="1" class="form-control text-center quantity-input fw-bold" style="width: 40px;" data-item-id="${item._id}">
-                                        <button type="button" class="qty-btn fw-bold" data-item-id="${item._id}"  onclick="increaseQuantity(this)">+</button>
-                                    </div>
-                                    <div>
-                                        <p class=" fw-bold " style="
-    margin: 10px 0;
-">${product.price.toLocaleString('vi-VN') + 'đ'}</p>
-                                    </div>
+                            <h6 class="mb-1 letter-spacing" style="font-size: 14px; font-weight: 600;">${product.name}</h6>
+                            <div class="d-flex w-100 justify-content-between">
+                                <select id="size-${item._id}" class="form-select rounded-pill w-25 size-select" name="size" aria-label="Default select example" data-size="${item.size}" data-item-id="${item._id}" style="font-size: 13px; font-weight: 600;">
+                                    <option value="S" ${item.size === 'S' ? 'selected' : ''}>S</option>
+                                    <option value="M" ${item.size === 'M' ? 'selected' : ''}>M</option>
+                                    <option value="L" ${item.size === 'L' ? 'selected' : ''}>L</option>
+                                    <option value="XL" ${item.size === 'XL' ? 'selected' : ''}>XL</option>
+                                    <option value="2XL" ${item.size === '2XL' ? 'selected' : ''}>2XL</option>
+                                    <option value="3XL" ${item.size === '3XL' ? 'selected' : ''}>3XL</option>
+                                </select>
+                                <div class="quantity-area d-flex align-items-center ms-5">
+                                    <button type="button" class="qty-btn fw-bold" data-item-id="${item._id}" onclick="decreaseQuantity(this)">-</button>
+                                    <input type="text" id="quantity-${item._id}" name="quantity" value="${item.quantity}" min="1" class="form-control text-center quantity-input fw-bold" style="width: 40px;" data-item-id="${item._id}">
+                                    <button type="button" class="qty-btn fw-bold" data-item-id="${item._id}" onclick="increaseQuantity(this)">+</button>
                                 </div>
-                                    
-                                
-                                <button class="btn btn-light text-dark delete-button" data-item-id="${item._id}" style="
-    border-radius: 30px;
-    font-size: 12px;
-    font-weight: 600;
-">
-                                    <i class='bx bx-trash'></i>
-                                    Xóa</button>
+                                <div>
+                                    <p class="fw-bold" style="margin: 10px 0;">${product.price.toLocaleString('vi-VN')}đ</p>
+                                </div>
                             </div>
-                `;
-                cartContainer.appendChild(itemElement);
-                
-            }
+                            <button class="btn btn-light text-dark delete-button" data-item-id="${item._id}" style="border-radius: 30px; font-size: 12px; font-weight: 600;">
+                                <i class='bx bx-trash'></i> Xóa
+                            </button>
+                        </div>
+                    `;
+                    cartContainer.appendChild(itemElement);
+                }
+            
                 calculateTotals(items);
+            
                 // Add event listeners for delete buttons
                 const deleteButtons = document.querySelectorAll('.delete-button');
                 deleteButtons.forEach(button => {
-                    button.addEventListener('click', function() {
+                    button.addEventListener('click', function () {
                         const itemId = this.getAttribute('data-item-id');
                         deleteCartItem(itemId, cart._id);
                     });
                 });
-                    
-                
-                    // Add event listeners to quantity inputs
-                    const quantityInputs = document.querySelectorAll('.quantity-input');
-                    quantityInputs.forEach(input => {
-                        input.addEventListener('change', function () {
-                            const itemId = this.getAttribute('data-item-id');
-                            const quantity = parseInt(this.value) || 1;
-                            updateCartItemQuantity(itemId, quantity, cart._id);
-                        });
-                    });
-                    
-                    const sizeSelects = document.querySelectorAll('.size-select');
-                    sizeSelects.forEach(select => {
-                        select.addEventListener('change', function () {
-                            const itemId = this.closest('.d-flex.justify-content-between.mb-3').querySelector('.delete-button').getAttribute('data-item-id');
-                            const size = this.value;
-                            
-                            updateCartItemSize(itemId, size, cart._id);
-                        });
-                    });
-        }
+            
+                // Add event listeners to quantity inputs
+                const quantityInputs = document.querySelectorAll('.quantity-input');
+                quantityInputs.forEach(input => {
+                    input.addEventListener('change', function () {
+                        const itemId = this.getAttribute('data-item-id');
+                        const quantity = parseInt(this.value) || 1;
+                        updateCartItemQuantity(itemId, quantity, cart._id);
 
+                        const notyf = new Notyf({
+                            position: {
+                              x: "right", // "left" hoặc "right"
+                              y: "top",   // "top" hoặc "bottom"
+                            },
+                          });
+                          
+                          notyf.success("Cập nhật giỏ hàng thành công !");
+                          
+
+                    });
+                });
+            
+                const sizeSelects = document.querySelectorAll('.size-select');
+                sizeSelects.forEach(select => {
+                    select.addEventListener('change', function () {
+                        const itemId = this.closest('.d-flex.justify-content-between.mb-3').querySelector('.delete-button').getAttribute('data-item-id');
+                        const size = this.value;
+            
+                        updateCartItemSize(itemId, size, cart._id);
+                        const notyf = new Notyf({
+                            position: {
+                              x: "right", // "left" hoặc "right"
+                              y: "top",   // "top" hoặc "bottom"
+                            },
+                          });
+                          
+                          notyf.success("Cập nhật giỏ hàng thành công !");
+                    });
+                });
+            }
         async function updateCartItemSize(itemId, size, cartId) {
             try {
                         const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
@@ -618,32 +657,60 @@
                     }
         }
 
+        // Cập nhật số lượng sản phẩm trong giỏ hàng
         async function updateCartItemQuantity(itemId, quantity, cartId) {
             try {
-                        const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ quantity: quantity }),
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error(`Failed to update cart item: ${response.statusText}`);
-                        }
-        
-                        const updatedCart = await response.json();
-                        console.log("updated cart after change quantity: ", updatedCart)
-                            //fetchCart(); we dont need to fetch again since cart is already passed in
-                            renderCartItems(updatedCart.items)
-        
-                    } catch (error) {
-                            console.error('Error updating cart item quantity:', error);
-                            alert('Failed to update cart item quantity. Please try again.');
-                    }
+                const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ quantity: quantity }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to update cart item: ${response.statusText}`);
+                }
+
+                const updatedCart = await response.json();
+                cart.items = updatedCart.items; // Cập nhật lại biến `cart`
+                renderCartItems(updatedCart.items);
+            } catch (error) {
+                console.error('Error updating cart item quantity:', error);
+                alert('Failed to update cart item quantity. Please try again.');
+            }
+        }
+
+        // Cập nhật kích thước sản phẩm trong giỏ hàng
+        async function updateCartItemSize(itemId, size, cartId) {
+            try {
+                const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ size: size }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to update cart item: ${response.statusText}`);
+                }
+
+                const updatedCart = await response.json();
+                cart.items = updatedCart.items; // Cập nhật lại biến `cart`
+                renderCartItems(updatedCart.items);
+            } catch (error) {
+                console.error('Error updating cart item size:', error);
+                alert('Failed to update cart item size. Please try again.');
+            }
         }
 
         async function deleteCartItem(itemId, cartId) {
+            const notyf = new Notyf({
+                position: { x: "right", y: "top" }, // Hiển thị ở góc trên phải
+                duration: 3000, // Hiển thị trong 3 giây
+                ripple: true, // Hiệu ứng sóng
+              });
             try {
                 const response = await fetch(`/api/cart/${cartId}/${itemId}`, {
                     method: 'DELETE'
@@ -655,6 +722,7 @@
         
                 const updatedCart = await response.json();
                 console.log("updated cart after delete: ", updatedCart)
+                notyf.success("Xóa sản phẩm khỏi giỏ hàng thành công !");
                 // fetchCart(); we dont need to fetch again since cart is already passed in
                 renderCartItems(updatedCart.items)
             } catch (error) {
@@ -662,15 +730,51 @@
                 alert('Failed to delete cart item. Please try again.');
             }
             }
+
+            
             //ham xu ly dat hang
             async function handleOrderSubmit(event) {
+                const notyf = new Notyf({
+                    position: { x: "right", y: "top" }, // Hiển thị ở góc trên phải
+                    duration: 3000, // Hiển thị trong 3 giây
+                    ripple: true, // Hiệu ứng sóng
+                  });
                 event.preventDefault();
-                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+                
+
+                // Lấy giá trị từ form
+                const paymentMethodEl = document.querySelector('input[name="payment-method"]:checked');
                 const address = getAddress();
-                const phoneNumber = document.getElementById('phoneNumber').value;
-                const voucherCode = document.getElementById('voucherCodeInput').value;
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
+                const phoneNumber = document.getElementById('phoneNumber').value.trim();
+                const voucherCode = document.getElementById('voucherCodeInput').value.trim();
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+
+
+                // Kiểm tra các trường có rỗng không
+                if (!name) {
+                    notyf.error("Vui lòng nhập họ và tên!");
+                    return;
+                }
+                if (!email) {
+                    notyf.error("Vui lòng nhập email!");
+                    return;
+                }
+                if (!address) {
+                    notyf.error("Vui lòng nhập địa chỉ giao hàng!");
+                    return;
+                }
+                if (!phoneNumber) {
+                    notyf.error("Vui lòng nhập số điện thoại!");
+                    return;
+                }
+                if (!paymentMethodEl) {
+                    notyf.error("Vui lòng chọn phương thức thanh toán!");
+                    return;
+                }
+
+                // Nếu không có lỗi, tiếp tục đặt hàng
+                const paymentMethod = paymentMethodEl.value;
             
                 try {
                     const orderData = {
@@ -701,15 +805,16 @@
                     if (paymentResponse.paymentUrl) {
                         window.location.href = paymentResponse.paymentUrl;
                     } else {
-                        alert('Order placed successfully!');
-                        // Handle case where no redirect is needed, or handle failed status
+                        notyf.success("Đặt hàng thành công!");
                         console.log("Order info from backend: ", paymentResponse);
                     }
                 } catch (error) {
                     console.error('Error submitting order:', error);
-                    alert('Không đủ số lượng sản phẩm trong kho. Vui lòng thử lại sau.');
+                    notyf.error('Không đủ số lượng sản phẩm trong kho. Vui lòng thử lại sau.');
                 }
             }
+
+            
         function decreaseQuantity(button) {
             const itemId = button.getAttribute('data-item-id');
             let quantityInput = document.getElementById(`quantity-${itemId}`);
@@ -818,9 +923,14 @@
 
 
           async function applyVoucher() {
+            const notyf = new Notyf({
+                position: { x: "right", y: "top" }, // Hiển thị ở góc trên phải
+                duration: 3000, // Hiển thị trong 3 giây
+                ripple: true, // Hiệu ứng sóng
+              });
             const voucherCode = document.getElementById('voucherCodeInput').value;
             if (!voucherCode) {
-                alert('Vui lòng nhập mã giảm giá.');
+                notyf.error("Vui lòng nhập mã giảm giá !");
                 return;
             }
         
@@ -835,13 +945,13 @@
                 if (voucher && voucher.isActive) {
                     const discountAmount = calculateDiscount(voucher);
                     updateTotal(discountAmount);
-                    alert('Áp dụng mã giảm giá thành công.');
+                    notyf.success("Áp dụng mã giảm giá thành công !");
                 } else {
-                    alert('Mã giảm giá không hợp lệ hoặc đã hết hạn.');
+                    notyf.error("Mã giảm giá không hợp lệ !");
                 }
             } catch (error) {
                 console.error('Lỗi khi áp dụng mã giảm giá:', error);
-                alert('Đã xảy ra lỗi khi áp dụng mã giảm giá.');
+                notyf.error("Mã giảm giá không hợp lệ !");
             }
         }
         
