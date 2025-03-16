@@ -32,47 +32,26 @@
   </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const productTableBody = document.getElementById("product-table-body");
 
-    // Function to fetch product data from API
     const fetchProducts = async () => {
       try {
         const response = await fetch("/api/admin/products");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         let products = await response.json();
-
-        // Fetch collection and category names for each product
         products = await Promise.all(
           products.map(async (product) => {
             try {
-              // const collectionResponse = await fetch(`/api/collection/${product.collection}`);
-              // const collectionData = await collectionResponse.json();
-              const test = product.categories;
-              const categoryResponse = await fetch(
-                `/api/category/${product.categories}`
-              );
               const categoryName = product.categories.name;
-
-              const collectionResponse = await fetch(
-                `/api/collection/${product.categories.collection_id}`
-              );
+              const collectionResponse = await fetch(`/api/collection/${product.categories.collection_id}`);
               const collectionData = await collectionResponse.json();
-              return {
-                ...product,
-                collectionName: collectionData.name,
-                categoryName: categoryName,
-              };
+              return { ...product, collectionName: collectionData.name, categoryName };
             } catch (error) {
               console.error("Error fetching collection or category:", error);
-              return {
-                ...product,
-                collectionName: "Unknown Collection",
-                categoryName: "Unknown Category",
-              };
+              return { ...product, collectionName: "Unknown Collection", categoryName: "Unknown Category" };
             }
           })
         );
@@ -83,45 +62,31 @@
       }
     };
 
-    // Function to render products to the table
     const renderProducts = (products) => {
       let tableRows = "";
       products.forEach((product) => {
         tableRows += `
-                <tr>
-                    <td><img src="http://localhost:3002/api/products/thumbnail/${
-                      product.thumbnail
-                    }"></td>
-                    <td style="width: 40%;">${product.name}</td>
-                    <td>${product.collectionName}</td>
-                    <td>${product.categoryName}</td>
-                    <td>${product.price} ₫</td>
-                    <td>
-                        <label class="switch">
-                            <input type="checkbox" class="status-toggle" data-id="${
-                              product._id
-                            }" ${product.status ? "checked" : ""}  ${
-          product.status ? "checked" : ""
-        }>
-                            <span class="slider"></span>
-                        </label>
-                    </td>
-                    <td><a href="/admin/products/edit/${
-                      product._id
-                    }"><span class="btn btn-primary">Sửa</span></a></td>
-                    <td>
-                        <button type="button" class="btn btn-danger" onclick="confirmDelete('${
-                          product._id
-                        }')">Xóa</button>
-                    </td>   
-                </tr>
-                `;
+          <tr>
+            <td><img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}"></td>
+            <td style="width: 40%;">${product.name}</td>
+            <td>${product.collectionName}</td>
+            <td>${product.categoryName}</td>
+            <td>${product.price} ₫</td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" class="status-toggle" data-id="${product._id}" ${product.status ? "checked" : ""}>
+                <span class="slider"></span>
+              </label>
+            </td>
+            <td><a href="/admin/products/edit/${product._id}"><span class="btn btn-primary">Sửa</span></a></td>
+            <td>
+              <button type="button" class="btn btn-danger" onclick="confirmDelete('${product._id}')">Xóa</button>
+            </td>
+          </tr>
+        `;
       });
       productTableBody.innerHTML = tableRows;
-
-      // Add event listeners to status toggle after rendering products
-      const statusToggles = document.querySelectorAll(".status-toggle");
-      statusToggles.forEach((toggle) => {
+      document.querySelectorAll(".status-toggle").forEach((toggle) => {
         toggle.addEventListener("change", handleStatusChange);
       });
     };
@@ -130,53 +95,51 @@
       const checkbox = event.target;
       const productId = checkbox.dataset.id;
       const newStatus = checkbox.checked;
-
       try {
         const response = await fetch(`/api/product/${productId}`, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: newStatus }),
         });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         console.log(`Product ID ${productId} status updated to ${newStatus}`);
-        // Optionally update the UI or refresh product table
-        //fetchProducts(); // Refresh the table after the update
       } catch (error) {
         console.error("Error updating product status:", error);
-        checkbox.checked = !newStatus; // Revert the checkbox in case of an error
+        checkbox.checked = !newStatus;
       }
     };
 
     fetchProducts();
 
     window.confirmDelete = async (id) => {
-      if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
-        try {
-          const response = await fetch(`/api/product/${id}`, {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-
-          if (response.ok) {
-            console.log(`Product ID ${id} was deleted successfully`);
-            fetchProducts(); // Refresh the table after the delete
-          } else {
-            const errorData = await response.json();
-            console.error("Error deleting product:", errorData);
-            alert("Could not delete the product");
+      Swal.fire({
+        title: "Bạn có chắc chắn muốn xóa sản phẩm này?",
+        text: "Hành động này không thể hoàn tác!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Xóa",
+        cancelButtonText: "Hủy",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(`/api/product/${id}`, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+            });
+            if (response.ok) {
+              Swal.fire("Đã xóa!", "Sản phẩm đã bị xóa thành công.", "success");
+              fetchProducts();
+            } else {
+              Swal.fire("Lỗi!", "Không thể xóa sản phẩm.", "error");
+            }
+          } catch (error) {
+            console.error("Error deleting product:", error);
+            Swal.fire("Lỗi!", "Đã xảy ra lỗi khi xóa sản phẩm.", "error");
           }
-        } catch (error) {
-          console.error("Error deleting product:", error);
-          alert("Could not delete the product");
         }
-      }
+      });
     };
   });
 </script>
