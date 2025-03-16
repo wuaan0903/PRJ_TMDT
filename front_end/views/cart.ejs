@@ -471,8 +471,9 @@
         
         
         // Assume you have a way to get the userId (e.g., from user context, cookie, or local storage)
-        const cart = <%- JSON.stringify(cart) %>;
-        const userId = cart.userId;
+        const cart = <%- JSON.stringify(cart) %> || {}; 
+        const userId = cart && cart.userId ? cart.userId : null;
+
         const PRODUCT_API_URL = 'http://localhost:3002/api/products';
         
 

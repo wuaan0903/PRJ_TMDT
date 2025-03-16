@@ -143,25 +143,7 @@ export const createVnPayPaymentUrl = async (orderId, clientIp) => {
   if (!order) {
     throw new Error('Order not found');
   }
-
-      // Get the total amount from the product API.
-      const items = await ProductOrder.find({orderId: orderId});
-  
-      let totalPrice = 0;
-      for (const item of items) {
-          try{
-              const productPriceResponse = await axios.get(`http://localhost:3002/api/products/${item.productId}`);
-              const price = productPriceResponse.data.price;
-               totalPrice += price * item.quantity;
-  
-          } catch (error) {
-              console.error(`Error fetching price for product ID ${item.productId}:`, error);
-              // You might want to handle this error gracefully, 
-              // e.g., by logging it, returning a default price, or setting a default message for the user.
-              //For now, we are skip this product price
-          }
-       }
-    // const totalPrice = 18060;
+      let totalPrice = order.totalAmount;
 
   const tmnCode = process.env.VNP_TMN_CODE;
   const secretKey = process.env.VNP_SECRET_KEY;
@@ -342,3 +324,7 @@ export const deleteOrder = async (orderId) => {
   await order.deleteOne({order: orderId});
   return order;
 }
+
+export const updateOrderPaymentStatus = async (orderId, updateData) => {
+  return await Order.findByIdAndUpdate(orderId, updateData, { new: true });
+};

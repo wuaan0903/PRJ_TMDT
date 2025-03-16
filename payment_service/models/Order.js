@@ -44,6 +44,12 @@ const OrderSchema = new mongoose.Schema({
     enum: ['COD', 'momo', 'vnpay', 'zalopay'],
     required: true
   },
+  paymentStatus: {
+    type: Boolean,
+    enum: ['true', 'false'],
+    default: 'false',
+    required: true
+  },
   rating : {
     type: Boolean, default: false
   },
