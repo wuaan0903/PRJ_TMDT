@@ -150,17 +150,17 @@
         <div class="col-md-3">
             <div class="p-5 bg-body-secondary text-center rounded me-5">
                 <h5 class="fw-bold" style="letter-spacing: -1px;font-size: 24px;">ĐÁNH GIÁ SẢN PHẨM</h5>
-                <h1 class="fw-bold" style="font-size: 50px;">4.9</h1>
+                <h1 class="fw-bold" id="averageRating" style="font-size: 50px;">0.0</h1>
                 <div class="mb-2" style="color: rgb(255 180 2);">
                     <div class="fs-1">
-                        <i class='bx bxs-star' ></i>
-                        <i class='bx bxs-star' ></i>
-                        <i class='bx bxs-star' ></i>
-                        <i class='bx bxs-star' ></i>
-                        <i class='bx bxs-star' ></i>
+                        <i class='bx bxs-star'></i>
+                        <i class='bx bxs-star'></i>
+                        <i class='bx bxs-star'></i>
+                        <i class='bx bxs-star'></i>
+                        <i class='bx bxs-star'></i>
                     </div>
                 </div>
-                <p class="mb-0" style="letter-spacing: -1px;font-style: italic;font-weight: 500;">5 đánh giá</p>
+                <p class="mb-0" id="totalReviews" style="letter-spacing: -1px;font-style: italic;font-weight: 500;">0 đánh giá</p>
             </div>
         </div>
         <div class="col-md-9">
@@ -465,20 +465,53 @@ async function fetchReviews(productId) {
     }
 }
 
+function calculateAverageRating(reviews) {
+    if (reviews.length === 0) {
+        return 0; // Nếu không có đánh giá, trả về 0
+    }
+
+    const totalStars = reviews.reduce((sum, review) => sum + review.rate, 0);
+    return (totalStars / reviews.length).toFixed(1); // Tính trung bình và làm tròn đến 1 chữ số thập phân
+}
+
 function displayReviews(reviews) {
     const reviewsContainer = document.getElementById('reviewsContainer');
+    const averageRatingElement = document.getElementById('averageRating'); // Phần tử hiển thị trung bình số sao
+    const totalReviewsElement = document.getElementById('totalReviews'); // Phần tử hiển thị tổng số đánh giá
+    const starContainer = document.querySelector('.fs-1'); // Phần tử chứa các ngôi sao
+
     reviewsContainer.innerHTML = ''; // Xóa các review hiện có
 
     if (reviews.length === 0) {
         reviewsContainer.innerHTML = '<p>Không có đánh giá nào cho sản phẩm này.</p>';
+        averageRatingElement.textContent = '0.0'; // Hiển thị 0.0 nếu không có đánh giá
+        totalReviewsElement.textContent = '0 đánh giá';
+        starContainer.innerHTML = `${'☆'.repeat(5)}`; // Hiển thị 5 ngôi sao rỗng
         return;
     }
 
+    // Tính trung bình số sao
+    const averageRating = calculateAverageRating(reviews);
+
+    // Hiển thị trung bình số sao và tổng số đánh giá
+    averageRatingElement.textContent = averageRating;
+    totalReviewsElement.textContent = `${reviews.length} đánh giá`;
+
+    // Hiển thị số sao tương ứng với đánh giá trung bình
+    const fullStars = Math.floor(averageRating); // Số sao đầy
+    const halfStar = averageRating % 1 >= 0.5 ? 1 : 0; // Kiểm tra có sao nửa không
+    const emptyStars = 5 - fullStars - halfStar; // Số sao rỗng
+
+    starContainer.innerHTML = `
+        ${'★'.repeat(fullStars)}${'⯪'.repeat(halfStar)}${'☆'.repeat(emptyStars)}
+    `;
+
+    // Hiển thị danh sách đánh giá
     reviews.forEach(review => {
         const reviewElement = document.createElement('div');
-        reviewElement.classList.add('list-group-item', 'pt-4', 'pb-3','border-top');
+        reviewElement.classList.add('list-group-item', 'pt-4', 'pb-3', 'border-top');
         reviewElement.style.width = "50%"; // ✅ Thêm width = 50%
-    
+
         reviewElement.innerHTML = `
             <div class="fs-4">
                 ${'★'.repeat(review.rate)}${'☆'.repeat(5 - review.rate)}
@@ -487,12 +520,10 @@ function displayReviews(reviews) {
             <p class="mt-4 mb-4" style="font-size: 13px; font-weight:600;">${review.comment}</p>
             <h5 class="text-secondary" style="font-size: 13px;">${new Date(review.createdAt).toLocaleDateString()}</h5>
         `;
-    
+
         reviewsContainer.appendChild(reviewElement);
     });
-    
 }
-
 
 </script>
 

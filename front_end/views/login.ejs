@@ -37,11 +37,17 @@
                 <div class="mb-3">
                     <label for="loginEmail" class="form-label fw-medium">Email</label>
                     <input type="email" class="form-control" id="loginEmail" placeholder="Email" required>
+                    <div id="emailError" class="text-danger mb-2" style="display: none;"></div>
                 </div>
-                <div class="mb-4">
+                <div class="mb-4 position-relative">
                     <label for="loginPassword" class="form-label fw-medium">Mật khẩu</label>
-                    <input type="password" class="form-control" id="loginPassword" placeholder="Mật khẩu" required>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="loginPassword" placeholder="Mật khẩu" required>
+                        <span id="togglePassword" class="input-group-text" style="cursor: pointer;">👁</span>
+                    </div>
+                    <div id="passwordError" class="text-danger mb-2" style="display: none;"></div>
                 </div>
+                
                 <div id="loginError" class="text-danger mb-3" style="display: none;"></div>
                 <button type="submit" class="btn-submit">ĐĂNG NHẬP</button>
                 
@@ -64,53 +70,106 @@
                 console.error('Error checking user login status:', error);
             }
         }
+    // Kiểm tra email có đúng định dạng không
+        function validateLoginEmail() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const emailError = document.getElementById('emailError');
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    document.getElementById('loginForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        const errorDiv = document.getElementById('loginError');
-
-        
-
-        try {
-            const response = await fetch('/api/login', { // Added cache control
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                 },
-                  
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Handle successful login (e.g., redirect to home page)
-                Swal.fire({
-                    icon: 'success',
-                    title: "Đăng nhập thành công !",
-                    text: "Đang chuyển hướng, vui lòng chờ...",
-                    timer: 1200,
-                    timerProgressBar: true,
-                    showConfirmButton: false,
-                }).then(() => {
-                    window.location.href = '/';
-                });
-                
+            if (!email) {
+                emailError.textContent = "Vui lòng nhập email!";
+                emailError.style.display = "block";
+                return false;
+            } else if (!emailPattern.test(email)) {
+                emailError.textContent = "Email không đúng định dạng!";
+                emailError.style.display = "block";
+                return false;
             } else {
-                // Handle login error (e.g., display. Please try again later.';
-                errorDiv.textContent = data.message || 'Login failed. Please try again.';
-                errorDiv.style.display = 'block';
+                emailError.style.display = "none";
+                return true;
             }
         }
-         catch (error) {
-                console.error('Error during login:', error);
-                 errorDiv.textContent =  'An error occurred. Please try again.'; // Show error
-                errorDiv.style.display = 'block';
-        }
-    });
 
+        // Kiểm tra mật khẩu có ít nhất 6 ký tự không
+        function validateLoginPassword() {
+            const password = document.getElementById('loginPassword').value.trim();
+            const passwordError = document.getElementById('passwordError');
+
+            if (!password) {
+                passwordError.textContent = "Vui lòng nhập mật khẩu!";
+                passwordError.style.display = "block";
+                return false;
+            } else if (password.length < 6) {
+                passwordError.textContent = "Mật khẩu phải có ít nhất 6 ký tự!";
+                passwordError.style.display = "block";
+                return false;
+            } else {
+                passwordError.style.display = "none";
+                return true;
+            }
+        }
+    
+        document.getElementById('loginEmail').addEventListener('input', validateLoginEmail);
+        document.getElementById('loginPassword').addEventListener('input', validateLoginPassword);
+
+        document.getElementById('loginForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const emailValid = validateLoginEmail();
+                const passwordValid = validateLoginPassword();
+
+                if (!emailValid || !passwordValid) {
+                    return; // Nếu có lỗi, dừng form submit
+                }
+
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                const errorDiv = document.getElementById('loginError');
+
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: "Đăng nhập thành công!",
+                            text: "Đang chuyển hướng, vui lòng chờ...",
+                            timer: 1200,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        }).then(() => {
+                            window.location.href = '/';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Vui lòng kiểm tra lại email hoặc mật khẩu!",
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error during login:', error);
+                    errorDiv.textContent = 'Đã xảy ra lỗi. Vui lòng thử lại sau.';
+                    errorDiv.style.display = 'block';
+                }
+            });
+
+    document.getElementById("togglePassword").addEventListener("click", function() {
+    const passwordInput = document.getElementById("loginPassword");
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text"; // Hiển thị mật khẩu
+        this.innerHTML = "🚫"; // Đổi icon thành dấu cấm 🚫
+    } else {
+        passwordInput.type = "password"; // Ẩn mật khẩu
+        this.innerHTML = "👁"; // Đổi lại icon mắt
+    }
+});
     // Check user role on page load
     document.addEventListener('DOMContentLoaded', async function() {
         await checkUserLoginStatus();

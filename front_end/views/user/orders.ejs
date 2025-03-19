@@ -412,12 +412,12 @@ padding: 0 50px;
                             padding: 10px 20px;
                             background: #f1f1f1;
                         ">
-                            <div>
+                        <div>
                             <a href="http://localhost:3000/user/orders/${order._id}" class="btn btn-custom">Chi tiết</a>
-                            ${order.status !== 'completed' && order.status !== 'cancelled' && order.status !=='processing' ? '<button id="cancellOrder" class="btn btn-custom1 cancellOrder">Hủy đơn</button>' : ''}
-                            ${order.status === 'completed' && order.rating === false ? `<button id="reviewOrder" class="btn btn-custom1 reviewOrder" data-order-id='${order._id}'>Đánh giá</button>` : ''}
+                            ${order.status !== 'completed' && order.status !== 'cancelled' && order.status !== 'processing' ? `<button id="cancellOrder" class="btn btn-custom1 cancellOrder" data-order-id="${order._id}">Hủy đơn</button>` : ''}
+                            ${order.status === 'completed' && order.rating === false ? `<button id="reviewOrder" class="btn btn-custom1 reviewOrder" data-order-id="${order._id}">Đánh giá</button>` : ''}
+                        </div>
 
-                            </div>
 
                                 
                                 <span style="
@@ -439,6 +439,39 @@ padding: 0 50px;
                             showReviewModal(orderId, products);
                         });
                     });
+
+
+                    document.querySelectorAll('.cancellOrder').forEach(button => {
+                        button.addEventListener('click', async function () {
+                            
+                            const orderId = this.getAttribute('data-order-id');
+                            const confirmation = confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?'); // Hiển thị hộp thoại xác nhận
+                
+                            if (!confirmation) return; // Nếu người dùng không xác nhận, thoát khỏi hàm
+                
+                            try {
+                                // Gọi API để cập nhật trạng thái đơn hàng thành "cancelled"
+                                const response = await fetch(`/api/orders/${orderId}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ status: 'cancelled' }),
+                                });
+                
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! Status: ${response.status}`);
+                                }
+                
+                                alert('Đơn hàng đã được hủy thành công!');
+                                fetchOrders(userId); // Tải lại danh sách đơn hàng sau khi hủy thành công
+                            } catch (error) {
+                                console.error('Error cancelling order:', error);
+                                alert('Đã xảy ra lỗi khi hủy đơn hàng. Vui lòng thử lại sau.');
+                            }
+                        });
+                    });
+            
                 }
 
 
@@ -584,8 +617,11 @@ padding: 0 50px;
                     });
                 });
             });
-    
+
+
             // Gọi hàm fetchOrders khi trang được tải
             fetchOrders();
+
+
         });
     </script>
