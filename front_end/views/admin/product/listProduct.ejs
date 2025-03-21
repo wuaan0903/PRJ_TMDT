@@ -1,6 +1,38 @@
 <%- layout('../layouts/index') %>
 
 <main id="view-panel">
+  <div class="d-flex justify-content-between align-items-center mb-4" bis_skin_checked="1">
+    <!-- Tìm kiếm đơn hàng -->
+      <div class="input-group" style="width: 40%;">
+        <span class="input-group-text" style="border-radius: 24px 0 0 24px; background: white; border-right: none;">
+            <i class="bx bx-search-alt-2"></i>
+        </span>
+        <input type="text" id="searchOrderInput" class="form-control" placeholder="Tìm kiếm sản phẩm..." style="
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: -1px;
+            border-radius: 0 24px 24px 0;
+            line-height: 2;
+            border-left: none;
+            outline: none;
+            box-shadow: none;
+        ">
+    </div>
+
+    <div class="d-flex" bis_skin_checked="1">
+      <!-- Dropdown Bộ sưu tập -->
+      <select id="filterCollection" class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" style="width: 200px; margin-right: 10px;">
+          <option value="all">Tất cả Bộ sưu tập</option>
+      </select>
+  
+      <!-- Dropdown Danh mục -->
+      <select id="filterCategory" class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" style="width: 250px;">
+          <option value="all">Tất cả Danh mục</option>
+      </select>
+  </div>
+
+</div>
+
   <div class="bg-white border rounded-4">
     <div>
       <div class="p-3 border-bottom d-flex justify-content-between">
@@ -35,6 +67,70 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const productTableBody = document.getElementById("product-table-body");
+    const searchInput = document.getElementById("searchOrderInput");
+    const filterCollection = document.getElementById("filterCollection");
+    const filterCategory = document.getElementById("filterCategory");
+
+    let allProducts = []; // Lưu trữ tất cả sản phẩm để tìm kiếm và lọc
+
+    // Hàm lấy danh sách bộ sưu tập từ API
+    const fetchCollections = async () => {
+      try {
+          const response = await fetch("/api/collections");
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const collections = await response.json();
+
+          // Thêm các tùy chọn vào dropdown Bộ sưu tập
+          collections.forEach((collection) => {
+              const option = document.createElement("option");
+              option.value = collection._id; // Sử dụng ID của bộ sưu tập
+              option.textContent = collection.name;
+              filterCollection.appendChild(option);
+          });
+      } catch (error) {
+          console.error("Error fetching collections:", error);
+      }
+  };
+  // Hàm lấy danh sách danh mục theo bộ sưu tập từ API
+  const fetchCategoriesByCollection = async (collectionId) => {
+    try {
+        const response = await fetch(`/api/categories?collectionId=${collectionId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const categories = await response.json();
+
+        // Xóa các tùy chọn cũ trong dropdown Danh mục
+        filterCategory.innerHTML = '<option value="all">Tất cả Danh mục</option>';
+
+        // Thêm các tùy chọn mới vào dropdown Danh mục
+        categories.forEach((category) => {
+            const option = document.createElement("option");
+            option.value = category._id; // Sử dụng ID của danh mục
+            option.textContent = category.name;
+            filterCategory.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+    }
+};
+// Lắng nghe sự kiện thay đổi trên dropdown Bộ sưu tập
+filterCollection.addEventListener("change", (event) => {
+  const selectedCollectionId = event.target.value;
+
+  if (selectedCollectionId === "all") {
+      // Nếu chọn "Tất cả Bộ sưu tập", hiển thị tất cả danh mục
+      filterCategory.innerHTML = '<option value="all">Tất cả Danh mục</option>';
+  } else {
+      // Lấy danh sách danh mục theo bộ sưu tập đã chọn
+      fetchCategoriesByCollection(selectedCollectionId);
+  }
+});
+
+// Gọi hàm để lấy danh sách bộ sưu tập ban đầu
+fetchCollections();
 
     // Function to fetch product data from API
     const fetchProducts = async () => {
@@ -76,6 +172,8 @@
             }
           })
         );
+        allProducts = products; // Save all products for search and filter
+
         renderProducts(products);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -125,6 +223,71 @@
         toggle.addEventListener("change", handleStatusChange);
       });
     };
+
+
+      // Hàm tìm kiếm sản phẩm theo tên
+      const searchProducts = (query) => {
+        return allProducts.filter((product) =>
+            product.name.toLowerCase().includes(query.toLowerCase())
+        );
+    };
+
+    // Hàm lọc sản phẩm theo bộ sưu tập
+    const filterByCollection = (collection) => {
+        if (collection === "all") return allProducts;
+        return allProducts.filter((product) => product.collectionName === collection);
+    };
+
+    // Hàm lọc sản phẩm theo danh mục
+    const filterByCategory = (category) => {
+        if (category === "all") return allProducts;
+        return allProducts.filter((product) => product.categoryName === category);
+    };
+
+// Hàm kết hợp tìm kiếm và lọc
+const filterAndSearchProducts = () => {
+  const searchQuery = searchInput.value.trim().toLowerCase();
+  const selectedCollection = filterCollection.value;
+  const selectedCategory = filterCategory.value;
+  const selectedCollection1 = filterCollection.options[filterCollection.selectedIndex].text;
+  const selectedCategory1 = filterCategory.options[filterCategory.selectedIndex].text;
+  
+
+  let filteredProducts = allProducts;
+
+  // Lọc theo bộ sưu tập
+  if (selectedCollection !== "all") {
+      filteredProducts = filteredProducts.filter(
+          (product) => product.collectionName === selectedCollection1
+      );
+  }
+
+  // Lọc theo danh mục
+  if (selectedCategory !== "all") {
+      filteredProducts = filteredProducts.filter(
+          (product) => product.categoryName === selectedCategory1
+      );
+  }
+
+  // Tìm kiếm theo tên
+  if (searchQuery) {
+      filteredProducts = filteredProducts.filter((product) =>
+          product.name.toLowerCase().includes(searchQuery)
+      );
+  }
+
+  renderProducts(filteredProducts); // Hiển thị sản phẩm đã lọc và tìm kiếm
+};
+
+
+      // Lắng nghe sự kiện tìm kiếm
+      searchInput.addEventListener("input", filterAndSearchProducts);
+
+// Lắng nghe sự kiện thay đổi bộ sưu tập
+filterCollection.addEventListener("change", filterAndSearchProducts);
+
+// Lắng nghe sự kiện thay đổi danh mục
+filterCategory.addEventListener("change", filterAndSearchProducts);
 
     const handleStatusChange = async (event) => {
       const checkbox = event.target;

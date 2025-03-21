@@ -37,6 +37,94 @@
         font-size: 16px;
         border: none;
     }
+
+
+
+    /* From Uiverse.io by barisdogansutcu */ 
+label {
+    background-color: white;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 15px 10px 10px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 20px;
+    border: 1px solid #dadada;
+    color: black;
+   }
+   
+   input {
+    display: none;
+   }
+   
+   input:checked + label svg {
+    fill: hsl(0deg 100% 50%);
+    stroke: hsl(0, 0%, 100%);
+    animation: heartButton 1s;
+   }
+   input:checked +label{
+    background-color: #ff3939;
+    border: 1px solid #f8f9fa;
+    color: #fff;
+   }
+   
+   @keyframes heartButton {
+    0% {
+     transform: scale(1);
+    }
+   
+    25% {
+     transform: scale(1.3);
+    }
+   
+    50% {
+     transform: scale(1);
+    }
+   
+    75% {
+     transform: scale(1.3);
+    }
+   
+    100% {
+     transform: scale(1);
+    }
+   }
+   
+   input + label .action {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+   }
+   
+   input + label .action span {
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    transition: all .5s;
+   }
+   
+   input + label .action span.option-1 {
+    transform: translate(0px,0%);
+    opacity: 1;
+   }
+   
+   input:checked + label .action span.option-1 {
+    transform: translate(0px,-100%);
+    opacity: 0;
+   }
+   
+   input + label .action span.option-2 {
+    transform: translate(0px,100%);
+    opacity: 0;
+   }
+   
+   input:checked + label .action span.option-2 {
+    transform: translate(0px,0%);
+    opacity: 1;
+   }
+   
 </style>
 <section style="padding-top: 82px;">
     <div class="container-fluid px-0">
@@ -67,16 +155,44 @@
 
                 <!-- Product Details Section -->
                 <div class="col-md-5">
+                    
+                    
+
                     <input type="hidden" id="productId" value="<%= product._id %>">
                      <input type="hidden" id="selectedSize" value="">
                     <h2 class="mb-3 fw-bold letter-spacing">
                         <%= product.name %>
                     </h2>
 
-                    <p class="fw-bold fs-4 ">
-                        <% const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
-                        <%= formattedPrice %>
-                     </p>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p class="fw-bold fs-4 ">
+                            <% const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
+                            <%= formattedPrice %>
+                         </p>
+
+                         <div class="d-flex justify-content-end align-items-center mb-3">
+                            <input type="checkbox"  id="favorite" name="favorite-checkbox" value="favorite-button">
+                            <label for="favorite" class="container" style="
+                            width: 260px;
+                            margin: 0;
+                        ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            <div class="action">
+                                <span class="option-1" style="
+                                font-size: 16px;
+                                font-weight: 600;
+                            ">Thêm vào yêu thích</span>
+                                <span class="option-2" style="
+                                font-size: 16px;
+                                font-weight: 600;
+                            ">Đã thêm vào yêu thích</span>
+                            </div>
+                            </label>
+                        </div>
+                         
+                    </div>
+
+                    
 
                     <h4 class="fs-6 fw-bold letter-spacing"> Đặc điểm nổi bật : </h4>
                     <ul>
@@ -446,9 +562,141 @@
    }
 
 
+   document.addEventListener('DOMContentLoaded', async () => {
+    const favoriteCheckbox = document.getElementById('favorite');
+    const productId = document.getElementById('productId').value;
+
+    try {
+        // Kiểm tra trạng thái đăng nhập của người dùng
+        const userInfo = await fetch('/auth/user', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!userInfo.ok) {
+            console.warn('Người dùng chưa đăng nhập.');
+            return;
+        }
+
+        const user = await userInfo.json();
+        if (!user.success) {
+            console.warn('Người dùng chưa đăng nhập.');
+            return;
+        }
+
+        const userId = user.user.user._id;
+
+        // Kiểm tra xem sản phẩm có trong danh sách yêu thích không
+        const response = await fetch(`/api/favourites/${userId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const favouriteList = await response.json();
+        const isFavourite = favouriteList.products.some(
+            (item) => item.product_id._id === productId
+        );
+
+        // Nếu sản phẩm đã có trong danh sách yêu thích, đánh dấu checkbox
+        if (isFavourite) {
+            favoriteCheckbox.checked = true;
+        }
+    } catch (error) {
+        console.error('Error checking favourite status:', error);
+    }
+});
+
+
    document.addEventListener('DOMContentLoaded', () => {
     const productId = document.getElementById('productId').value;
     fetchReviews(productId);
+
+
+        const favoriteCheckbox = document.getElementById('favorite');
+
+        
+
+        favoriteCheckbox.addEventListener('change', async () => {
+            try {
+                // Kiểm tra trạng thái đăng nhập của người dùng
+                const userInfo = await fetch('/auth/user', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!userInfo.ok) {
+                    alert('Vui lòng đăng nhập để thêm sản phẩm vào danh sách yêu thích.');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const user = await userInfo.json();
+                if (!user.success) {
+                    alert('Vui lòng đăng nhập để thêm sản phẩm vào danh sách yêu thích.');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const userId = user.user.user._id;
+
+                
+
+                if (favoriteCheckbox.checked) {
+                    // Gọi API để thêm sản phẩm vào danh sách yêu thích
+                    const response = await fetch('/api/favourites', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            product_id: productId,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const notyf = new Notyf({
+                        position: { x: "right", y: "top" }, // Hiển thị ở góc trên phải
+                        duration: 3000, // Hiển thị trong 3 giây
+                        ripple: true, // Hiệu ứng sóng
+                      });
+                      notyf.success("Đã thêm vào danh sách yêu thích!");
+
+                    
+                } else {
+                    // Gọi API để xóa sản phẩm khỏi danh sách yêu thích
+                    const response = await fetch('/api/favourites', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            product_id: productId,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const notyf = new Notyf({
+                        position: { x: "right", y: "top" }, // Hiển thị ở góc trên phải
+                        duration: 3000, // Hiển thị trong 3 giây
+                        ripple: true, // Hiệu ứng sóng
+                      });
+                    notyf.error("Đã xóa khỏi danh sách yêu thích!");
+                }
+            } catch (error) {
+                console.error('Error handling favourite action:', error);
+                alert('Không thể thực hiện thao tác, vui lòng thử lại sau.');
+            }
+        });
 });
 
 async function fetchReviews(productId) {
@@ -511,18 +759,29 @@ function displayReviews(reviews) {
         const reviewElement = document.createElement('div');
         reviewElement.classList.add('list-group-item', 'pt-4', 'pb-3', 'border-top');
         reviewElement.style.width = "50%"; // ✅ Thêm width = 50%
-
+    
+        // ✅ Kiểm tra có ảnh không
+        let imagesHTML = "";
+        if (review.image_review && review.image_review.length > 0) {
+            imagesHTML = review.image_review.map(image => `
+                <img src="http://localhost:3002/api/reviewProduct/imageReview/${image}" 
+                     alt="Product" class="img-fluid" style="max-width: 100px; margin-right: 5px;">
+            `).join('');
+        }
+    
         reviewElement.innerHTML = `
             <div class="fs-4">
                 ${'★'.repeat(review.rate)}${'☆'.repeat(5 - review.rate)}
             </div>
             <h5 class="fw-bold" style="font-size: 14px;">${review.user.username}</h5>
             <p class="mt-4 mb-4" style="font-size: 13px; font-weight:600;">${review.comment}</p>
+            <div>${imagesHTML}</div> <!-- ✅ Hiển thị danh sách ảnh nếu có -->
             <h5 class="text-secondary" style="font-size: 13px;">${new Date(review.createdAt).toLocaleDateString()}</h5>
         `;
-
+    
         reviewsContainer.appendChild(reviewElement);
     });
+    
 }
 
 </script>

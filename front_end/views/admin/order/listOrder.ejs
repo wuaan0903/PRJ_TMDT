@@ -178,6 +178,11 @@
     .status-dropdown.active .dropdown-content {
         display: block;
     }
+    input:focus, textarea:focus, select:focus {
+        outline: none !important;
+        box-shadow: none !important;
+        border-color: inherit; /* Giữ nguyên border cũ */
+    }
 </style>
 <main>
     <div class="view-panell">
@@ -193,14 +198,19 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <!-- Tìm kiếm đơn hàng -->
             <div class="input-group" style="width: 40%;">
-                <input type="text" id="searchOrderInput" class="form-control" placeholder="Tìm kiếm theo mã đơn hàng hoặc tên khách hàng"style="
-                font-size: 16px;
-                font-weight: 600;
-                letter-spacing: -1px;
-                border-radius: 24px;
-                line-height: 2;
-">
-                
+                <span class="input-group-text" style="border-radius: 24px 0 0 24px; background: white; border-right: none;">
+                    <i class='bx bx-search-alt-2'></i>
+                </span>
+                <input type="text" id="searchOrderInput" class="form-control" placeholder="Tìm kiếm theo mã đơn hàng hoặc tên khách hàng" style="
+                    font-size: 16px;
+                    font-weight: 600;
+                    letter-spacing: -1px;
+                    border-radius: 0 24px 24px 0;
+                    line-height: 2;
+                    border-left: none;
+                    outline: none;
+                    box-shadow: none;
+                ">
             </div>
 
             <div class="d-flex">
@@ -270,6 +280,7 @@
                         <th>Mã ĐH</th>
                         <th>Ngày đặt</th>
                         <th>Khách hàng</th>
+                        <th>Số điện thoại</th>
                         <th>Trạng thái đơn hàng</th>
                         <th>Phương thức thanh toán</th>
                         <th>Trạng thái thanh toán</th>
@@ -298,6 +309,7 @@
                     <td>#${order._id}</td>
                     <td>${new Date(order.date).toLocaleString()}</td>
                     <td>${order.name || 'N/A'}</td>
+                    <td>${order.phoneNumber || 'N/A'}</td>
                     <td>${statusDropdown}</td>
                     <td>${order.paymentMethod}</td>
                     <td>${order.paymentStatus ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
@@ -316,6 +328,21 @@
             console.error('Error fetching or processing orders:', error);
             orderContainer.innerHTML = '<p>Error loading orders.</p>';
         }
+    }
+
+    // Xử lý sự kiện tìm kiếm đơn hàng
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim().toLowerCase(); // Lấy giá trị tìm kiếm và chuyển về chữ thường
+        const filteredOrders = searchOrders(allOrders, query); // Lọc đơn hàng dựa trên query
+        renderOrders(filteredOrders); // Hiển thị danh sách đơn hàng đã lọc
+    });
+
+    // Hàm tìm kiếm đơn hàng theo Order ID hoặc Số điện thoại
+    function searchOrders(orders, query) {
+        const lowerCaseQuery = query.toLowerCase();
+        return orders.filter(order =>
+            order.phoneNumber && order.phoneNumber.replace(/\s+/g, '').includes(lowerCaseQuery) // Tìm theo Số điện thoại (loại bỏ khoảng trắng)
+        );
     }
 
     // Hiển thị danh sách đơn hàng
@@ -340,9 +367,10 @@
         `;
 
             row.innerHTML = `
-                <td>#${order._id.slice(-6)}</td>
+                <td>#${order._id}</td>
                 <td>${new Date(order.date).toLocaleString('vi-VN')}</td>
                 <td>${order.name || 'N/A'}</td>
+                <td>${order.phoneNumber || 'N/A'}</td>
                 <td>${statusDropdown}</td>
                 <td>${order.paymentMethod}</td>
                 <td>${order.paymentStatus ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
@@ -381,14 +409,7 @@
             return orders.filter(order => order.status === status);
         }
 
-        // Tìm kiếm đơn hàng theo mã hoặc tên khách hàng
-        function searchOrders(orders, query) {
-            const lowerCaseQuery = query.toLowerCase();
-            return orders.filter(order =>
-                order._id.toLowerCase().includes(lowerCaseQuery) ||
-                (order.name && order.name.toLowerCase().includes(lowerCaseQuery))
-            );
-        }
+        
 
 
 

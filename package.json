@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "multer": "^1.4.5-lts.1",
     "notyf": "^3.10.0",
     "toastify-js": "^1.12.0"
   }

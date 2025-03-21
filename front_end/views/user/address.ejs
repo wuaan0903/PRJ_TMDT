@@ -482,10 +482,20 @@ async function editAddress(address) {
 
             // Cập nhật địa chỉ thành công, gọi lại hàm fetchAddresses để cập nhật danh sách địa chỉ
             fetchAddresses(userId);
-
+            
+            const notyf = new Notyf({
+                position: { x: "right", y: "top" }, // Hiển thị ở góc trên phải
+                duration: 3000, // Hiển thị trong 3 giây
+                ripple: true, // Hiệu ứng sóng
+              });
+              notyf.success("Cập nhật địa chỉ thành công!");
+              
             // Đóng modal sau khi cập nhật thành công
             const editAddressModal = bootstrap.Modal.getInstance(document.getElementById('editAddressModal'));
             editAddressModal.hide();
+            setTimeout(function() {
+                window.location.reload();
+            }, 2000); // Tải lại trang sau 3 giây
         } catch (error) {
             console.error('Error updating address:', error);
         }

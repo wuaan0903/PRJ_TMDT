@@ -65,7 +65,7 @@ export const placeOrder = async (req, res) => {
         }
 
         if (paymentMethod === 'COD') {
-            return res.json({ ...order, paymentUrl: "http://localhost:3000/payment/success" });
+            return res.json({ ...order, paymentUrl: `http://localhost:3000/payment/success/${order._id}` });
         } else if (paymentMethod === 'momo') {
             return res.json({ orderId: order._id });
         } else if (paymentMethod === 'vnpay') {
@@ -96,12 +96,17 @@ export const payOrder = async (req, res) => {
 export const getOrder = async (req, res) => {
   const { orderId } = req.params;
 
-  try {
-    const order = await getOrderById(orderId);
-    res.json(order);
-  } catch (err) {
-    res.status(500).send('Server error');
-  }
+    try {
+        const order = await Order.findById(orderId).populate('products.productId');
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        res.json(order);
+    } catch (error) {
+        console.error('Error fetching order:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 };
 
 export const getUserOrders = async (req, res) => {

@@ -1,0 +1,233 @@
+<%- layout('layouts/index') %>
+
+<!-- Import thư viện Owl Carousel -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
+<style>
+    /* Style sản phẩm */
+    .product {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        height: 100%;
+    }
+
+    .image {
+        width: 100%;
+        height: 380px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        border-radius: 10px;
+    }
+
+    .image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .product-name {
+        font-size: 1rem;
+        font-weight: bold;
+        color: #333;
+        text-decoration: none;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        padding-left: 10px;
+    }
+
+    .button {
+        text-align: left;
+        padding-left: 10px;
+    }
+
+    .btn-primary {
+        background-color: black;
+        border-radius: 30px;
+        padding: 8px 15px;
+        font-size: 1rem;
+        transition: background 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #444;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 15px;
+        }
+    }
+</style>
+
+<!-- Ô tìm kiếm đầu trang -->
+<section style="padding-top: 80px;">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3 mt-4">
+            <h5 class="fw-bold mb-0">Sản phẩm</h5>
+            <div class="d-flex gap-2">
+                <input id="searchInputTop" type="text" class="form-control form-control-sm rounded-pill" placeholder="Nhập từ khóa..." style="max-width: 250px;">
+
+                <!-- Dropdown danh mục -->
+                <select id="categorySelect" class="form-select form-select-sm rounded-pill" style="max-width: 150px;">
+                    <option value="">Danh mục</option>
+                </select>
+
+                <button id="searchBtnTop" class="btn btn-dark btn-sm rounded-pill px-3">
+                    <i class='bx bx-search-alt fs-4'></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <hr class="my-4">
+</section>
+
+<!-- Phần kết quả tìm kiếm -->
+<section style="padding-bottom: 30px;">
+    <div class="container">
+        <h4 class="fw-bold mb-4">DANH SÁCH YÊU THÍCH</h4>
+        <div id="searchResultWrapper"></div>
+    </div>
+</section>
+
+<!-- Import thư viện jQuery & Owl Carousel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const searchResultWrapper = document.getElementById('searchResultWrapper');
+
+        try {
+            // Kiểm tra trạng thái đăng nhập của người dùng
+            const userInfo = await fetch('/auth/user', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!userInfo.ok) {
+                searchResultWrapper.innerHTML = '<p>Vui lòng đăng nhập để xem danh sách yêu thích.</p>';
+                return;
+            }
+
+            const user = await userInfo.json();
+            if (!user.success) {
+                searchResultWrapper.innerHTML = '<p>Vui lòng đăng nhập để xem danh sách yêu thích.</p>';
+                return;
+            }
+
+            const userId = user.user.user._id;
+
+            // Gọi API để lấy danh sách yêu thích
+            const response = await fetch(`/api/favourites/${userId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const favouriteList = await response.json();
+
+            // Kiểm tra nếu danh sách yêu thích trống
+            if (!favouriteList.products || favouriteList.products.length === 0) {
+                searchResultWrapper.innerHTML = '<p>Danh sách yêu thích của bạn đang trống.</p>';
+                return;
+            }
+
+            // Hiển thị danh sách yêu thích với layout của bạn
+            const productHtml = favouriteList.products.map((item) => {
+                const product = item.product_id;
+                return `
+                    <div class="mb-4">
+                        <div class="product">
+                            <div class="image position-relative">
+                                <div class="img">
+                                    <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}"
+                                        alt="Sản phẩm" class="img-fluid w-100">
+                                </div>
+                                <div class="img-hover position-absolute top-0 start-0 w-100 h-100">
+                                    <img src="http://localhost:3002/api/products/thumbnail/${product.thumbnail}"
+                                        alt="Sản phẩm hover" class="img-fluid w-100">
+                                </div>
+                            </div>
+                            <a href="/product/${product._id}" class="text-decoration-none">
+                                <h2 class="product-name mt-3">${product.name}</h2>
+                            </a>
+                            <h2 class="fs-6 fw-bold ps-3">${product.price.toLocaleString('vi-VN')} đ</h2>
+                            <div class="button text-center mt-3">
+                                <button class="btn btn-danger px-4 bg-menu" onclick="removeFromFavourites('${product._id}')">
+                                    <div class="btn__txt">XÓA</div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            searchResultWrapper.innerHTML = `
+                <div class="row row-cols-1 row-cols-md-4 g-4">
+                    ${productHtml}
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error fetching favourite list:', error);
+            searchResultWrapper.innerHTML = '<p>Không thể tải danh sách yêu thích. Vui lòng thử lại sau.</p>';
+        }
+    });
+
+    // Hàm xóa sản phẩm khỏi danh sách yêu thích
+    async function removeFromFavourites(productId) {
+        try {
+            const userInfo = await fetch('/auth/user', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!userInfo.ok) {
+                alert('Vui lòng đăng nhập để thực hiện thao tác này.');
+                return;
+            }
+
+            const user = await userInfo.json();
+            if (!user.success) {
+                alert('Vui lòng đăng nhập để thực hiện thao tác này.');
+                return;
+            }
+
+            const userId = user.user.user._id;
+
+            const response = await fetch('/api/favourites', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    product_id: productId,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            alert('Sản phẩm đã được xóa khỏi danh sách yêu thích.');
+            location.reload(); // Tải lại trang để cập nhật danh sách
+        } catch (error) {
+            console.error('Error removing product from favourites:', error);
+            alert('Không thể xóa sản phẩm khỏi danh sách yêu thích. Vui lòng thử lại sau.');
+        }
+    }
+</script>
