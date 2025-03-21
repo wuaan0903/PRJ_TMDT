@@ -87,8 +87,83 @@
     } else {
         emailError.style.display = "none";
     }
-}
+    }
+    document.getElementById('registerForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
 
+    validateEmail();
+    validatePhone();
+    validatePassword();
+    validateConfirmPassword();
+
+    const emailValid = document.getElementById('emailError').style.display === "none";
+    const phoneValid = document.getElementById('phoneError').style.display === "none";
+    const passwordValid = document.getElementById('passwordError').style.display === "none";
+    const confirmPasswordValid = document.getElementById('confirmPasswordError').style.display === "none";
+
+    if (!emailValid || !phoneValid || !passwordValid || !confirmPasswordValid) {
+        return;
+    }
+
+    const username = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const phone_number = document.getElementById('registerPhoneNb').value;
+    const errorDiv = document.getElementById('registerError');
+
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password, phone_number })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: "Đăng ký thành công!",
+                text: "Bạn sẽ được chuyển hướng đến trang đăng nhập.",
+                timer: 1500,
+                timerProgressBar: true,
+                showConfirmButton: false,
+            }).then(() => {
+                window.location.href = '/login';
+            });
+        } else {
+            // Kiểm tra lỗi từ API trả về
+            if (data.message.includes("Email đã tồn tại")) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Lỗi đăng ký!",
+                    text: "Email này đã được sử dụng. Vui lòng chọn email khác!",
+                    confirmButtonText: "OK"
+                });
+            } else if (data.message.includes("Số điện thoại đã tồn tại")) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Lỗi đăng ký!",
+                    text: "Số điện thoại này đã được sử dụng. Vui lòng chọn số khác!",
+                    confirmButtonText: "OK"
+                });
+            } else {
+                errorDiv.textContent = data.message || 'Đăng ký thất bại!';
+                errorDiv.style.display = 'block';
+            }
+        }
+    } catch (error) {
+        console.error('Lỗi khi đăng ký:', error);
+        Swal.fire({
+            icon: 'error',
+            title: "Lỗi hệ thống!",
+            text: "Email hoặc số điện thoại đã được sử dụng!",
+            confirmButtonText: "OK"
+        });
+    }
+});
 function validatePhone() {
     const phone = document.getElementById('registerPhoneNb').value;
     const phoneError = document.getElementById('phoneError');

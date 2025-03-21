@@ -330,6 +330,9 @@ padding-bottom: 40px;
                     <div class="mb-3">
                         <label for="editPhoneNumber" class="form-label">Số điện thoại</label>
                         <input type="text" class="form-control" id="editPhoneNumber" required>
+                        <span id="phoneError" style="color: red; font-size: 14px; display: none;">
+                            Số điện thoại phải là số và có 10 chữ số.
+                        </span>
                     </div>
                     <div class="mb-3">
                         <label for="editGender" class="form-label">Giới tính</label>
@@ -375,10 +378,16 @@ padding-bottom: 40px;
                     <div class="mb-3">
                         <label for="newPassword" class="form-label">Mật khẩu mới</label>
                         <input type="password" class="form-control" id="newPassword" required>
+                        <span id="passwordError" class="text-danger" style="font-size: 14px; display: none;">
+                            Mật khẩu phải có ít nhất 6 ký tự.
+                        </span>
                     </div>
                     <div class="mb-3">
                         <label for="confirmNewPassword" class="form-label">Xác nhận mật khẩu mới</label>
                         <input type="password" class="form-control" id="confirmNewPassword" required>
+                        <span id="confirmPasswordError" class="text-danger" style="font-size: 14px; display: none;">
+                            Mật khẩu xác nhận không khớp.
+                        </span>
                     </div>
                     <button type="submit" class="btn btn-dark w-100">Lưu thay đổi</button>
                 </form>
@@ -464,12 +473,37 @@ padding-bottom: 40px;
         });
 
         // Xử lý sự kiện submit form chỉnh sửa thông tin người dùng
+        document.getElementById('editPhoneNumber').addEventListener('input', function () {
+            const phoneInput = this.value.trim();
+            const phoneError = document.getElementById('phoneError');
+            const submitButton = document.getElementById('submitEditUser');
+            const phoneRegex = /^[0-9]{10}$/; // Chỉ chấp nhận 10 chữ số
+
+            if (!phoneRegex.test(phoneInput)) {
+                phoneError.style.display = 'block'; // Hiển thị lỗi
+                submitButton.disabled = true; // Vô hiệu hóa nút submit
+            } else {
+                phoneError.style.display = 'none'; // Ẩn lỗi nếu nhập đúng
+                submitButton.disabled = false; // Bật lại nút submit
+            }
+        });
+
+        // Kiểm tra số điện thoại trước khi gửi form
         document.getElementById('editUserForm').addEventListener('submit', async function (event) {
             event.preventDefault();
 
+            const phoneInput = document.getElementById('editPhoneNumber').value.trim();
+            const phoneError = document.getElementById('phoneError');
+            const phoneRegex = /^[0-9]{10}$/;
+
+            if (!phoneRegex.test(phoneInput)) {
+                phoneError.style.display = 'block';
+                return; // Không gửi form nếu số điện thoại không hợp lệ
+            }
+
             const updatedUserInfo = {
                 username: document.getElementById('editFullName').value,
-                phone_number: document.getElementById('editPhoneNumber').value,
+                phone_number: phoneInput,
                 gender: document.getElementById('editGender').value,
                 birthDate: document.getElementById('editBirthDate').value,
                 height: document.getElementById('editHeight').value,
@@ -489,34 +523,56 @@ padding-bottom: 40px;
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
 
-                // Cập nhật thông tin người dùng trên giao diện
+                // Cập nhật giao diện người dùng
                 fetchUserInfo(userId);
 
                 // Đóng modal sau khi cập nhật thành công
                 const editUserModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
                 editUserModal.hide();
+
+                // Hiển thị thông báo thành công bằng SweetAlert2
+                Swal.fire({
+                    title: "Cập nhật thành công!",
+                    text: "Thông tin của bạn đã được cập nhật.",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                    timer: 3000,
+                    timerProgressBar: true
+                });
             } catch (error) {
                 console.error('Error updating user info:', error);
             }
         });
 
+
         // Xử lý sự kiện submit form cập nhật mật khẩu
         document.getElementById('editPasswordForm').addEventListener('submit', async function (event) {
             event.preventDefault();
 
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+            const currentPassword = document.getElementById('currentPassword').value.trim();
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value.trim();
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
 
-            if (newPassword !== confirmNewPassword) {
-                alert('Mật khẩu mới và xác nhận mật khẩu mới không khớp.');
+            // Kiểm tra độ dài mật khẩu
+            if (newPassword.length < 6) {
+                passwordError.style.display = 'block';
                 return;
+            } else {
+                passwordError.style.display = 'none';
             }
 
-            const passwordUpdateInfo = {
-                currentPassword,
-                newPassword
-            };
+            // Kiểm tra mật khẩu mới và xác nhận mật khẩu có khớp không
+            if (newPassword !== confirmNewPassword) {
+                confirmPasswordError.style.display = 'block';
+                return;
+            } else {
+                confirmPasswordError.style.display = 'none';
+            }
+
+            const passwordUpdateInfo = { currentPassword, newPassword };
+
             try {
                 const response = await fetch(`/api/account/${userId}/password`, {
                     method: 'PATCH',
@@ -533,10 +589,51 @@ padding-bottom: 40px;
                 // Đóng modal sau khi cập nhật thành công
                 const editPasswordModal = bootstrap.Modal.getInstance(document.getElementById('editPasswordModal'));
                 editPasswordModal.hide();
-                alert('Cập nhật mật khẩu thành công.');
+
+                // Hiển thị thông báo cập nhật thành công bằng SweetAlert2
+                Swal.fire({
+                    title: "Cập nhật thành công!",
+                    text: "Mật khẩu của bạn đã được cập nhật.",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+
+                // Xóa nội dung các ô nhập sau khi cập nhật thành công
+                document.getElementById('currentPassword').value = "";
+                document.getElementById('newPassword').value = "";
+                document.getElementById('confirmNewPassword').value = "";
+
             } catch (error) {
                 console.error('Error updating password:', error);
-                alert('Đã xảy ra lỗi khi cập nhật mật khẩu.');
+                Swal.fire({
+                    title: "Lỗi!",
+                    text: "Đã xảy ra lỗi khi cập nhật mật khẩu. Vui lòng thử lại.",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+            }
+        });
+
+        // Kiểm tra mật khẩu khi nhập
+        document.getElementById('newPassword').addEventListener('input', function () {
+            const passwordError = document.getElementById('passwordError');
+            if (this.value.length < 6) {
+                passwordError.style.display = 'block';
+            } else {
+                passwordError.style.display = 'none';
+            }
+        });
+
+        // Kiểm tra xác nhận mật khẩu khi nhập
+        document.getElementById('confirmNewPassword').addEventListener('input', function () {
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            if (this.value !== newPassword) {
+                confirmPasswordError.style.display = 'block';
+            } else {
+                confirmPasswordError.style.display = 'none';
             }
         });
     });
