@@ -42,91 +42,144 @@
                 <div class="mb-3">
                     <label for="registerName" class="form-label fw-medium">Họ tên</label>
                     <input type="text" class="form-control" id="registerName" placeholder="Nhập họ và tên" required>
+                    <div id="nameError" class="text-danger mt-1" style="display: none;"></div>
                 </div>
+            
                 <div class="mb-4">
                     <label for="registerEmail" class="form-label fw-medium">Email</label>
-                    <input type="email" class="form-control" id="registerEmail" placeholder="Nhập địa chỉ Email" required>
+                    <input type="email" class="form-control" id="registerEmail" placeholder="Nhập địa chỉ Email" required oninput="validateEmail()">
+                    <div id="emailError" class="text-danger mt-1" style="display: none;"></div>
                 </div>
+            
                 <div class="mb-4">
                     <label for="registerPhoneNb" class="form-label fw-medium">Số điện thoại</label>
-                    <input type="text" class="form-control" id="registerPhoneNb" placeholder="Nhập số điện thoại" required>
+                    <input type="text" class="form-control" id="registerPhoneNb" placeholder="Nhập số điện thoại" required oninput="validatePhone()">
+                    <div id="phoneError" class="text-danger mt-1" style="display: none;"></div>
                 </div>
+            
                 <div class="mb-4">
                     <label for="registerPassword" class="form-label fw-medium">Mật khẩu</label>
-                    <input type="password" class="form-control" id="registerPassword" placeholder="Nhập mật khẩu" required>
+                    <input type="password" class="form-control" id="registerPassword" placeholder="Nhập mật khẩu" required oninput="validatePassword()">
+                    <div id="passwordError" class="text-danger mt-1" style="display: none;"></div>
                 </div>
+            
                 <div class="mb-4">
-                    <label for="registerConfirmPassword" class="form-label fw-medium">Mật khẩu</label>
-                    <input type="password" class="form-control" id="registerConfirmPassword" placeholder="Xác nhận mật khẩu" required>
+                    <label for="registerConfirmPassword" class="form-label fw-medium">Xác nhận mật khẩu</label>
+                    <input type="password" class="form-control" id="registerConfirmPassword" placeholder="Xác nhận mật khẩu" required oninput="validateConfirmPassword()">
+                    <div id="confirmPasswordError" class="text-danger mt-1" style="display: none;"></div>
                 </div>
-                <div id="RegisterError" class="text-danger mb-3" style="display: none;"></div>
+
+                <div id="registerError" class="text-danger mb-3" style="display: none;"></div>
                 <button type="submit" class="btn-submit">ĐĂNG KÝ</button>
-                
             </form>
         </div>
     </div>
 </div>  
 <script>
-    document.getElementById('registerForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const username = document.getElementById('registerName').value;
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-        const phone_number = document.getElementById('registerPhoneNb').value;
-        const errorDiv = document.getElementById('registerError');
+    function validateEmail() {
+    const email = document.getElementById('registerEmail').value;
+    const emailError = document.getElementById('emailError');
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-        try {
-            const response = await fetch('/api/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, email, password, phone_number })
+    if (!emailPattern.test(email)) {
+        emailError.textContent = "Email không đúng định dạng!";
+        emailError.style.display = "block";
+    } else {
+        emailError.style.display = "none";
+    }
+}
+
+function validatePhone() {
+    const phone = document.getElementById('registerPhoneNb').value;
+    const phoneError = document.getElementById('phoneError');
+    const phonePattern = /^[0-9]{10,11}$/;
+
+    if (!phonePattern.test(phone)) {
+        phoneError.textContent = "Số điện thoại là số và phải có 10-11 chữ số!";
+        phoneError.style.display = "block";
+    } else {
+        phoneError.style.display = "none";
+    }
+}
+
+function validatePassword() {
+    const password = document.getElementById('registerPassword').value;
+    const passwordError = document.getElementById('passwordError');
+
+    if (password.length < 6) {
+        passwordError.textContent = "Mật khẩu phải có ít nhất 6 ký tự!";
+        passwordError.style.display = "block";
+    } else {
+        passwordError.style.display = "none";
+    }
+}
+
+function validateConfirmPassword() {
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
+    const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+    if (confirmPassword !== password) {
+        confirmPasswordError.textContent = "Mật khẩu xác nhận không khớp!";
+        confirmPasswordError.style.display = "block";
+    } else {
+        confirmPasswordError.style.display = "none";
+    }
+}
+
+document.getElementById('registerForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    validateEmail();
+    validatePhone();
+    validatePassword();
+    validateConfirmPassword();
+
+    const emailValid = document.getElementById('emailError').style.display === "none";
+    const phoneValid = document.getElementById('phoneError').style.display === "none";
+    const passwordValid = document.getElementById('passwordError').style.display === "none";
+    const confirmPasswordValid = document.getElementById('confirmPasswordError').style.display === "none";
+
+    if (!emailValid || !phoneValid || !passwordValid || !confirmPasswordValid) {
+        return;
+    }
+
+    const username = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const phone_number = document.getElementById('registerPhoneNb').value;
+    const errorDiv = document.getElementById('registerError');
+
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password, phone_number })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: "Đăng ký tài khoản thành công!",
+                text: "Đang chuyển hướng, vui lòng chờ...",
+                timer: 1500,
+                timerProgressBar: true,
+                showConfirmButton: false,
+            }).then(() => {
+                window.location.href = '/login';
             });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Handle successful registration (e.g., redirect to login page)
-                Swal.fire({
-                    icon: 'success',
-                    title: "Đăng ký tài khoản thành công !",
-                    text: "Đang chuyển hướng, vui lòng chờ...",
-                    timer: 1500,
-                    timerProgressBar: true,
-                    showConfirmButton: false,
-                }).then(() => {
-                    window.location.href = '/login';
-                });
-                  
-            } else {
-                // Handle registration error (e.g., display error message)
-                 errorDiv.textContent = data.message || 'Registration failed';
-                errorDiv.style.display = 'block';
-            }
-        } catch (error) {
-            console.error('Error during registration:', error);
-            errorDiv.textContent = 'An error occurred. Please try again later.';
+        } else {
+            errorDiv.textContent = data.message || 'Đăng ký thất bại!';
             errorDiv.style.display = 'block';
         }
-    });
-
-    async function checkUserLoginStatus() {
-            try {
-                const response = await fetch('/auth/user');
-                const data = await response.json();
-                if (response.ok) {
-                    
-                    window.location.href = '/';
-                }
-            } catch (error) {
-                console.error('Error checking user login status:', error);
-            }
-        }
-
-    // Check user role on page load
-    document.addEventListener('DOMContentLoaded', async function() {
-        await checkUserLoginStatus();
-    });
-
+    } catch (error) {
+        console.error('Lỗi khi đăng ký:', error);
+        errorDiv.textContent = 'Đã xảy ra lỗi. Vui lòng thử lại sau.';
+        errorDiv.style.display = 'block';
+    }
+});
 </script>

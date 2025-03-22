@@ -194,6 +194,11 @@ router.put('/api/review/:id', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct/${req.params.id}`, 'put');
 });
 
+// Proxy for updating a review by id
+router.put('/api/review/reply/:id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct/reply/${req.params.id}`, 'put');
+});
+
 // Proxy for deleting a review by id
 router.delete('/api/review/:id', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct/${req.params.id}`, 'delete');
@@ -234,6 +239,21 @@ router.get('/api/voucher/check/:code', async (req, res) => {
 // Proxy for check a voucher by code
 router.put('/api/voucher/updateUsage/:code', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/vouchers/updateUsage/${req.params.code}`,'put');
+});
+
+// Proxy for adding a product to favourites
+router.post('/api/favourites', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/favourites`, 'post');
+});
+
+// Proxy for removing a product from favourites
+router.delete('/api/favourites', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/favourites`, 'delete');
+});
+
+// Proxy for fetching the favourite list of a user
+router.get('/api/favourites/:user_id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/favourites/${req.params.user_id}`);
 });
 
 module.exports = router;

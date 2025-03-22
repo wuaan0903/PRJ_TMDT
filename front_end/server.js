@@ -38,6 +38,10 @@ app.get("/search", (req, res) => {
   res.render("search"); // Renders the cart.ejs file
 } );
 
+app.get("/favourites", (req, res) => {
+  res.render("favourite"); // Renders the cart.ejs file
+} );
+
 app.get('/filter', productController.renderProductSortByCategory);
 
 app.get("/user/", (req, res) => {
@@ -142,6 +146,10 @@ app.get("/admin/discount", (req, res) => {
   res.render("admin/discount/listVoucher"); //
 });
 
+app.get("/admin/review", (req, res) => {
+  res.render("admin/review/listReview"); //
+});
+
 app.get('/product/:id', productController.renderProductDetails);
 app.get('/cart/:id', cartController.renderCartPage);
 app.get('/admin/storage/edit/:id', productController.renderEditQuantityPage);
@@ -151,7 +159,7 @@ app.get('/admin', adminController.renderHomePage);
 app.get('/admin/collections/edit/:id', productController.renderEditCollectionPage);
 
 
-app.get('/payment/success', paymentController.renderPaymentSuccess);
+app.get('/payment/success/:id', paymentController.renderPaymentSuccess);
 
 app.get('/payment/error', paymentController.renderPaymentFailed);
 

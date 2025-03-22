@@ -178,6 +178,11 @@
     .status-dropdown.active .dropdown-content {
         display: block;
     }
+    input:focus, textarea:focus, select:focus {
+        outline: none !important;
+        box-shadow: none !important;
+        border-color: inherit; /* Giữ nguyên border cũ */
+    }
 </style>
 <main>
     <div class="view-panell">
@@ -189,6 +194,48 @@
                 </div>
             </div>
         </section>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <!-- Tìm kiếm đơn hàng -->
+            <div class="input-group" style="width: 40%;">
+                <span class="input-group-text" style="border-radius: 24px 0 0 24px; background: white; border-right: none;">
+                    <i class='bx bx-search-alt-2'></i>
+                </span>
+                <input type="text" id="searchOrderInput" class="form-control" placeholder="Tìm kiếm theo mã đơn hàng hoặc tên khách hàng" style="
+                    font-size: 16px;
+                    font-weight: 600;
+                    letter-spacing: -1px;
+                    border-radius: 0 24px 24px 0;
+                    line-height: 2;
+                    border-left: none;
+                    outline: none;
+                    box-shadow: none;
+                ">
+            </div>
+
+            <div class="d-flex">
+                <select id="filterDate" class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" style="
+                width: 200px;
+                margin-right: 10px;
+            ">
+                    <option value="all">Toàn thời gian</option>
+                    <option value="today">Hôm nay</option>
+                    <option value="week">Tuần này</option>
+                    <option value="month">Tháng này</option>
+                </select>
+
+                <select id="filterStatus" class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" style="
+                width: 250px;
+            ">
+                    <option value="all">Tất cả đơn hàng</option>
+                    <option value="pending">Chờ xác nhận</option>
+                    <option value="processing">Đang giao hàng</option>
+                    <option value="completed">Đã giao hàng</option>
+                    <option value="cancelled">Đã hủy</option>
+                </select>
+            </div>
+
+        </div>
         <div id="order-container">
             <div class="loader" style="display: flex; justify-content: center; align-items: center;"><i class="bx bx-loader-circle bx-spin bx-rotate-90"></i></div>
         </div>
@@ -197,6 +244,15 @@
 
 <script>
     const orderContainer = document.getElementById('order-container');
+
+    const searchInput = document.getElementById('searchOrderInput');
+    const searchButton = document.getElementById('searchOrderButton');
+    const filterDate = document.getElementById('filterDate');
+    const filterStatus = document.getElementById('filterStatus');
+    const tableBody = document.getElementById('order-container');
+
+    let allOrders = []; // Lưu trữ tất cả đơn hàng để lọc và tìm kiếm
+
     async function fetchOrders() {
         try {
             const response = await fetch('/api/orders');
@@ -205,84 +261,182 @@
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const orders = await response.json();
-                orderContainer.innerHTML = '';
-            // Group orders by date
-            const ordersByDate = orders.reduce((acc, order) => {
-                const date = new Date(order.date).toLocaleDateString();
-                if (!acc[date]) {
-                    acc[date] = [];
-                }
-                acc[date].push(order);
-                return acc;
-            }, {});
-
-            // Sort dates in descending order (latest first)
-            const sortedDates = Object.keys(ordersByDate).sort((a, b) => new Date(b) - new Date(a));
-             for (const date of sortedDates) {
-                 // Sort orders within each date group by time (latest first)
-                ordersByDate[date].sort((a, b) => new Date(b.date) - new Date(a.date));
-                const dateDiv = document.createElement('div');
-                dateDiv.classList.add('date');
-                dateDiv.innerHTML = `<p>${date}</p>`;
-                orderContainer.appendChild(dateDiv);
-
-                const tableDataDiv = document.createElement('div');
-                tableDataDiv.classList.add('table-data');
-                const orderDiv = document.createElement('div');
-                orderDiv.classList.add('order');
-                const table = document.createElement('table');
-                table.classList.add('myTable');
-
-                table.innerHTML = `
-                    <thead>
-                        <tr>
-                            <th>Mã đơn hàng</th>
-                            <th>Thời gian</th>
-                            <th>Họ Tên</th>
-                            <th>Số Điện Thoại</th>
-                            <th>Địa Chỉ</th>
-                            <th>Tình trạng</th>
-                            <th>Chi Tiết</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
+            allOrders = orders;
+            orderContainer.innerHTML = '';
+    
+            // Sắp xếp danh sách đơn hàng theo ngày giảm dần
+            orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+            const tableDataDiv = document.createElement('div');
+            tableDataDiv.classList.add('table-data');
+            const orderDiv = document.createElement('div');
+            orderDiv.classList.add('order');
+            const table = document.createElement('table');
+            table.classList.add('myTable');
+    
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Mã ĐH</th>
+                        <th>Ngày đặt</th>
+                        <th>Khách hàng</th>
+                        <th>Số điện thoại</th>
+                        <th>Trạng thái đơn hàng</th>
+                        <th>Phương thức thanh toán</th>
+                        <th>Trạng thái thanh toán</th>
+                        <th>Tổng tiền</th>
+                        <th>Chi Tiết</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            `;
+            const tbody = table.querySelector('tbody');
+    
+            for (const order of orders) {
+                const user = await fetchUser(order.userId);
+                const row = document.createElement('tr');
+    
+                const statusDropdown = `
+                    <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="orderStatusSelect" data-order-id="${order._id}" ${order.status === 'completed' || order.status === 'cancelled' ? 'disabled' : ''}>
+                        <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>🟡 Đang chờ xử lý</option>
+                        <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>🚚 Đang giao hàng</option>
+                        <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>✅ Đã giao hàng</option>
+                        <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Đã hủy</option>
+                    </select>
                 `;
-                const tbody = table.querySelector('tbody');
-                for (const order of ordersByDate[date]) {
-                   const user = await fetchUser(order.userId);
-                   const row = document.createElement('tr');
-                      const statusDropdown = `
-                        <div class="status-dropdown">
-                            <span class="status-btn status ${getStatusClass(order.status)}">${getStatusText(order.status)}</span>
-                           <div class="dropdown-content">
-                                <a href="#" data-status="pending" data-order-id="${order._id}">Đang chờ xử lý</a>
-                                <a href="#" data-status="processing" data-order-id="${order._id}">Đang giao hàng</a>
-                                <a href="#" data-status="completed" data-order-id="${order._id}">Đã giao hàng</a>
-                                <a href="#" data-status="cancelled" data-order-id="${order._id}">Đã hủy</a>
-                            </div>
-                        </div>
-                    `;
-                    row.innerHTML = `
-                    <td>#${order._id.slice(-2)}</td>
-                         <td>${new Date(order.date).toLocaleTimeString()}</td>
-                        <td>${order.name || 'N/A'}</td>
-                        <td>${order.phoneNumber}</td>
-                         <td>${order.address}</td>
-                         <td>${statusDropdown}</td>
-                        <td><span class="status edit" onclick="viewSp('${order._id}')">Xem</span></td>
-                    `;
-                    tbody.appendChild(row);
-                }
-                orderDiv.appendChild(table)
-                tableDataDiv.appendChild(orderDiv)
-                orderContainer.appendChild(tableDataDiv);
+    
+                row.innerHTML = `
+                    <td>#${order._id}</td>
+                    <td>${new Date(order.date).toLocaleString()}</td>
+                    <td>${order.name || 'N/A'}</td>
+                    <td>${order.phoneNumber || 'N/A'}</td>
+                    <td>${statusDropdown}</td>
+                    <td>${order.paymentMethod}</td>
+                    <td>${order.paymentStatus ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
+                    <td>${order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                    <td><span class="status edit" onclick="viewSp('${order._id}')">Xem</span></td>
+                `;
+                tbody.appendChild(row);
             }
-            attachStatusDropdownListeners();
+    
+            orderDiv.appendChild(table);
+            tableDataDiv.appendChild(orderDiv);
+            orderContainer.appendChild(tableDataDiv);
+    
+            attachStatusSelectListeners();
         } catch (error) {
             console.error('Error fetching or processing orders:', error);
             orderContainer.innerHTML = '<p>Error loading orders.</p>';
         }
     }
+
+    // Xử lý sự kiện tìm kiếm đơn hàng
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim().toLowerCase(); // Lấy giá trị tìm kiếm và chuyển về chữ thường
+        const filteredOrders = searchOrders(allOrders, query); // Lọc đơn hàng dựa trên query
+        renderOrders(filteredOrders); // Hiển thị danh sách đơn hàng đã lọc
+    });
+
+    // Hàm tìm kiếm đơn hàng theo Order ID hoặc Số điện thoại
+    function searchOrders(orders, query) {
+        const lowerCaseQuery = query.toLowerCase();
+        return orders.filter(order =>
+            order.phoneNumber && order.phoneNumber.replace(/\s+/g, '').includes(lowerCaseQuery) // Tìm theo Số điện thoại (loại bỏ khoảng trắng)
+        );
+    }
+
+    // Hiển thị danh sách đơn hàng
+    function renderOrders(orders) {
+        const tableBody = document.querySelector('tbody');
+        tableBody.innerHTML = '';
+
+        if (orders.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="8">Không có đơn hàng nào.</td></tr>';
+            return;
+        }
+
+        orders.forEach(order => {
+            const row = document.createElement('tr');
+            const statusDropdown = `
+                <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="orderStatusSelect" data-order-id="${order._id}" ${order.status === 'completed' || order.status === 'cancelled' ? 'disabled' : ''}>
+                    <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>🟡 Đang chờ xử lý</option>
+                    <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>🚚 Đang giao hàng</option>
+                    <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>✅ Đã giao hàng</option>
+                    <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Đã hủy</option>
+                </select>
+            `;
+
+            row.innerHTML = `
+                <td>#${order._id}</td>
+                <td>${new Date(order.date).toLocaleString('vi-VN')}</td>
+                <td>${order.name || 'N/A'}</td>
+                <td>${order.phoneNumber || 'N/A'}</td>
+                <td>${statusDropdown}</td>
+                <td>${order.paymentMethod}</td>
+                <td>${order.paymentStatus ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
+                <td>${order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                <td><span class="status edit" onclick="viewSp('${order._id}')">Xem</span></td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Lọc đơn hàng theo ngày/tuần/tháng
+    function filterOrdersByDate(orders, filter) {
+        const now = new Date();
+        return orders.filter(order => {
+            const orderDate = new Date(order.date);
+            switch (filter) {
+                case 'today':
+                    return orderDate.toDateString() === now.toDateString();
+                case 'week':
+                    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+                    const endOfWeek = new Date(startOfWeek);
+                    endOfWeek.setDate(startOfWeek.getDate() + 6);
+                    return orderDate >= startOfWeek && orderDate <= endOfWeek;
+                case 'month':
+                    return orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
+                default:
+                    return true;
+            }
+        });
+    }
+    
+        // Lọc đơn hàng theo trạng thái
+        function filterOrdersByStatus(orders, status) {
+            if (status === 'all') return orders;
+            return orders.filter(order => order.status === status);
+        }
+
+        
+
+
+
+    // Xử lý sự kiện lọc theo ngày/tuần/tháng
+    filterDate.addEventListener('change', () => {
+        const dateFilter = filterDate.value;
+        const statusFilter = filterStatus.value;
+
+        let filteredOrders = filterOrdersByDate(allOrders, dateFilter);
+        filteredOrders = filterOrdersByStatus(filteredOrders, statusFilter);
+
+        renderOrders(filteredOrders);
+    });
+
+    // Xử lý sự kiện lọc theo trạng thái
+    filterStatus.addEventListener('change', () => {
+        const dateFilter = filterDate.value;
+        const statusFilter = filterStatus.value;
+
+        let filteredOrders = filterOrdersByDate(allOrders, dateFilter);
+        filteredOrders = filterOrdersByStatus(filteredOrders, statusFilter);
+
+        renderOrders(filteredOrders);
+    });
+
+
+    
     async function fetchUser(userId) {
         try {
             const response = await fetch(`/api/account/${userId}`);
@@ -344,32 +498,18 @@
             console.error('Error updating order status:', error);
         }
     }
-
-    function attachStatusDropdownListeners() {
-        document.querySelectorAll('.status-dropdown').forEach(dropdown => {
-            const btn = dropdown.querySelector('.status-btn');
-            const content = dropdown.querySelector('.dropdown-content');
-
-            btn.addEventListener('click', (e) => {
-                   e.stopPropagation();
-                dropdown.classList.toggle('active');
-            });
-
-
-            content.addEventListener('click', async (event) => {
-               if(event.target.tagName === 'A')
-               {
-                   event.preventDefault();
-                  const newStatus = event.target.getAttribute('data-status');
-                   const orderId = event.target.getAttribute('data-order-id');
-                   await updateOrderStatus(orderId, newStatus);
-                   dropdown.classList.remove('active');
-
-               }
+    function attachStatusSelectListeners() {
+        // Lấy tất cả các phần tử <select> liên quan đến trạng thái đơn hàng
+        document.querySelectorAll('#orderStatusSelect').forEach(select => {
+            select.addEventListener('change', async (event) => {
+                const newStatus = event.target.value; // Lấy giá trị trạng thái mới
+                const orderId = event.target.getAttribute('data-order-id'); // Lấy ID đơn hàng
+    
+                // Gọi API để cập nhật trạng thái đơn hàng
+                await updateOrderStatus(orderId, newStatus);
             });
         });
     }
-
     async function viewSp(orderId) {
         try {
             const response = await fetch(`/api/orders/${orderId}`);

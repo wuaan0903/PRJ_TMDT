@@ -1,5 +1,5 @@
 // paymentController.mjs
-import { createOrder, processPayment, getOrderById, getOrdersByUser, createVnPayPaymentUrl, getOrders, getProductsByOrderId, updateOrderStatus, createZaloPayPaymentRequest, deleteOrder } from '../services/paymentService.mjs';
+import { createOrder, processPayment, getOrderById, getOrdersByUser, createVnPayPaymentUrl, getOrders, getProductsByOrderId, updateOrderStatus,updateOrderPaymentStatus ,createZaloPayPaymentRequest, deleteOrder } from '../services/paymentService.mjs';
 import axios from 'axios';
 import Order from '../models/Order.js'; // Giả sử bạn có model Order
 
@@ -29,11 +29,11 @@ export const placeOrder = async (req, res) => {
         if (paymentMethod === 'COD') {
             order = await createOrder(userId,name,email, address, phoneNumber, items, voucherCode, paymentMethod);
         } else if (paymentMethod === 'momo') {
-            order = await createOrder(userId, address, phoneNumber, items, voucherCode,paymentMethod);
+            order = await createOrder(userId,name,email, address, phoneNumber, items, voucherCode,paymentMethod);
         } else if (paymentMethod === 'vnpay') {
-            order = await createOrder(userId, address, phoneNumber, items, voucherCode,paymentMethod);
+            order = await createOrder(userId,name,email, address, phoneNumber, items, voucherCode,paymentMethod);
         } else if (paymentMethod === 'zalopay') {
-            order = await createOrder(userId, address, phoneNumber, items, voucherCode,paymentMethod);
+            order = await createOrder(userId,name,email, address, phoneNumber, items, voucherCode,paymentMethod);
         }
 
         // 3. Reduce Quantity after order
@@ -65,7 +65,7 @@ export const placeOrder = async (req, res) => {
         }
 
         if (paymentMethod === 'COD') {
-            return res.json({ ...order, paymentUrl: "http://localhost:3000/payment/success" });
+            return res.json({ ...order, paymentUrl: `http://localhost:3000/payment/success/${order._id}` });
         } else if (paymentMethod === 'momo') {
             return res.json({ orderId: order._id });
         } else if (paymentMethod === 'vnpay') {
@@ -96,12 +96,17 @@ export const payOrder = async (req, res) => {
 export const getOrder = async (req, res) => {
   const { orderId } = req.params;
 
-  try {
-    const order = await getOrderById(orderId);
-    res.json(order);
-  } catch (err) {
-    res.status(500).send('Server error');
-  }
+    try {
+        const order = await Order.findById(orderId).populate('products.productId');
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        res.json(order);
+    } catch (error) {
+        console.error('Error fetching order:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 };
 
 export const getUserOrders = async (req, res) => {
@@ -140,12 +145,20 @@ export const updateOrderStatusCon = async (req, res) => {
   const { orderId } = req.params;
 
   try {
+    // Cập nhật trạng thái đơn hàng
     const order = await updateOrderStatus(orderId, status);
+
+    // Nếu trạng thái là 'completed', cập nhật paymentStatus thành true
+    if (status === 'completed') {
+      await updateOrderPaymentStatus(orderId, { paymentStatus: true });
+    }
+
     res.json(order);
   } catch (err) {
+    console.error('Error updating order status:', err);
     res.status(500).send('Server error');
   }
-}
+};
 
 
 export const updateOrderRating = async (req, res) => {
@@ -198,6 +211,14 @@ export const vnpayCallback = async (req, res) => {
     await deleteOrder(orderId);
     return res.redirect('http://localhost:3000/payment/error');
   } else{
+          // **Cập nhật trạng thái thanh toán thành công**
+          try {
+            await updateOrderPaymentStatus(orderId, { paymentStatus: true });
+          } catch (error) {
+            console.error(`Error updating payment status for order ID ${orderId}:`, error);
+          }
+
+
     return res.redirect('http://localhost:3000/payment/success');
   }
 };

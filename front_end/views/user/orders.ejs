@@ -196,15 +196,7 @@ padding: 0 50px;
                                 <i class="fas fa-map-marker-alt"></i> Sổ địa chỉ
                             </a>
                         </div>
-                        <div class="col-12">
-                            <a href="/user/reviews" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
-                            font-size: 15px;
-                            letter-spacing: -1px;
-                            font-weight: 600;
-                        ">
-                                <i class="fas fa-star"></i> Đánh giá & Phản hồi
-                            </a>
-                        </div>
+                        
                         <div class="col-12">
                             <a href="/user/policies" class="list-group-item list-group-item-action rounded-3 d-flex align-items-center w-100" style="
                             font-size: 15px;
@@ -412,12 +404,12 @@ padding: 0 50px;
                             padding: 10px 20px;
                             background: #f1f1f1;
                         ">
-                            <div>
+                        <div>
                             <a href="http://localhost:3000/user/orders/${order._id}" class="btn btn-custom">Chi tiết</a>
-                            ${order.status !== 'completed' && order.status !== 'cancelled' && order.status !=='processing' ? '<button id="cancellOrder" class="btn btn-custom1 cancellOrder">Hủy đơn</button>' : ''}
-                            ${order.status === 'completed' && order.rating === false ? `<button id="reviewOrder" class="btn btn-custom1 reviewOrder" data-order-id='${order._id}'>Đánh giá</button>` : ''}
+                            ${order.status !== 'completed' && order.status !== 'cancelled' && order.status !== 'processing' ? `<button id="cancellOrder" class="btn btn-custom1 cancellOrder" data-order-id="${order._id}">Hủy đơn</button>` : ''}
+                            ${order.status === 'completed' && order.rating === false ? `<button id="reviewOrder" class="btn btn-custom1 reviewOrder" data-order-id="${order._id}">Đánh giá</button>` : ''}
+                        </div>
 
-                            </div>
 
                                 
                                 <span style="
@@ -439,6 +431,53 @@ padding: 0 50px;
                             showReviewModal(orderId, products);
                         });
                     });
+
+
+                    document.querySelectorAll('.cancellOrder').forEach(button => {
+                        button.addEventListener('click', async function () {
+                            const orderId = this.getAttribute('data-order-id');
+                            Swal.fire({
+                                title: "Bạn có chắc muốn hủy đơn hàng này không?",
+                                text: "Bạn sẽ không thể khôi phục lại đơn hàng sau khi đã hủy.",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#3085d6",
+                                cancelButtonColor: "#d33",
+                                confirmButtonText: "Yes"  
+                            }).then(async (result) => { // Thêm async vào đây
+                                if (result.isConfirmed) {
+                                    try {
+                                        // Gọi API để cập nhật trạng thái đơn hàng thành "cancelled"
+                                        const response = await fetch(`/api/orders/${orderId}`, {
+                                            method: 'PUT',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify({ status: 'cancelled' }),
+                                        });
+                    
+                                        if (!response.ok) {
+                                            throw new Error(`HTTP error! Status: ${response.status}`);
+                                        }
+                    
+                                        
+                                        fetchOrders(userId); // Tải lại danh sách đơn hàng sau khi hủy thành công
+                                    } catch (error) {
+                                        console.error('Error cancelling order:', error);
+                                        alert('Đã xảy ra lỗi khi hủy đơn hàng. Vui lòng thử lại sau.');
+                                    }
+                    
+                                    Swal.fire({
+                                        title: "Đã hủy đơn hàng!",
+                                        text: "Đơn hàng của bạn đã được hủy thành công.",
+                                        icon: "success"
+                                    });
+                                }
+                            });
+                        });
+                    });
+                    
+            
                 }
 
 
@@ -497,7 +536,11 @@ padding: 0 50px;
                                 <input class="form-control" style="
     font-size: 14px;
     font-weight: 500;
-" type="file" id="reviewImage${index}" accept="image/*">
+" type="file" id="reviewImage${index}" name="images" multiple accept="image/*">
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewImage${index}" class="form-label"></label>
+                                <img id="reviewImagePreview${index}" src="#" alt="Ảnh đánh giá" style="display: none; width: 100px; height: auto; margin-top: 10px;">
                             </div>
                         </div>
                     `;
@@ -519,23 +562,69 @@ padding: 0 50px;
                     });
                 });
 
+                async function uploadReviewImages(imageFiles) {
+                    if (!imageFiles || imageFiles.length === 0) return;
+                
+                    const imageFormData = new FormData();
+                    Array.from(imageFiles).forEach(file => imageFormData.append("images", file));
+                
+                    try {
+                        const response = await fetch(`http://localhost:3002/api/reviewProduct/imageReview`, {
+                            method: "POST",
+                            body: imageFormData
+                        });
+                
+                        const result = await response.json();
+                        if (!response.ok) throw new Error(result.message);
+                
+                        console.log("Ảnh review đã được tải lên!", result.images);
+                    } catch (error) {
+                        console.error("Lỗi khi upload ảnh review:", error);
+                    }
+                }
+
                 // Xử lý sự kiện submit form đánh giá
                 document.getElementById('submitReviews').addEventListener('click', async function (event) {
                     event.preventDefault();
                 
-                    const reviews = products.map((product, index) => {
+                    const reviews = await Promise.all(products.map(async (product, index) => {
                         const stars = document.querySelectorAll(`#rating${index} .fas.selected`);
                         const rating = stars.length > 0 ? stars[stars.length - 1].getAttribute('data-value') : 0;
 
                         const reviewContent = document.getElementById(`reviewContent${index}`).value;
+                        const reviewImages = document.getElementById(`reviewImage${index}`).files; // Lấy danh sách ảnh
+                        
+                        // **📌 Gửi ảnh lên server trước khi tạo review**
+                            let uploadedImages = [];
+                            if (reviewImages.length > 0) {
+                                const imageFormData = new FormData();
+                                Array.from(reviewImages).forEach(file => imageFormData.append("images", file));
+
+                                try {
+                                    const imageResponse = await fetch("http://localhost:3002/api/reviewProduct/imageReview", {
+                                        method: "POST",
+                                        body: imageFormData
+                                    });
+
+                                    if (!imageResponse.ok) {
+                                        throw new Error(`HTTP error! Status: ${imageResponse.status}`);
+                                    }
+
+                                    const imageData = await imageResponse.json();
+                                    uploadedImages = imageData.images; // Danh sách ảnh từ server
+                                } catch (error) {
+                                    console.error("Error uploading images:", error);
+                                }
+                            }
                         
                         return {
                             product_id: product.productId,
                             user_id: userId,
                             comment: reviewContent,
-                            rate: rating
+                            rate: rating,
+                            image_review: uploadedImages // Lưu danh sách ảnh vào review
                         };
-                    });
+                    }));
                 
                     try {
                         for (const review of reviews) {
@@ -562,6 +651,7 @@ padding: 0 50px;
                         if (!updateRatingResponse.ok) {
                             throw new Error(`HTTP error! Status: ${updateRatingResponse.status}`);
                         }
+                        
                 
                         // Đóng modal sau khi đánh giá thành công
                         reviewModal.hide();
@@ -570,6 +660,8 @@ padding: 0 50px;
                         console.error('Error submitting review:', error);
                     }
                 });
+
+
             }
             
                 // Xử lý sự kiện click vào sao để chọn đánh giá
@@ -584,8 +676,11 @@ padding: 0 50px;
                     });
                 });
             });
-    
+
+
             // Gọi hàm fetchOrders khi trang được tải
             fetchOrders();
+
+
         });
     </script>

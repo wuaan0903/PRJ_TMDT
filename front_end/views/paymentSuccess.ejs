@@ -42,58 +42,52 @@
 
 <body>
     
-    <div class="container order-container ">
+    <div class="container order-container">
         <div class="row">
             <!-- Đặt hàng thành công & Thông tin đơn hàng -->
             <div class="col-md-6">
                 <div class="text-left">
                     <img src="http://localhost:3002/api/products/thumbnail/logo2.png" alt="Logo" width="120">
-                    <h4 class="mt-3 fw-bold letter-spacing" >Đặt hàng thành công</h4>
-                    <p><strong>Mã đơn hàng:</strong> <span class="text-danger letter-spacing">#600111</span></p>
-                    <p class="fs-6  letter-spacing">Bạn có thể xem lại đơn hàng của mình.</p>
-                    <p class=" fs-6 fw-bold letter-spacing">Cảm ơn bạn đã mua hàng!</p>
+                    <h4 class="mt-3 fw-bold letter-spacing">Đặt hàng thành công</h4>
+                    <p><strong>Mã đơn hàng:</strong> <span class="text-danger letter-spacing orderId">#</span></p>
+                    <p class="fs-6 letter-spacing">Bạn có thể xem lại đơn hàng của mình.</p>
+                    <p class="fs-6 fw-bold letter-spacing">Cảm ơn bạn đã mua hàng!</p>
                     <p class="fs-6 letter-spacing">Đơn hàng sẽ được xác nhận qua Zalo hoặc SMS.</p>
                 </div>
-
+    
                 <div class="order-summary">
                     <h5 class="fw-bold letter-spacing">Thông tin đơn hàng</h5>
-                    <p><strong class="fs-6 fw-bold letter-spacing">Người nhận:</strong><span class="fs-6 letter-spacing"> Tiến Cấp </span></p>
-                    <p><strong class="fs-6 fw-bold letter-spacing">Điện thoại:</strong><span class="fs-6 letter-spacing">  0838922669 </span></p>
-                    <p><strong class="fs-6 fw-bold letter-spacing">Địa chỉ:</strong> <span class="fs-6 letter-spacing"> Dương Nội , Hà Đông, Hà nội</span></p>
-                    <p><strong class="fs-6 fw-bold letter-spacing">Phương thức thanh toán:</strong> <span class="fs-6 letter-spacing"> Thanh toán khi nhận hàng (COD)</span></p>
+                    <p><strong class="fs-6 fw-bold letter-spacing">Người nhận : </strong> <span class="fs-6 letter-spacing name"></span></p>
+                    <p><strong class="fs-6 fw-bold letter-spacing">Điện thoại : </strong> <span class="fs-6 letter-spacing phone-number"></span></p>
+                    <p><strong class="fs-6 fw-bold letter-spacing">Địa chỉ : </strong> <span class="fs-6 letter-spacing address"></span></p>
+                    <p><strong class="fs-6 fw-bold letter-spacing">Phương thức thanh toán : </strong> <span class="fs-6 letter-spacing payment-method"></span></p>
                 </div>
             </div>
-
-            <!--  Chi tiết đơn hàng & Thanh toán -->
+    
+            <!-- Chi tiết đơn hàng & Thanh toán -->
             <div class="col-md-6">
-                <div class="order-summary ">
-                    <h6 class="fw-bold letter-spacing">Chi tiết đơn hàng</h6>
-                    <div class="d-flex align-items-center">
-                        <img src="http://localhost:3002/api/products/thumbnail/test1.png" width="70" alt="Áo thun trắng">
-                        <div class="ms-3">
-                            <p class="mb-0  letter-spacing fs-6 "><strong>Áo thun trắng</strong></p>
-                            <p class=" letter-spacing fs-6 ">Màu: Trắng | Size: 39 | Mã: HSM007500TRG</p>
-                        </div>
-                        <div class="ms-auto">
-                            <p class="fw-bold  letter-spacing fs-6 "> 855,200 đ</p>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="order-summary">
-                    <h6 class="fw-bold letter-spacing">Thanh toán</h6>
-                    <p><strong class="fs-6 fw-bold letter-spacing">Tạm tính: </strong><span class="fs-6 letter-spacing">  855,200 đ </span></p>
-                    <p><strong class="fs-6 fw-bold letter-spacing">Phí vận chuyển: </strong> <span class="fs-6 letter-spacing"> 9,000 đ </span></p>
-                    <h6 class="text-danger letter-spacing" ><strong>Tổng cộng: 864,200 đ</strong></h6>
+                    <h6 class="fw-bold letter-spacing">Chi tiết đơn hàng</h6>
+                    <div class="product-list"></div>
                 </div>
-
-                <!--  "Tiếp tục mua hàng"  -->
+    
+                <div class="order-summary">
+                    <h6 class="fw-bold letter-spacing mb-3">Thanh toán</h6>
+                    <p><strong class="fs-6 fw-bold letter-spacing">Tạm tính:</strong> <span class="fs-6 letter-spacing total-amount"></span></p>
+                    <p><strong class="fs-6 fw-bold letter-spacing">Giảm giá:</strong> <span class="fs-6  letter-spacing discount"></span></p>
+                    <h6 class="text-danger letter-spacing"><strong>Tổng cộng: <span class="final-amount"></span></strong></h6>
+                </div>
+    
+                <!-- Tiếp tục mua hàng -->
                 <div class="text-right mt-3">
-                    <a href="/" class="btn btn-primary btn-sm rounded-pill px-4 letter-spacing" >Tiếp tục mua hàng</a>
+                    <a href="/" class="btn btn-primary btn-sm rounded-pill px-4 letter-spacing">Tiếp tục mua hàng</a>
                 </div>
             </div>
         </div>
     </div>
+
+
+    
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -103,4 +97,74 @@
 <script src="/js/owl.carousel.js"></script>
 <script src="/js/slide.js"></script>
 <script src="/js/main.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+        // Lấy orderId từ URL
+        const orderId = window.location.pathname.split('/').pop();
+
+        try {
+            // Gọi API để lấy thông tin đơn hàng
+            const response = await fetch(`/api/orders/${orderId}`);
+            if (!response.ok) {
+                alert('Không thể tải thông tin đơn hàng. Vui lòng thử lại sau.');
+                return;
+            }
+
+            const order = await response.json();
+
+            // Hiển thị thông tin đơn hàng
+            document.querySelector('.orderId').textContent = `#${order._id}`;
+            document.querySelector('.order-summary .name').textContent = order.name;
+            document.querySelector('.order-summary .phone-number').textContent = order.phoneNumber;
+            document.querySelector('.order-summary .address').textContent = order.address;
+            document.querySelector('.order-summary .payment-method').textContent = order.paymentMethod === 'vnpay' ? 'VNPay' : 'Thanh toán khi nhận hàng (COD)';
+
+            // Hiển thị danh sách sản phẩm
+            const productContainer = document.querySelector('.order-summary .product-list');
+            if (!order.products || order.products.length === 0) {
+                productContainer.innerHTML = '<p>Không có sản phẩm nào trong đơn hàng.</p>';
+                return;
+            }
+
+            async function fetchProductDetails(productId) {
+                const response = await fetch(`/api/product/${productId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch product details for ID: ${productId}`);
+                }
+                return await response.json();
+            }
+
+            productContainer.innerHTML = await Promise.all(order.products.map(async product => {
+                try {
+                    const productDetails = await fetchProductDetails(product.productId);
+                    return `
+                        <div class="d-flex align-items-center mb-3">
+                            <img src=" http://localhost:3002/api/products/thumbnail/${productDetails.thumbnail}" width="70" alt="${productDetails.name}">
+                            <div class="ms-3">
+                                <p class="mb-0 letter-spacing fs-6"><strong>${productDetails.name}</strong></p>
+                                <p class="letter-spacing fs-6">Size: ${product.size} | Số lượng: ${product.quantity}</p>
+                            </div>
+                            <div class="ms-auto">
+                                <p class="fw-bold letter-spacing fs-6">${(productDetails.price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</p>
+                            </div>
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error(`Error fetching details for product ID: ${product.productId}`, error);
+                    return `<p>Không thể tải thông tin sản phẩm (ID: ${product.productId}).</p>`;
+                }
+            })).then(results => results.join(''));
+
+            // Hiển thị tổng tiền và giảm giá
+            document.querySelector('.order-summary .total-amount').textContent = order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+            document.querySelector('.order-summary .discount').textContent = order.discount ? order.discount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '0 VND';
+            document.querySelector('.order-summary .final-amount').textContent = (order.totalAmount - (order.discount || 0)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        } catch (error) {
+            console.error('Error fetching order details:', error);
+            alert('Không thể tải thông tin đơn hàng. Vui lòng thử lại sau.');
+        }
+    });
+</script>
+
 </body>
