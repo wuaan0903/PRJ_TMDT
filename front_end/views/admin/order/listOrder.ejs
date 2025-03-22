@@ -297,7 +297,7 @@
                 const row = document.createElement('tr');
     
                 const statusDropdown = `
-                    <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="orderStatusSelect" data-order-id="${order._id}">
+                    <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="orderStatusSelect" data-order-id="${order._id}" ${order.status === 'completed' || order.status === 'cancelled' ? 'disabled' : ''}>
                         <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>🟡 Đang chờ xử lý</option>
                         <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>🚚 Đang giao hàng</option>
                         <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>✅ Đã giao hàng</option>
@@ -358,13 +358,13 @@
         orders.forEach(order => {
             const row = document.createElement('tr');
             const statusDropdown = `
-            <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="orderStatusSelect" data-order-id="${order._id}">
-                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>🟡 Đang chờ xử lý</option>
-                <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>🚚 Đang giao hàng</option>
-                <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>✅ Đã giao hàng</option>
-                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Đã hủy</option>
-            </select>
-        `;
+                <select class="form-select rounded-pill fw-medium letter-spacing py-2 px-3" id="orderStatusSelect" data-order-id="${order._id}" ${order.status === 'completed' || order.status === 'cancelled' ? 'disabled' : ''}>
+                    <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>🟡 Đang chờ xử lý</option>
+                    <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>🚚 Đang giao hàng</option>
+                    <option value="completed" ${order.status === 'completed' ? 'selected' : ''}>✅ Đã giao hàng</option>
+                    <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>❌ Đã hủy</option>
+                </select>
+            `;
 
             row.innerHTML = `
                 <td>#${order._id}</td>

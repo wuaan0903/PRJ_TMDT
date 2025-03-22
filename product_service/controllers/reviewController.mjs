@@ -75,11 +75,31 @@ export const createReview = async (req, res) => {
 
 
 
-// Hàm lấy tất cả reviews
 export const getAllReviews = async (req, res) => {
     try {
+        // Lấy tất cả reviews
         const reviews = await Review.find();
-        res.status(200).json(reviews);
+
+        // Lấy thông tin người dùng từ user_service
+        const userIds = reviews.map(review => review.user_id);
+        const uniqueUserIds = [...new Set(userIds)]; // Loại bỏ các user_id trùng lặp
+
+        const userResponses = await Promise.all(uniqueUserIds.map(userId => 
+            axios.get(`${USER_SERVICE_URL}/api/users/${userId}`)
+        ));
+
+        const users = userResponses.reduce((acc, response) => {
+            acc[response.data._id] = response.data;
+            return acc;
+        }, {});
+
+        // Thêm thông tin người dùng vào review
+        const reviewsWithUserInfo = reviews.map(review => ({
+            ...review.toObject(),
+            user: users[review.user_id]
+        }));
+
+        res.status(200).json(reviewsWithUserInfo);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -123,6 +143,8 @@ export const getReviewsByProductId = async (req, res) => {
     }
 };
 
+
+
 // Hàm cập nhật review theo ID
 export const updateReview = async (req, res) => {
     try {
@@ -140,6 +162,27 @@ export const updateReview = async (req, res) => {
         res.status(200).json(review);
     } catch (err) {
         res.status(400).json({ message: err.message });
+    }
+};
+
+export const replyToReview = async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+        const { reply_review } = req.body;
+
+        const review = await Review.findByIdAndUpdate(
+            reviewId,
+            { reply_review },
+            { new: true } // Trả về review đã được cập nhật
+        );
+
+        if (!review) {
+            return res.status(404).json({ message: 'Review not found' });
+        }
+
+        res.status(200).json(review);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };
 

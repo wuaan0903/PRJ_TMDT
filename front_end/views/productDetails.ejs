@@ -46,7 +46,7 @@ label {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 10px 15px 10px 10px;
+    padding: 8px 10px;
     cursor: pointer;
     user-select: none;
     border-radius: 20px;
@@ -124,6 +124,17 @@ label {
     transform: translate(0px,0%);
     opacity: 1;
    }
+
+   .reply-arrow::before {
+    content: "";
+    position: absolute;
+    top: -10px; /* Đưa mũi tên lên trên */
+    left: 20px; /* Điều chỉnh vị trí ngang */
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #e9ecef; /* Màu giống với phần nền phản hồi */
+}
+
    
 </style>
 <section style="padding-top: 82px;">
@@ -609,6 +620,70 @@ label {
 });
 
 
+document.addEventListener('DOMContentLoaded', () => {
+    const reviewsContainer = document.getElementById('reviewsContainer');
+    const ratingFilter = document.querySelectorAll('.form-select')[0]; 
+    const imageFilter = document.querySelectorAll('.form-select')[1]; 
+    const replyFilter = document.querySelectorAll('.form-select')[2]; 
+    
+    let allReviews = []; // Lưu trữ tất cả các review để lọc
+
+    // Lấy danh sách review ban đầu
+    async function fetchReviews(productId) {
+        try {
+            const response = await fetch(`/api/reviewProduct/${productId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const reviews = await response.json();
+            allReviews = reviews; // Lưu trữ tất cả các review
+            displayReviews(reviews); // Hiển thị tất cả review ban đầu
+        } catch (error) {
+            console.error('Error fetching reviews:', error);
+            alert('Không thể tải danh sách đánh giá.');
+        }
+    }
+
+    // Lọc review dựa trên các tiêu chí
+    function filterReviews() {
+        let filteredReviews = [...allReviews];
+
+        // Lọc theo đánh giá sao
+        const selectedRating = ratingFilter.value;
+        if (selectedRating !== 'Đánh giá') {
+            filteredReviews = filteredReviews.filter(review => review.rate === parseInt(selectedRating));
+        }
+
+        // Lọc theo ảnh
+        const selectedImage = imageFilter.value;
+        if (selectedImage === 'có ảnh') {
+            filteredReviews = filteredReviews.filter(review => review.image_review && review.image_review.length > 0);
+        } else if (selectedImage === 'không ảnh') {
+            filteredReviews = filteredReviews.filter(review => !review.image_review || review.image_review.length === 0);
+        }
+
+        // Lọc theo phản hồi
+        const selectedReply = replyFilter.value;
+        if (selectedReply === 'có phản hồi') {
+            filteredReviews = filteredReviews.filter(review => review.reply_review && review.reply_review.trim() !== '');
+        } else if (selectedReply === 'không phản hồi') {
+            filteredReviews = filteredReviews.filter(review => !review.reply_review || review.reply_review.trim() === '');
+        }
+
+        // Hiển thị danh sách review đã lọc
+        displayReviews(filteredReviews);
+    }
+
+    // Thêm sự kiện change cho các dropdown
+    ratingFilter.addEventListener('change', filterReviews);
+    imageFilter.addEventListener('change', filterReviews);
+    replyFilter.addEventListener('change', filterReviews);
+
+    // Gọi hàm fetchReviews để lấy danh sách review ban đầu
+    const productId = document.getElementById('productId').value;
+    fetchReviews(productId);
+});
+
    document.addEventListener('DOMContentLoaded', () => {
     const productId = document.getElementById('productId').value;
     fetchReviews(productId);
@@ -757,8 +832,12 @@ function displayReviews(reviews) {
     // Hiển thị danh sách đánh giá
     reviews.forEach(review => {
         const reviewElement = document.createElement('div');
-        reviewElement.classList.add('list-group-item', 'pt-4', 'pb-3', 'border-top');
-        reviewElement.style.width = "50%"; // ✅ Thêm width = 50%
+        reviewElement.classList.add('list-group-item', 'border-top');
+        reviewElement.style.border = "1px solid #e9ecef";
+        reviewElement.style.marginBottom = "10px";
+        reviewElement.style.padding = "0 20px";
+        reviewElement.style.borderRadius = "20px";
+        
     
         // ✅ Kiểm tra có ảnh không
         let imagesHTML = "";
@@ -773,13 +852,40 @@ function displayReviews(reviews) {
             <div class="fs-4">
                 ${'★'.repeat(review.rate)}${'☆'.repeat(5 - review.rate)}
             </div>
-            <h5 class="fw-bold" style="font-size: 14px;">${review.user.username}</h5>
-            <p class="mt-4 mb-4" style="font-size: 13px; font-weight:600;">${review.comment}</p>
+            <div class="d-flex justify-content-between">
+                <h5 class="fw-bold" style="font-size: 14px;">${review.user.username}</h5>
+                <h5 class="text-secondary" style="font-size: 13px; font-weight:600;">${new Date(review.createdAt).toLocaleDateString()}</h5>
+            </div>
+            
+            <p class="mt-3 mb-3" style="font-size: 13px; font-weight:600;">${review.comment}</p>
             <div>${imagesHTML}</div> <!-- ✅ Hiển thị danh sách ảnh nếu có -->
-            <h5 class="text-secondary" style="font-size: 13px;">${new Date(review.createdAt).toLocaleDateString()}</h5>
+            
         `;
     
         reviewsContainer.appendChild(reviewElement);
+        // ✅ Hiển thị phản hồi nếu có
+        if (review.reply_review && review.reply_review.trim() !== "") {
+            const replyElement = document.createElement('div');
+            replyElement.classList.add('list-group-item', 'pt-4', 'pb-3', 'px-4', 'border-top', 'reply-arrow');
+            replyElement.style.background = '#e9ecef';
+            replyElement.style.position = 'relative'; // Để căn chỉnh mũi tên
+            replyElement.style.marginBottom = "10px";
+            replyElement.style.borderRadius = "20px";
+            replyElement.style.border = "1px solid #cdcdcd";
+        
+            replyElement.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <h5 class="fw-bold" style="font-size: 14px;">Phản hồi từ 79SPORTSWEAR</h5>
+                </div>
+                <p class="mt-2 mb-2" style="font-size: 13px; font-weight:600;">${review.reply_review}</p>
+            `;
+        
+
+                reviewsContainer.appendChild(replyElement);
+            
+        }
+        
+
     });
     
 }

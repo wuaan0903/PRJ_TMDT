@@ -8,12 +8,15 @@ import {
     getReviewsByProductId,
     upload,
     createImageReview,
-    serveImage
+    serveImage,
+    replyToReview,
 } from '../controllers/reviewController.mjs';
 
 const router = express.Router();
 // Route tạo review (hỗ trợ upload nhiều ảnh)
 router.post('/', upload.array('images', 5), createReview); // Cho phép tải tối đa 5 ảnh
+
+router.put('/reply/:reviewId', replyToReview);
 
 // Route lấy tất cả reviews
 router.get('/', getAllReviews);

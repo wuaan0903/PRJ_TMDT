@@ -194,6 +194,11 @@ router.put('/api/review/:id', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct/${req.params.id}`, 'put');
 });
 
+// Proxy for updating a review by id
+router.put('/api/review/reply/:id', async (req, res) => {
+    await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct/reply/${req.params.id}`, 'put');
+});
+
 // Proxy for deleting a review by id
 router.delete('/api/review/:id', async (req, res) => {
     await handleProxyRequest(req, res, `${BACKEND_API_URL}/api/reviewProduct/${req.params.id}`, 'delete');

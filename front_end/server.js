@@ -146,6 +146,10 @@ app.get("/admin/discount", (req, res) => {
   res.render("admin/discount/listVoucher"); //
 });
 
+app.get("/admin/review", (req, res) => {
+  res.render("admin/review/listReview"); //
+});
+
 app.get('/product/:id', productController.renderProductDetails);
 app.get('/cart/:id', cartController.renderCartPage);
 app.get('/admin/storage/edit/:id', productController.renderEditQuantityPage);

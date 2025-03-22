@@ -145,12 +145,20 @@ export const updateOrderStatusCon = async (req, res) => {
   const { orderId } = req.params;
 
   try {
+    // Cập nhật trạng thái đơn hàng
     const order = await updateOrderStatus(orderId, status);
+
+    // Nếu trạng thái là 'completed', cập nhật paymentStatus thành true
+    if (status === 'completed') {
+      await updateOrderPaymentStatus(orderId, { paymentStatus: true });
+    }
+
     res.json(order);
   } catch (err) {
+    console.error('Error updating order status:', err);
     res.status(500).send('Server error');
   }
-}
+};
 
 
 export const updateOrderRating = async (req, res) => {

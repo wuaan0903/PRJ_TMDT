@@ -6,6 +6,8 @@ const ReviewSchema = new mongoose.Schema({
   comment: { type: String },
   rate: { type: Number, required: true, min: 1, max: 5 }, // Thêm trường rate
   image_review: { type: [String], default: [] },
+  reply_review: { type: String
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

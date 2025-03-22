@@ -69,7 +69,10 @@
 
     document.getElementById('addCategoryBtn').addEventListener('click', async function() {
         const categoryName = document.getElementById('categoryName').value;
-        const collectionId = document.getElementById('collectionId').value;
+        const urlPath = window.location.pathname;
+        const segments = urlPath.split("/"); // Tách URL thành mảng
+        const collectionId = segments.pop(); // Lấy phần tử cuối (chính là ID)
+
 
         if (!categoryName.trim()) {
             alert("Vui lòng nhập tên danh mục.");
