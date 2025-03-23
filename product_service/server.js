@@ -9,6 +9,7 @@ import quantityProductRoutes from './routes/quantityProductRoutes.mjs';
 import reviewRoutes from './routes/reviewRoutes.mjs';
 import voucherRoutes from './routes/voucherRoutes.mjs';
 import favouriteRoutes from './routes/favouriteRoutes.mjs';
+import bannerRoutes from './routes/bannerRoutes.mjs';
 import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -26,7 +27,7 @@ app.use('/api/quantityProduct', quantityProductRoutes);
 app.use('/api/reviewProduct', reviewRoutes);
 app.use('/api/vouchers', voucherRoutes);
 app.use('/api/favourites', favouriteRoutes);
-
+app.use('/api/banners', bannerRoutes);
 // MongoDB Connection
 connectDB();
 

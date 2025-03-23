@@ -1,27 +1,29 @@
 <%- layout('layouts/index') %>
-
+<style>
+    
+</style>
 
 <main id="view-panel">
     <!-- BOX INFO -->
     <ul class="box-info p-0">
-        <li>
-            <i class='bx bxs-calendar-check'></i>
-            <span class="text">
-                <h3>100</h3>
-                <p>Đơn hàng mới</p>
-            </span>
-        </li>
+            <li>
+                <i class='bx bxs-calendar-check'></i>
+                <span class="text">
+                    <h3 id="order"></h3>
+                    <p>Đơn hàng mới</p>
+                </span>
+            </li>
         <li>
             <i class='bx bxs-package'></i>
-            <span class="text">
-                <h3>100</h3>
+            <span class="text" >
+                <h3 id="totalProducts"></h3>
                 <p>Sản phẩm</p>
             </span>
         </li>
         <li>
             <i class='bx bxs-dollar-circle'></i>
-            <span class="text">
-                <h3>1000000 ₫</h3>
+            <span class="text" >
+                <h3 id="monthlyRevenue" ></h3>
                 <p>Doanh thu</p>
             </span>
         </li>
@@ -50,26 +52,23 @@
 
             </table>
         </div>
+        
 
         <!-- TODO LIST -->
         <div>
             <h3 class="mb-3 text-center">Quản lý Banner</h3>
         
             <!-- Form nhập banner -->
-            <div class="card p-3 mb-3">
+            <div class="container p-3 mb-3">
                 <input type="hidden" id="bannerId">
                 <div class="mb-2">
                     <label class="form-label">Tiêu đề:</label>
                     <input type="text" class="form-control" id="bannerTitle">
                 </div>
                 <div class="mb-2">
-                    <label class="form-label">Liên kết:</label>
-                    <input type="text" class="form-control" id="bannerLink">
-                </div>
-                <div class="mb-2">
                     <label class="form-label">Hình ảnh:</label>
-                    <input type="file" class="form-control" id="bannerImage" accept="image/*">
-                    <img id="previewImage" class="mt-2" style="max-width:150px; display:none;">
+                    <input type="file" class="form-control" id="bannerImage" accept="image/*" onchange="previewBannerImage(event)">
+                    <img id="previewImage" class="mt-2 img-fluid d-none">
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-success" onclick="saveBanner()">Thêm</button>
@@ -79,13 +78,171 @@
             </div>
         
             <h4 class="mb-3 text-center">Danh sách Banner</h4>
-            <div id="bannerList" class="row"></div>
+        
+            <!-- Danh sách banner hiển thị full chiều ngang -->
+            <div id="bannerList" class="banner-container"></div>
         </div>
+        
 </main>
 
 <script>
-    // Function to check user role from the backend
-    async function checkUserRole() {
+   document.addEventListener('DOMContentLoaded', async () => {
+    const tableBody = document.createElement('tbody'); // Tạo thẻ tbody mới
+    const table = document.querySelector('.order table'); // Lấy bảng trong giao diện
+    table.appendChild(tableBody);
+
+    async function fetchOrders() {
+        try {
+            const response = await fetch('/api/orders'); // Gọi API lấy danh sách đơn hàng
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP! Status: ${response.status}`);
+            }
+            let orders = await response.json();
+
+            // Lọc đơn hàng của hôm nay
+            const today = new Date().toISOString().split('T')[0];
+            const todayOrders = orders.filter(order => 
+                new Date(order.date).toISOString().split('T')[0] === today
+            );
+
+            // Sắp xếp theo ngày giảm dần (mới nhất trước)
+            todayOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            renderOrders(todayOrders);
+        } catch (error) {
+            console.error('Lỗi tải đơn hàng:', error);
+            tableBody.innerHTML = '<tr><td colspan="4">Không thể tải đơn hàng.</td></tr>';
+        }
+    }
+
+    function renderOrders(orders) {
+        tableBody.innerHTML = ''; // Xóa nội dung cũ
+
+        if (orders.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="4">Không có đơn hàng nào hôm nay.</td></tr>';
+            return;
+        }
+
+        orders.forEach(order => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>#${order._id}</td>
+                <td>${order.name || 'N/A'}</td>
+                <td>${new Date(order.date).toLocaleString('vi-VN')}</td>
+                <td>${getStatusText(order.status)}</td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    function getStatusText(status) {
+        switch (status) {
+            case 'pending': return '🟡 Đang chờ xử lý';
+            case 'processing': return '🚚 Đang giao hàng';
+            case 'completed': return '✅ Đã giao hàng';
+            case 'cancelled': return '❌ Đã hủy';
+            default: return status;
+        }
+    }
+
+    fetchOrders(); // Gọi API khi trang tải
+});
+
+//hiển thị số đơn hàng mới
+document.addEventListener('DOMContentLoaded', async () => {
+    const orderCountElement = document.getElementById('order'); // Chỗ hiển thị số đơn hàng
+
+    async function fetchOrders() {
+        try {
+            const response = await fetch('/api/orders'); // Gọi API lấy danh sách đơn hàng
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP! Status: ${response.status}`);
+            }
+            let orders = await response.json();
+
+            // Lọc đơn hàng của hôm nay
+            const today = new Date().toISOString().split('T')[0];
+            const todayOrders = orders.filter(order => 
+                new Date(order.date).toISOString().split('T')[0] === today
+            );
+
+            // Cập nhật số lượng đơn hàng lên giao diện
+            orderCountElement.textContent = todayOrders.length;
+        } catch (error) {
+            console.error('Lỗi tải đơn hàng:', error);
+            orderCountElement.textContent = '0'; // Nếu lỗi thì hiển thị 0 đơn hàng
+        }
+    }
+
+    fetchOrders(); // Gọi API khi trang tải
+});
+
+
+//hiển thị số sản phẩm
+document.addEventListener("DOMContentLoaded", async function () {
+    const totalProductsElement = document.getElementById("totalProducts"); // Lấy thẻ hiển thị tổng sản phẩm
+
+    const fetchProducts = async () => {
+        try {
+            const response = await fetch("/api/admin/products"); // Gọi API lấy danh sách sản phẩm
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP! Status: ${response.status}`);
+            }
+            let products = await response.json();
+
+            // Cập nhật tổng số sản phẩm lên giao diện
+            totalProductsElement.textContent = products.length;
+        } catch (error) {
+            console.error("Lỗi tải sản phẩm:", error);
+            totalProductsElement.textContent = "0"; // Nếu lỗi thì hiển thị 0 sản phẩm
+        }
+    };
+
+    fetchProducts(); // Gọi API khi trang tải
+});
+// doanh thu
+document.addEventListener("DOMContentLoaded", async function () {
+    const monthlyRevenueElement = document.getElementById("monthlyRevenue"); // Lấy phần tử hiển thị doanh thu tháng này
+
+    async function fetchMonthlyRevenue() {
+        try {
+            const response = await fetch("/api/orders"); // Gọi API lấy danh sách đơn hàng
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP! Status: ${response.status}`);
+            }
+            let orders = await response.json();
+
+            // Lọc các đơn hàng đã hoàn thành trong tháng hiện tại
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            const monthlyOrders = orders.filter(order => {
+                const orderDate = new Date(order.date);
+                return order.status === "completed" &&
+                       orderDate.getMonth() === currentMonth &&
+                       orderDate.getFullYear() === currentYear;
+            });
+
+            // Tính tổng doanh thu của tháng này
+            const monthlyRevenue = monthlyOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+
+            // Cập nhật doanh thu lên giao diện
+            monthlyRevenueElement.textContent = monthlyRevenue.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+
+        } catch (error) {
+            console.error("Lỗi tải doanh thu tháng này:", error);
+            monthlyRevenueElement.textContent = "0₫"; // Nếu lỗi, hiển thị 0₫
+        }
+    }
+
+    fetchMonthlyRevenue(); // Gọi API khi trang tải
+});
+
+  // Function to check user role from the backend
+  async function checkUserRole() {
         try {
             const response = await fetch('/auth/user'); // Make the request to the api
             if (!response.ok) {
@@ -117,13 +274,12 @@
 
     banners.forEach(banner => {
         const card = document.createElement("div");
-        card.classList.add("col-md-4", "mb-3");
+        card.classList.add( "mb-3");
         card.innerHTML = `
             <div class="card border-primary" onclick="editBanner('${banner._id}', '${banner.title}', '${banner.link}', '${banner.imageUrl}')">
-                <img src="http://localhost:3002/api/products/banner/${banner.imageUrl}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                <img src="http://localhost:3002/api/banners/banner/${banner.imageUrls}" class="card-img-top" style="height: 150px; object-fit: cover;">
                 <div class="card-body text-center">
                     <h5 class="card-title">${banner.title}</h5>
-                    <p><a href="${banner.link}" target="_blank">${banner.link}</a></p>
                 </div>
             </div>
         `;
