@@ -16,7 +16,7 @@ router.get('/',  getAllProducts);
 router.get('/search',  searchProducts);
 router.get('/:id',  getProductById);
 router.put('/:id',  updateProduct);
-router.delete('/:id',  deleteProduct);
+router.delete('/:id', deleteProduct);
 router.get('/thumbnail/:filename', serveThumbnail);
 
 router.get('/api/products', getAllProducts);

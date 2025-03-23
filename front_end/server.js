@@ -14,6 +14,12 @@ const adminController = require("./controllers/adminController");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const { checkAdminRole } = require('./middlewares/authMiddleware');
+
+// Áp dụng middleware cho các route admin
+app.use('/admin', checkAdminRole);
+
+
 // Set up EJS with layouts
 app.engine("ejs", ejsLocals);
 app.set("view engine", "ejs");
@@ -74,12 +80,7 @@ app.get("/user/policies", (req, res) => {
 app.get('/admin/orders', (req, res) => {
   res.render('admin/order/listOrder'); // 
 });
-app.get("/login", (req, res) => {
-  res.render("login");
-});
-app.get("/register", (req, res) => {
-  res.render("register");
-});
+
 
 app.get("/admin", (req, res) => {
   res.render("admin/home"); // Renders the home.ejs file

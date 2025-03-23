@@ -30,6 +30,12 @@ router.post('/login', async (req, res) => {
     // user.refreshTokens.push({token: refreshToken});
     await user.save();
 
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      secure: false, // Đặt thành true nếu sử dụng HTTPS
+      maxAge: 3600000, // 1 giờ
+    });
+
     // Trả về accessToken, refreshToken và userId
     res.status(201).send({
       userId: user._id,
@@ -37,6 +43,7 @@ router.post('/login', async (req, res) => {
       accessToken: accessToken,
       refreshToken: refreshToken
     });
+    
   } catch (error) {
     res.status(400).json({ message: 'Login failed', error });
   }

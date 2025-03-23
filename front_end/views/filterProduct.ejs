@@ -118,3 +118,35 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const productList = document.getElementById("product-list");
+    const filterRadios = document.querySelectorAll("input[name='sort']");
+
+    filterRadios.forEach(radio => {
+        radio.addEventListener("change", function () {
+            const sortBy = this.value;
+            const products = Array.from(productList.querySelectorAll(".col-6"));
+
+            products.sort((a, b) => {
+                const priceA = parseInt(a.querySelector(".fs-6").textContent.replace(/\D/g, ""), 10) || 0;
+                const priceB = parseInt(b.querySelector(".fs-6").textContent.replace(/\D/g, ""), 10) || 0;
+                const dateA = new Date(a.querySelector(".product").dataset.date);
+                const dateB = new Date(b.querySelector(".product").dataset.date);
+
+                if (sortBy === "price-asc") {
+                    return priceA - priceB; // Giá thấp -> cao
+                } else if (sortBy === "price-desc") {
+                    return priceB - priceA; // Giá cao -> thấp
+                } else if (sortBy === "newest") {
+                    return dateB - dateA; // Sản phẩm mới nhất trước
+                }
+            });
+
+            productList.innerHTML = "";
+            products.forEach(product => productList.appendChild(product));
+        });
+    });
+});
+
+</script>
